@@ -18,7 +18,7 @@
   }
   
   .self-reference-line {
-    @apply stroke-blue-500 stroke-2 animate-pulse-slow;
+    @apply stroke-[#6366f1] stroke-2 animate-pulse-slow;
   }
   
   .control-button {

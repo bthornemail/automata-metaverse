@@ -27,14 +27,14 @@ spec:
   - host: universallifeprotocol.com
     http:
       paths:
-      - path: /api(/|$)(.*)
+      - path: /api
         pathType: Prefix
         backend:
           service:
             name: backend-service
             port:
               number: 5555
-      - path: /socket.io(/|$)(.*)
+      - path: /socket.io
         pathType: Prefix
         backend:
           service:
@@ -43,15 +43,15 @@ spec:
               number: 5555
       - path: /(.*)
         pathType: Prefix
-        backend:
-          service:
-            name: frontend-service
-            port:
-              number: 80
+         backend:
+           service:
+             name: frontend-service
+             port:
+               number: 80
   - host: api.universallifeprotocol.com
     http:
       paths:
-      - path: /(.*)
+      - path: /
         pathType: Prefix
         backend:
           service:

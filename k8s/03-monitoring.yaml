@@ -119,7 +119,7 @@ spec:
   resources:
     requests:
       storage: 10Gi
-  storageClassName: fast-ssd
+  storageClassName: standard
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -270,7 +270,9 @@ spec:
         - name: GF_SMTP_ENABLED
           value: "true"
         - name: GF_SMTP_HOST
-          value: "smtp.gmail.com:587"
+          value: "smtp.ionos.com:587"
+        - name: GF_SMTP_PROTOCOL
+          value: "STARTTLS"
         - name: GF_SMTP_USER
           valueFrom:
             secretKeyRef:
@@ -350,4 +352,4 @@ spec:
   resources:
     requests:
       storage: 5Gi
-  storageClassName: fast-ssd
+  storageClassName: standard

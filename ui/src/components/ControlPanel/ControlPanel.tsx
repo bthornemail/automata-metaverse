@@ -98,7 +98,7 @@ const ControlPanel: React.FC = () => {
                 onClick={() => setSelectedAction(action.id)}
                 className={`p-3 rounded-lg border-2 transition-all duration-200 text-left ${
                   selectedAction === action.id
-                    ? 'border-dimensions-0d bg-dimensions-0d/20 text-white'
+                     ? 'border-[#6366f1] bg-[#6366f1]/20 text-white'
                     : 'border-gray-600 bg-gray-700/50 text-gray-300 hover:border-gray-500'
                 }`}
               >
@@ -117,7 +117,7 @@ const ControlPanel: React.FC = () => {
         <button
           onClick={handleExecuteAction}
           disabled={state.isRunning}
-          className="control-button w-full bg-dimensions-0d hover:bg-dimensions-1d text-white flex items-center justify-center gap-2"
+          className="control-button w-full bg-[#6366f1] hover:bg-[#8b5cf6] text-white flex items-center justify-center gap-2"
         >
           <Zap className="w-4 h-4" />
           Execute: {availableActions.find(a => a.id === selectedAction)?.name}
@@ -186,7 +186,7 @@ const ControlPanel: React.FC = () => {
                 onClick={() => actions.setDimension(dim)}
                 className={`w-10 h-10 rounded-lg font-medium transition-all duration-200 ${
                   state.currentDimension === dim
-                    ? 'bg-dimensions-0d text-white'
+                     ? 'bg-[#6366f1] text-white'
                     : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                 }`}
               >

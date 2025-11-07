@@ -44,7 +44,7 @@ const App: React.FC = () => {
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-white flex items-center gap-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-dimensions-0d to-dimensions-7d rounded-lg"></div>
+              <div className="w-8 h-8 bg-gradient-to-br from-[#6366f1] to-[#a855f7] rounded-lg"></div>
               Self-Referencing Automaton Interface
             </h1>
             
@@ -68,7 +68,7 @@ const App: React.FC = () => {
                   onClick={() => setActiveTab(tab.id as any)}
                   className={`flex items-center gap-2 px-4 py-3 border-b-2 transition-all duration-200 ${
                     activeTab === tab.id
-                      ? 'border-dimensions-0d text-white bg-dimensions-0d/10'
+                       ? 'border-[#6366f1] text-white bg-[#6366f1]/10'
                       : 'border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-700/50'
                   }`}
                 >

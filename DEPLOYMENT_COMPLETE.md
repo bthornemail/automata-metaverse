@@ -222,7 +222,12 @@ spec:
 
 ### 🌍 **Access Information**
 
-#### **Application Access**
+#### **Application Access (Current Minikube Setup)**
+- **Main Application (HTTPS)**: `curl -k -H "Host: universallifeprotocol.com" https://192.168.49.2/`
+- **API Endpoint (HTTPS)**: `curl -k -H "Host: api.universallifeprotocol.com" https://192.168.49.2/api/status`
+- **WebSocket**: `wss://universallifeprotocol.com`
+
+#### **Production Access (After DNS Configuration)**
 - **Main Application**: `https://universallifeprotocol.com`
 - **API Endpoint**: `https://api.universallifeprotocol.com`
 - **WebSocket**: `wss://universallifeprotocol.com`
@@ -248,12 +253,19 @@ kubectl port-forward -n monitoring service/prometheus-service 9090:9090
 
 ### 📚 **Next Steps**
 
+#### **Immediate (Minikube Testing)**
+✅ **COMPLETED**: SSL Certificates with self-signed cert for testing
+✅ **COMPLETED**: HTTPS Ingress configuration working
+✅ **COMPLETED**: All API endpoints functional
+
+#### **Production Deployment**
 1. **DNS Configuration**: Configure DNS records at Linode (see DNS_CONFIGURATION.md)
-2. **SSL Certificates**: Set up cert-manager for automatic TLS
-3. **Monitoring Alerts**: Configure alerting rules and notifications
-4. **Performance Tuning**: Adjust resource limits based on usage
-5. **Backup Strategy**: Implement regular data backups
-6. **Security Audit**: Conduct regular security assessments
+2. **Deploy to Linode**: Apply manifests to production Kubernetes cluster
+3. **Let's Encrypt Certificates**: Switch to production TLS certificates
+4. **Monitoring Alerts**: Configure alerting rules and notifications
+5. **Performance Tuning**: Adjust resource limits based on usage
+6. **Backup Strategy**: Implement regular data backups
+7. **Security Audit**: Conduct regular security assessments
 
 ### 🎉 **Congratulations!**
 

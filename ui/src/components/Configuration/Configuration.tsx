@@ -351,7 +351,7 @@ const Configuration: React.FC<ConfigurationProps> = ({ className = '' }) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-dimensions-0d"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#6366f1]"></div>
       </div>
     );
   }
