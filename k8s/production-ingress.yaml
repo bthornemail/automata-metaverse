@@ -19,11 +19,11 @@ spec:
   ingressClassName: nginx
   tls:
   - hosts:
-    - universallifeprotocol.com
-    - api.universallifeprotocol.com
+    - universallifeprotocol.net
+    - api.universallifeprotocol.net
     secretName: automaton-tls
   rules:
-  - host: universallifeprotocol.com
+  - host: universallifeprotocol.net
     http:
       paths:
       - path: /api
@@ -54,7 +54,7 @@ spec:
             name: frontend-service
             port:
               number: 80
-  - host: api.universallifeprotocol.com
+  - host: api.universallifeprotocol.net
     http:
       paths:
       - path: /

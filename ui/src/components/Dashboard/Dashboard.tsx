@@ -1,10 +1,28 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Play, Pause, RotateCcw, Settings, Activity } from 'lucide-react';
-import { useAutomatonState } from '@/hooks/useAutomatonState';
+import { useStatus, useWsConnected } from '@/hooks/useUnifiedState';
+import { useAutomatonActions } from '@/hooks/useAutomatonActions';
+import { useAutomatonStore } from '@/store/automatonStore';
+import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
+import { Button } from '@/components/shared/Button';
+import { Card } from '@/components/shared/Card';
 
 const Dashboard: React.FC = () => {
-  const { state, loading, error, wsConnected, actions } = useAutomatonState();
+  // Use unified state and hooks
+  const status = useStatus();
+  const wsConnected = useWsConnected();
+  const { startAutomaton, stopAutomaton, resetAutomaton } = useAutomatonActions();
+  const setError = useAutomatonStore((state) => state.setError);
+  
+  // Stable function to clear errors
+  const clearError = useCallback((key: string) => {
+    setError(key, null);
+  }, [setError]);
+  
+  // Get loading and error states from store
+  const loading = useAutomatonStore((state) => state.loading.start || state.loading.stop || state.loading.reset || false);
+  const error = useAutomatonStore((state) => state.errors.start || state.errors.stop || state.errors.reset || null);
 
   const dimensionColors = [
     'bg-dimension-0d', 'bg-dimension-1d', 'bg-dimension-2d', 'bg-dimension-3d',
@@ -17,7 +35,7 @@ const Dashboard: React.FC = () => {
   };
 
   const getStatusColor = () => {
-    switch (state.status) {
+    switch (status.status) {
       case 'running': return 'status-running';
       case 'idle': return 'status-idle';
       case 'error': return 'status-stopped';
@@ -27,14 +45,14 @@ const Dashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#6366f1]"></div>
-      </div>
+      <Card>
+        <LoadingSpinner size="lg" text="Loading dashboard..." />
+      </Card>
     );
   }
 
   return (
-    <div className="p-6 bg-gray-800 rounded-xl shadow-xl">
+    <Card>
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-white flex items-center gap-3">
@@ -55,7 +73,7 @@ const Dashboard: React.FC = () => {
           <div className="flex items-center gap-2">
             <div className={`status-indicator ${getStatusColor()}`}></div>
             <span className="text-sm text-gray-400 capitalize">
-              {state.status}
+              {status.status}
             </span>
           </div>
         </div>
@@ -70,7 +88,11 @@ const Dashboard: React.FC = () => {
         >
           <strong>Error:</strong> {error}
           <button
-            onClick={actions.clearError}
+            onClick={() => {
+              clearError('start');
+              clearError('stop');
+              clearError('reset');
+            }}
             className="ml-2 text-red-400 hover:text-red-200 underline"
           >
             Dismiss
@@ -84,13 +106,13 @@ const Dashboard: React.FC = () => {
         <div className="bg-gray-700/50 rounded-lg p-4">
           <div className="text-sm text-gray-400 mb-1">Current Dimension</div>
           <div className="flex items-center gap-2">
-            <div className={`w-4 h-4 rounded ${dimensionColors[state.currentDimension]}`}></div>
+            <div className={`w-4 h-4 rounded ${dimensionColors[status.currentDimension]}`}></div>
             <span className="text-xl font-bold text-white">
-              {state.currentDimension}D
+              {status.currentDimension}D
             </span>
           </div>
           <div className="text-xs text-gray-500 mt-1">
-            {getDimensionName(state.currentDimension)}
+            {getDimensionName(status.currentDimension)}
           </div>
         </div>
 
@@ -98,7 +120,7 @@ const Dashboard: React.FC = () => {
         <div className="bg-gray-700/50 rounded-lg p-4">
           <div className="text-sm text-gray-400 mb-1">Iterations</div>
           <div className="text-xl font-bold text-white">
-            {state.iterationCount.toLocaleString()}
+            {status.iterationCount.toLocaleString()}
           </div>
           <div className="text-xs text-gray-500 mt-1">
             Total executed
@@ -109,7 +131,7 @@ const Dashboard: React.FC = () => {
         <div className="bg-gray-700/50 rounded-lg p-4">
           <div className="text-sm text-gray-400 mb-1">Self-Modifications</div>
           <div className="text-xl font-bold text-white">
-            {state.selfModificationCount}
+            {status.selfModificationCount}
           </div>
           <div className="text-xs text-gray-500 mt-1">
             Dynamic changes
@@ -120,7 +142,7 @@ const Dashboard: React.FC = () => {
         <div className="bg-gray-700/50 rounded-lg p-4">
           <div className="text-sm text-gray-400 mb-1">Total Objects</div>
           <div className="text-xl font-bold text-white">
-            {state.totalObjects}
+            {status.totalObjects}
           </div>
           <div className="text-xs text-gray-500 mt-1">
             In JSONL file
@@ -139,7 +161,7 @@ const Dashboard: React.FC = () => {
             <div
               key={index}
               className={`flex-1 h-3 rounded-full transition-all duration-300 ${
-                index <= state.currentDimension ? color : 'bg-gray-700'
+                index <= status.currentDimension ? color : 'bg-gray-700'
               }`}
             />
           ))}
@@ -148,50 +170,37 @@ const Dashboard: React.FC = () => {
 
       {/* Control Buttons */}
       <div className="flex flex-wrap gap-3">
-        <button
-          onClick={() => state.isRunning ? actions.stopAutomaton() : actions.startAutomaton()}
-          disabled={state.status === 'error'}
-          className={`control-button flex items-center gap-2 ${
-            state.isRunning 
-              ? 'bg-red-600 hover:bg-red-700 text-white' 
-              : 'bg-green-600 hover:bg-green-700 text-white'
-          }`}
+        <Button
+          onClick={() => status.isRunning ? stopAutomaton() : startAutomaton()}
+          disabled={status.status === 'error'}
+          variant={status.isRunning ? 'danger' : 'success'}
+          leftIcon={status.isRunning ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
         >
-          {state.isRunning ? (
-            <>
-              <Pause className="w-4 h-4" />
-              Stop
-            </>
-          ) : (
-            <>
-              <Play className="w-4 h-4" />
-              Start
-            </>
-          )}
-        </button>
+          {status.isRunning ? 'Stop' : 'Start'}
+        </Button>
 
-        <button
-          onClick={actions.resetAutomaton}
-          disabled={state.isRunning}
-          className="control-button bg-gray-600 hover:bg-gray-700 text-white flex items-center gap-2"
+        <Button
+          onClick={resetAutomaton}
+          disabled={status.isRunning}
+          variant="secondary"
+          leftIcon={<RotateCcw className="w-4 h-4" />}
         >
-          <RotateCcw className="w-4 h-4" />
           Reset
-        </button>
+        </Button>
 
-        <button
-          className="control-button bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
+        <Button
+          variant="secondary"
+          leftIcon={<Settings className="w-4 h-4" />}
         >
-          <Settings className="w-4 h-4" />
           Configure
-        </button>
+        </Button>
       </div>
 
       {/* Last Action */}
-      {state.lastAction && (
+      {status.lastAction && (
         <div className="mt-4 p-3 bg-gray-700/30 rounded-lg">
           <div className="text-sm text-gray-400">Last Action</div>
-          <div className="text-white font-mono">{state.lastAction}</div>
+          <div className="text-white font-mono">{status.lastAction}</div>
         </div>
       )}
 
@@ -201,7 +210,7 @@ const Dashboard: React.FC = () => {
         <div className="flex gap-2">
           <button
             className={`px-3 py-1 rounded text-sm ${
-              state.executionMode === 'builtin'
+              status.executionMode === 'builtin'
                  ? 'bg-[#6366f1] text-white'
                 : 'bg-gray-700 text-gray-400'
             }`}
@@ -210,7 +219,7 @@ const Dashboard: React.FC = () => {
           </button>
           <button
             className={`px-3 py-1 rounded text-sm ${
-              state.executionMode === 'ollama'
+              status.executionMode === 'ollama'
                 ? 'bg-quantum-superposition text-white'
                 : 'bg-gray-700 text-gray-400'
             }`}
@@ -218,13 +227,13 @@ const Dashboard: React.FC = () => {
             AI (Ollama)
           </button>
         </div>
-        {state.executionMode === 'ollama' && state.ollamaModel && (
+        {status.executionMode === 'ollama' && status.ollamaModel && (
           <span className="text-xs text-gray-500">
-            Model: {state.ollamaModel}
+            Model: {status.ollamaModel}
           </span>
         )}
       </div>
-    </div>
+    </Card>
   );
 };
 

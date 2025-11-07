@@ -1,0 +1,79 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e6]:
+      - heading "Self-Referencing Automaton Interface" [level=1] [ref=e7]: Self-Referencing Automaton Interface
+      - generic [ref=e10]: "Phase 3: Quantum Visualization"
+  - generic [ref=e14]:
+    - button "Overview" [ref=e15] [cursor=pointer]:
+      - img [ref=e16]
+      - text: Overview
+    - button "Self-Reference" [ref=e18] [cursor=pointer]:
+      - img [ref=e19]
+      - text: Self-Reference
+    - button "History" [active] [ref=e22] [cursor=pointer]:
+      - img [ref=e23]
+      - text: History
+    - button "Agents" [ref=e27] [cursor=pointer]:
+      - img [ref=e28]
+      - text: Agents
+    - button "Quantum" [ref=e30] [cursor=pointer]:
+      - img [ref=e31]
+      - text: Quantum
+    - button "Animations" [ref=e33] [cursor=pointer]:
+      - img [ref=e34]
+      - text: Animations
+    - button "WebGL 3D" [ref=e36] [cursor=pointer]:
+      - img [ref=e37]
+      - text: WebGL 3D
+    - button "Multiplayer" [ref=e40] [cursor=pointer]:
+      - img [ref=e41]
+      - text: Multiplayer
+    - button "AI Evolution" [ref=e44] [cursor=pointer]:
+      - img [ref=e45]
+      - text: AI Evolution
+    - button "Metaverse" [ref=e48] [cursor=pointer]:
+      - img [ref=e49]
+      - text: Metaverse
+    - button "OpenCode" [ref=e52] [cursor=pointer]:
+      - img [ref=e53]
+      - text: OpenCode
+    - button "Config" [ref=e56] [cursor=pointer]:
+      - img [ref=e57]
+      - text: Config
+  - main [ref=e68]:
+    - generic [ref=e70]:
+      - generic [ref=e71]:
+        - heading "Execution History & Analysis" [level=3] [ref=e72]:
+          - img [ref=e73]
+          - text: Execution History & Analysis
+        - generic [ref=e77]:
+          - button "Refresh" [ref=e78] [cursor=pointer]:
+            - img [ref=e79]
+            - text: Refresh
+          - button "Clear" [ref=e81] [cursor=pointer]:
+            - img [ref=e82]
+            - text: Clear
+      - generic [ref=e85]:
+        - button "Timeline" [ref=e86] [cursor=pointer]:
+          - img [ref=e87]
+          - text: Timeline
+        - button "Action Frequency" [ref=e90] [cursor=pointer]:
+          - img [ref=e91]
+          - text: Action Frequency
+        - button "Dimensional Progression" [ref=e93] [cursor=pointer]:
+          - img [ref=e94]
+          - text: Dimensional Progression
+        - button "Performance" [ref=e97] [cursor=pointer]:
+          - img [ref=e98]
+          - text: Performance
+      - generic [ref=e101]:
+        - heading "Recent Execution Timeline" [level=4] [ref=e102]
+        - generic [ref=e104]: No execution history available
+  - contentinfo [ref=e105]:
+    - generic [ref=e107]:
+      - generic [ref=e108]: Self-Referencing JSONL Automaton • 8-Dimensional Church Encoding
+      - generic [ref=e109]: Meta-Circular Evaluator • Quantum Visualization & Advanced Analytics
+```

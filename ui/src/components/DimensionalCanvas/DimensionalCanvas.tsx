@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAutomatonState } from '@/hooks/useAutomatonState';
+import { useStatus } from '@/hooks/useUnifiedState';
+import { useDimensionChange } from '@/hooks/useCrossComponent';
+import { Card } from '@/components/shared/Card';
+import { Button } from '@/components/shared/Button';
 import * as d3 from 'd3';
 
 interface DimensionNode {
@@ -21,11 +24,17 @@ interface DimensionLink {
 }
 
 const DimensionalCanvas: React.FC = () => {
-  const { state } = useAutomatonState();
+  const status = useStatus();
   const svgRef = useRef<SVGSVGElement>(null);
   const [selectedNode, setSelectedNode] = useState<DimensionNode | null>(null);
   const [dimensions, setDimensions] = useState<DimensionNode[]>([]);
   const [links, setLinks] = useState<DimensionLink[]>([]);
+  const [currentDimension, setCurrentDimension] = useState(status.currentDimension);
+
+  // Subscribe to dimension changes via event bus
+  useDimensionChange((dimension) => {
+    setCurrentDimension(dimension);
+  });
 
   // Dimension configuration
   const dimensionConfig = [
@@ -136,9 +145,9 @@ const DimensionalCanvas: React.FC = () => {
     nodeSelection.append('circle')
       .attr('r', 35)
       .attr('fill', d => d.color)
-      .attr('stroke', d => d.level === state.currentDimension ? '#ffffff' : 'transparent')
-      .attr('stroke-width', d => d.level === state.currentDimension ? 3 : 0)
-      .attr('class', d => d.level === state.currentDimension ? 'animate-glow' : '');
+      .attr('stroke', d => d.level === currentDimension ? '#ffffff' : 'transparent')
+      .attr('stroke-width', d => d.level === currentDimension ? 3 : 0)
+      .attr('class', d => d.level === currentDimension ? 'animate-glow' : '');
 
     // Node labels
     nodeSelection.append('text')
@@ -158,17 +167,16 @@ const DimensionalCanvas: React.FC = () => {
 
     // Highlight current dimension
     nodeSelection
-      .filter(d => d.level === state.currentDimension)
+      .filter(d => d.level === currentDimension)
       .select('circle')
       .attr('r', 40)
       .attr('stroke', '#ffffff')
       .attr('stroke-width', 3);
 
-  }, [dimensions, links, state.currentDimension]);
+  }, [dimensions, links, currentDimension]);
 
   return (
-    <div className="p-6 bg-gray-800 rounded-xl shadow-xl">
-      <h3 className="text-xl font-bold text-white mb-4">Dimensional Topology</h3>
+    <Card title="Dimensional Topology">
       
       <div className="relative">
         <svg
@@ -193,12 +201,13 @@ const DimensionalCanvas: React.FC = () => {
               <h4 className="text-lg font-bold text-white">
                 {selectedNode.level}D: {selectedNode.name}
               </h4>
-              <button
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => setSelectedNode(null)}
-                className="text-gray-400 hover:text-white"
               >
                 ×
-              </button>
+              </Button>
             </div>
 
             <div className="space-y-3">
@@ -222,7 +231,7 @@ const DimensionalCanvas: React.FC = () => {
                     style={{ backgroundColor: selectedNode.color }}
                   ></div>
                   <span className="text-white">
-                    {selectedNode.level === state.currentDimension ? 'Active' : 'Inactive'}
+                    {selectedNode.level === currentDimension ? 'Active' : 'Inactive'}
                   </span>
                 </div>
               </div>
@@ -242,7 +251,7 @@ const DimensionalCanvas: React.FC = () => {
           <span className="text-gray-400">Dimensional Progression</span>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };
 

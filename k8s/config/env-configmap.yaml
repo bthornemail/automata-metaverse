@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: automaton-config
+  namespace: ${K8S_NAMESPACE:-automaton}
+data:
+  NODE_ENV: "${NODE_ENV:-production}"
+  PORT: "${PORT:-5555}"
+  WS_PORT: "${WS_PORT:-5556}"
+  LOG_LEVEL: "${LOG_LEVEL:-info}"
+  DOMAIN_NET: "${DOMAIN_NET:-universallifeprotocol.net}"
+  BASE_URL_NET: "${BASE_URL_NET:-https://universallifeprotocol.net}"
+  API_URL_NET: "${API_URL_NET:-https://universallifeprotocol.net/api}"
+  WS_URL_NET: "${WS_URL_NET:-wss://universallifeprotocol.net}"
+  REDIS_URL: "${REDIS_URL:-redis://redis:6379}"
+  CORS_ORIGIN: "${CORS_ORIGIN:-*}"
+  ENABLE_MONITORING: "${ENABLE_MONITORING:-true}"
+  ENABLE_SSL: "${ENABLE_SSL:-true}"
+  ENABLE_RATE_LIMITING: "${ENABLE_RATE_LIMITING:-true}"
+  ENABLE_WEBSOCKETS: "${ENABLE_WEBSOCKETS:-true}"
+  PROMETHEUS_RETENTION: "${PROMETHEUS_RETENTION:-200h}"
+  K8S_CLUSTER_ISSUER: "${K8S_CLUSTER_ISSUER:-letsencrypt-prod}"
+  K8S_INGRESS_CLASS: "${K8S_INGRESS_CLASS:-nginx}"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: automaton-secrets
+  namespace: ${K8S_NAMESPACE:-automaton}
+type: Opaque
+data:
+  REDIS_PASSWORD: ${REDIS_PASSWORD:-automaton123}
+  JWT_SECRET: ${JWT_SECRET}
+  SESSION_SECRET: ${SESSION_SECRET}
+  GRAFANA_PASSWORD: ${GRAFANA_PASSWORD:-automaton123}
+  SMTP_USER: ${SMTP_USER}
+  SMTP_PASS: ${SMTP_PASS}

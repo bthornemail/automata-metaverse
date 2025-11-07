@@ -9,10 +9,23 @@ services:
     container_name: automaton-backend
     restart: unless-stopped
     environment:
-      - NODE_ENV=production
-      - PORT=5555
-      - REDIS_URL=redis://redis:6379
-      - LOG_LEVEL=info
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=${PORT:-5555}
+      - WS_PORT=${WS_PORT:-5556}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-automaton123}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - DOMAIN=${DOMAIN_COM:-universallifeprotocol.com}
+      - BASE_URL=${BASE_URL_COM:-https://universallifeprotocol.com}
+      - API_URL=${API_URL_COM:-https://universallifeprotocol.com/api}
+      - WS_URL=${WS_URL_COM:-wss://universallifeprotocol.com}
+      - JWT_SECRET=${JWT_SECRET}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - CORS_ORIGIN=${CORS_ORIGIN:-*}
+      - ENABLE_MONITORING=${ENABLE_MONITORING:-true}
+      - ENABLE_SSL=${ENABLE_SSL:-true}
+      - ENABLE_RATE_LIMITING=${ENABLE_RATE_LIMITING:-true}
+      - ENABLE_WEBSOCKETS=${ENABLE_WEBSOCKETS:-true}
     ports:
       - "5555:5555"
       - "9001:9001"

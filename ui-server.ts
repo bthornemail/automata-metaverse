@@ -6,13 +6,33 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import morgan from 'morgan';
+import { readFileSync, existsSync } from 'fs';
+import { join, extname } from 'path';
 import WordNetIntegration from './src/services/wordnet';
 import { simpleOpenCodeService } from './src/services/simple-opencode';
 
-const HTTP_PORT = 5555;
-const WS_PORT = 5556;
+const HTTP_PORT = 3000;
+const WS_PORT = 3001;
+const UI_DIST_PATH = join(__dirname, '../ui/dist');
 
-// Simple HTTP server for API endpoints
+// MIME types for static files
+const mimeTypes: Record<string, string> = {
+  '.html': 'text/html',
+  '.js': 'application/javascript',
+  '.css': 'text/css',
+  '.json': 'application/json',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.gif': 'image/gif',
+  '.svg': 'image/svg+xml',
+  '.ico': 'image/x-icon',
+  '.woff': 'font/woff',
+  '.woff2': 'font/woff2',
+  '.ttf': 'font/ttf',
+  '.eot': 'application/vnd.ms-fontobject',
+};
+
+// Simple HTTP server for API endpoints and static files
 const httpServer = createServer((req, res) => {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -33,10 +53,50 @@ const httpServer = createServer((req, res) => {
   if (path.startsWith('/api/')) {
     handleAPIRequest(path, req, res);
   } else {
-    res.writeHead(404);
-    res.end('Not Found');
+    // Serve static files from UI dist
+    serveStaticFile(path, res);
   }
 });
+
+function serveStaticFile(path: string, res: any) {
+  // Default to index.html for root or non-file paths
+  let filePath = path === '/' ? 'index.html' : path;
+  
+  // Remove leading slash
+  if (filePath.startsWith('/')) {
+    filePath = filePath.substring(1);
+  }
+  
+  const fullPath = join(UI_DIST_PATH, filePath);
+  const ext = extname(fullPath);
+  
+  // If no extension and file doesn't exist, try index.html (for SPA routing)
+  if (!ext && !existsSync(fullPath)) {
+    const indexPath = join(UI_DIST_PATH, 'index.html');
+    if (existsSync(indexPath)) {
+      filePath = 'index.html';
+    }
+  }
+  
+  const finalPath = join(UI_DIST_PATH, filePath);
+  
+  if (!existsSync(finalPath)) {
+    res.writeHead(404, { 'Content-Type': 'text/plain' });
+    res.end('Not Found');
+    return;
+  }
+  
+  try {
+    const content = readFileSync(finalPath);
+    const contentType = mimeTypes[ext] || 'application/octet-stream';
+    
+    res.writeHead(200, { 'Content-Type': contentType });
+    res.end(content);
+  } catch (error) {
+    res.writeHead(500, { 'Content-Type': 'text/plain' });
+    res.end('Internal Server Error');
+  }
+}
 
 // Socket.IO server for WebSocket connections
 const io = new SocketIOServer({

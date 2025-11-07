@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Play, SkipForward, RotateCcw, Zap, Eye, BookOpen, Save, Upload } from 'lucide-react';
-import { useAutomatonState } from '@/hooks/useAutomatonState';
+import { useStatus } from '@/hooks/useUnifiedState';
+import { useAutomatonActions } from '@/hooks/useAutomatonActions';
+import { Card } from '@/components/shared/Card';
+import { Button } from '@/components/shared/Button';
 
 const ControlPanel: React.FC = () => {
-  const { state, actions } = useAutomatonState();
+  const status = useStatus();
+  const { startAutomaton, stopAutomaton, resetAutomaton, executeAction, setDimension } = useAutomatonActions();
   const [selectedAction, setSelectedAction] = useState('evolve');
   const [intervalMs, setIntervalMs] = useState(2000);
   const [maxIterations, setMaxIterations] = useState(100);
@@ -21,65 +25,51 @@ const ControlPanel: React.FC = () => {
   ];
 
   const handleExecuteAction = async () => {
-    await actions.executeAction(selectedAction);
+    await executeAction(selectedAction);
   };
 
   const handleStartStop = async () => {
-    if (state.isRunning) {
-      await actions.stopAutomaton();
+    if (status.isRunning) {
+      await stopAutomaton();
     } else {
-      await actions.startAutomaton({ intervalMs, maxIterations });
+      await startAutomaton({ intervalMs, maxIterations });
     }
   };
 
   const handleIntervalChange = (newInterval: number) => {
     setIntervalMs(newInterval);
     // If running, restart with new interval
-    if (state.isRunning) {
-      actions.stopAutomaton();
+    if (status.isRunning) {
+      stopAutomaton();
       setTimeout(() => {
-        actions.startAutomaton({ intervalMs: newInterval, maxIterations });
+        startAutomaton({ intervalMs: newInterval, maxIterations });
       }, 100);
     }
   };
 
   return (
-    <div className="p-6 bg-gray-800 rounded-xl shadow-xl">
-      <h3 className="text-xl font-bold text-white mb-6">Control Panel</h3>
+    <Card title="Control Panel">
 
       {/* Quick Actions */}
       <div className="mb-6">
         <h4 className="text-sm font-medium text-gray-400 mb-3">Quick Actions</h4>
         <div className="flex flex-wrap gap-3">
-          <button
+          <Button
             onClick={handleStartStop}
-            className={`control-button flex items-center gap-2 px-6 py-3 ${
-              state.isRunning 
-                ? 'bg-red-600 hover:bg-red-700 text-white' 
-                : 'bg-green-600 hover:bg-green-700 text-white'
-            }`}
+            variant={status.isRunning ? 'danger' : 'success'}
+            leftIcon={<Play className="w-5 h-5" />}
           >
-            {state.isRunning ? (
-              <>
-                <Play className="w-5 h-5" />
-                Stop Automaton
-              </>
-            ) : (
-              <>
-                <Play className="w-5 h-5" />
-                Start Automaton
-              </>
-            )}
-          </button>
+            {status.isRunning ? 'Stop Automaton' : 'Start Automaton'}
+          </Button>
 
-          <button
-            onClick={actions.resetAutomaton}
-            disabled={state.isRunning}
-            className="control-button bg-gray-600 hover:bg-gray-700 text-white flex items-center gap-2 px-6 py-3"
+          <Button
+            onClick={resetAutomaton}
+            disabled={status.isRunning}
+            variant="secondary"
+            leftIcon={<RotateCcw className="w-5 h-5" />}
           >
-            <RotateCcw className="w-5 h-5" />
             Reset
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -114,14 +104,15 @@ const ControlPanel: React.FC = () => {
           })}
         </div>
 
-        <button
+        <Button
           onClick={handleExecuteAction}
-          disabled={state.isRunning}
-          className="control-button w-full bg-[#6366f1] hover:bg-[#8b5cf6] text-white flex items-center justify-center gap-2"
+          disabled={status.isRunning}
+          variant="primary"
+          className="w-full"
+          leftIcon={<Zap className="w-4 h-4" />}
         >
-          <Zap className="w-4 h-4" />
           Execute: {availableActions.find(a => a.id === selectedAction)?.name}
-        </button>
+        </Button>
       </div>
 
       {/* Execution Parameters */}
@@ -142,7 +133,7 @@ const ControlPanel: React.FC = () => {
               value={intervalMs}
               onChange={(e) => handleIntervalChange(Number(e.target.value))}
               className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
-              disabled={state.isRunning}
+              disabled={status.isRunning}
             />
             <div className="flex justify-between text-xs text-gray-500 mt-1">
               <span>100ms</span>
@@ -163,7 +154,7 @@ const ControlPanel: React.FC = () => {
               value={maxIterations}
               onChange={(e) => setMaxIterations(Number(e.target.value))}
               className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
-              disabled={state.isRunning}
+              disabled={status.isRunning}
             />
             <div className="flex justify-between text-xs text-gray-500 mt-1">
               <span>10</span>
@@ -181,17 +172,15 @@ const ControlPanel: React.FC = () => {
           <span className="text-sm text-gray-300">Jump to Dimension:</span>
           <div className="flex gap-2">
             {[0, 1, 2, 3, 4, 5, 6, 7].map((dim) => (
-              <button
+              <Button
                 key={dim}
-                onClick={() => actions.setDimension(dim)}
-                className={`w-10 h-10 rounded-lg font-medium transition-all duration-200 ${
-                  state.currentDimension === dim
-                     ? 'bg-[#6366f1] text-white'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                }`}
+                onClick={() => setDimension(dim)}
+                variant={status.currentDimension === dim ? 'primary' : 'secondary'}
+                size="sm"
+                className="w-10 h-10"
               >
                 {dim}D
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -203,23 +192,23 @@ const ControlPanel: React.FC = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
           <div>
             <span className="text-gray-400">Mode:</span>
-            <span className="ml-2 text-white capitalize">{state.executionMode}</span>
+            <span className="ml-2 text-white capitalize">{status.executionMode}</span>
           </div>
           <div>
             <span className="text-gray-400">Status:</span>
-            <span className="ml-2 text-white capitalize">{state.status}</span>
+            <span className="ml-2 text-white capitalize">{status.status}</span>
           </div>
           <div>
             <span className="text-gray-400">Dimension:</span>
-            <span className="ml-2 text-white">{state.currentDimension}D</span>
+            <span className="ml-2 text-white">{status.currentDimension}D</span>
           </div>
           <div>
             <span className="text-gray-400">Iterations:</span>
-            <span className="ml-2 text-white">{state.iterationCount}</span>
+            <span className="ml-2 text-white">{status.iterationCount}</span>
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };
 

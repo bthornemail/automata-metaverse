@@ -11,6 +11,14 @@
     "type-check": "tsc --noEmit",
     "lint": "eslint . --ext .ts --fix",
     "test": "jest",
+    "test:e2e": "CI=true playwright test --reporter=list",
+    "test:e2e:headed": "playwright test",
+    "test:e2e:ui": "xvfb-run -a playwright test --ui",
+    "test:e2e:debug": "xvfb-run -a playwright test --debug",
+    "test:e2e:codegen": "xvfb-run -a playwright codegen",
+    "test:e2e:install": "playwright install",
+    "test:e2e:report": "playwright show-report",
+    "test:all": "npm run test && npm run test:e2e",
     "clean": "rm -rf dist",
     "prebuild": "npm run clean",
     "pm2:start": "pm2 start ecosystem.config.js",
@@ -46,6 +54,7 @@
     "wordpos": "^2.1.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.56.1",
     "@types/bcryptjs": "^2.4.6",
     "@types/compression": "^1.7.5",
     "@types/cors": "^2.8.17",

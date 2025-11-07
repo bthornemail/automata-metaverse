@@ -1,6 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { Activity, Eye, MessageSquare, History, Zap, Sparkles, Cog, Brain } from 'lucide-react';
+import { AutomatonProvider } from '@/contexts/AutomatonContext';
+import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
+import { ToastContainer } from '@/components/shared/Toast';
+import { useAutomatonStore } from '@/store/automatonStore';
 import Dashboard from '@/components/Dashboard/Dashboard';
 import DimensionalCanvas from '@/components/DimensionalCanvas/DimensionalCanvas';
 import ControlPanel from '@/components/ControlPanel/ControlPanel';
@@ -19,8 +23,9 @@ import OpenCodeInterface from './components/OpenCodeInterface/OpenCodeInterface'
 
 console.log('App.tsx: OpenCodeInterface imported:', OpenCodeInterface);
 
-const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'analysis' | 'history' | 'agents' | 'quantum' | 'animations' | 'webgl' | 'multiplayer' | 'evolution' | 'metaverse' | 'opencode' | 'config'>('overview');
+const AppContent: React.FC = () => {
+  const activeTab = useAutomatonStore((state) => state.activeTab);
+  const setActiveTab = useAutomatonStore((state) => state.setActiveTab);
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Activity },
@@ -65,7 +70,7 @@ const App: React.FC = () => {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
+                  onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 px-4 py-3 border-b-2 transition-all duration-200 ${
                     activeTab === tab.id
                        ? 'border-[#6366f1] text-white bg-[#6366f1]/10'
@@ -258,7 +263,20 @@ const App: React.FC = () => {
           </div>
         </div>
       </footer>
+      
+      {/* Toast Notifications */}
+      <ToastContainer />
     </div>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <ErrorBoundary>
+      <AutomatonProvider>
+        <AppContent />
+      </AutomatonProvider>
+    </ErrorBoundary>
   );
 };
 
