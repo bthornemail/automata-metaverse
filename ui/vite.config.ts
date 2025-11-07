@@ -17,17 +17,18 @@ export default defineConfig({
     allowedHosts: ["universallifeprotocol.com"],
     proxy: {
       '/api': {
-        target: 'http://localhost:5555',
+        target: 'http://localhost:3000',
         changeOrigin: true,
         secure: false,
       },
       '/socket.io': {
-        target: 'http://localhost:5555',
+        target: 'http://localhost:3001',
         changeOrigin: true,
         ws: true,
       },
     },
   },
+  publicDir: 'public',
   build: {
     outDir: 'dist',
     sourcemap: true,

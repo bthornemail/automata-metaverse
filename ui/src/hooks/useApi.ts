@@ -21,7 +21,8 @@ export const useApi = <T = any>(endpoint: string) => {
     try {
       // This is a simplified version - in practice, you'd map endpoints to methods
       // For now, we'll use a generic approach
-      const response = await fetch(`http://localhost:5555/api${endpoint}`, {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+      const response = await fetch(`${apiUrl}${endpoint}`, {
         headers: {
           'Content-Type': 'application/json',
           ...options?.headers,

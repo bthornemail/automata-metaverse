@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { databaseService, DatabaseService } from '../services/database-service';
+import { localFileService } from '../services/local-file-service';
 
 export function useDatabase() {
   return databaseService;
@@ -43,7 +44,23 @@ export function useJSONL(file: string) {
     load();
   }, [load]);
 
-  return { data, loading, error, reload: load, append };
+  const loadFromFile = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const result = await localFileService.loadFromFilePicker();
+      if (result) {
+        setData(result.data);
+        console.log(`✓ Loaded ${result.data.length} items from file: ${result.filename}`);
+      }
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return { data, loading, error, reload: load, append, loadFromFile };
 }
 
 export function useR5RSFunction(name: string) {

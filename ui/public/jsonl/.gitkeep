@@ -1,0 +1,2 @@
+# JSONL files directory
+# Files in this directory are served at /jsonl/{filename}

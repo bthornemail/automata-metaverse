@@ -271,6 +271,13 @@ const AppContent: React.FC = () => {
 };
 
 const App: React.FC = () => {
+  // Test connections on mount
+  React.useEffect(() => {
+    import('./utils/connection-test').then(({ testConnections, logConnectionStatus }) => {
+      testConnections().then(logConnectionStatus);
+    });
+  }, []);
+
   return (
     <ErrorBoundary>
       <AutomatonProvider>

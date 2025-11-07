@@ -84,6 +84,8 @@ console.log(fibonacci(10));`);
   const [agentTask, setAgentTask] = useState<string>('');
   const [agentResponses, setAgentResponses] = useState<AgentTask[]>([]);
   const [isExecutingAgent, setIsExecutingAgent] = useState(false);
+  const [isGeneratingMetaverse, setIsGeneratingMetaverse] = useState(false);
+  const [metaverseResult, setMetaverseResult] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'analysis' | 'agents' | 'config'>('analysis');
   const [showConfigModal, setShowConfigModal] = useState(false);
   const [showAgentModal, setShowAgentModal] = useState(false);
@@ -333,6 +335,26 @@ console.log(fibonacci(10));`);
       setCurrentModel(model);
     } catch (error) {
       console.error('Failed to switch model:', error);
+    }
+  };
+
+  const generateMetaverse = async (outputPath?: string) => {
+    setIsGeneratingMetaverse(true);
+    setMetaverseResult(null);
+    
+    try {
+      const response = await opencodeApi.generateMetaverse(outputPath);
+      const result = response.data as any;
+      
+      if (result.success) {
+        setMetaverseResult(`Successfully generated ${result.outputPath || './generate.metaverse.jsonl'} (${result.lines || 0} lines)`);
+      } else {
+        setMetaverseResult(`Error: ${result.error || 'Unknown error'}`);
+      }
+    } catch (error: any) {
+      setMetaverseResult(`Error: ${error.message || 'Failed to generate metaverse'}`);
+    } finally {
+      setIsGeneratingMetaverse(false);
     }
   };
 
@@ -813,6 +835,46 @@ console.log(fibonacci(10));`);
                     <span className="text-sm text-gray-300">Available Agents</span>
                     <span className="text-sm text-white">{availableAgents.length}</span>
                   </div>
+                </div>
+              </div>
+
+              {/* System Operations */}
+              <div>
+                <h3 className="text-lg font-medium text-white mb-4 flex items-center">
+                  <Database className="w-5 h-5 mr-2 text-purple-400" />
+                  System Operations
+                </h3>
+                <div className="space-y-3">
+                  <button
+                    onClick={() => generateMetaverse()}
+                    disabled={isGeneratingMetaverse}
+                    className={`w-full flex items-center justify-center space-x-2 px-4 py-3 rounded-lg transition-colors ${
+                      isGeneratingMetaverse
+                        ? 'bg-gray-600 cursor-not-allowed'
+                        : 'bg-purple-600 hover:bg-purple-700'
+                    }`}
+                  >
+                    {isGeneratingMetaverse ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        <span>Generating...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Database className="w-5 h-5" />
+                        <span>Generate Metaverse JSONL</span>
+                      </>
+                    )}
+                  </button>
+                  {metaverseResult && (
+                    <div className={`p-3 rounded-lg text-sm ${
+                      metaverseResult.startsWith('Successfully')
+                        ? 'bg-green-900/30 text-green-400 border border-green-700'
+                        : 'bg-red-900/30 text-red-400 border border-red-700'
+                    }`}>
+                      {metaverseResult}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

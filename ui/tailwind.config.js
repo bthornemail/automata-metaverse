@@ -32,6 +32,16 @@ export default {
           '7d': '#a855f7', // purple
         },
       },
+      stroke: {
+        'dimensions-0d': '#6366f1',
+        'dimensions-1d': '#8b5cf6',
+        'dimensions-2d': '#ec4899',
+        'dimensions-3d': '#f59e0b',
+        'dimensions-4d': '#10b981',
+        'dimensions-5d': '#06b6d4',
+        'dimensions-6d': '#3b82f6',
+        'dimensions-7d': '#a855f7',
+      },
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'float': 'float 6s ease-in-out infinite',

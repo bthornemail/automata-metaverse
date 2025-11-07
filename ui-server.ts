@@ -10,6 +10,7 @@ import { readFileSync, existsSync } from 'fs';
 import { join, extname } from 'path';
 import WordNetIntegration from './src/services/wordnet';
 import { simpleOpenCodeService } from './src/services/simple-opencode';
+import OpenCodeIntegration from './opencode-integration';
 
 const HTTP_PORT = parseInt(process.env.PORT || '3000', 10);
 const WS_PORT = parseInt(process.env.WS_PORT || '3001', 10);
@@ -468,6 +469,26 @@ async function handleAPIRequest(path: string, req: any, res: any) {
 
       case 'opencode/models':
         response.data = simpleOpenCodeService.getAvailableModels();
+        break;
+
+      case 'opencode/execute':
+        const executeBody = await parseRequestBody(req);
+        const tool = executeBody.tool;
+        const toolArgs = executeBody.args || [];
+        
+        if (tool) {
+          try {
+            const integration = new OpenCodeIntegration();
+            const result = await integration.executeCommand({ tool, args: toolArgs });
+            response.data = result;
+          } catch (error: any) {
+            response.success = false;
+            response.error = error.message || 'Failed to execute command';
+          }
+        } else {
+          response.success = false;
+          response.error = 'Tool name is required';
+        }
         break;
 
       default:

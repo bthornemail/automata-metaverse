@@ -61,7 +61,7 @@ class UnifiedWebSocketService {
   private eventBus = new ComponentEventBus();
   private connectionHandlers: Set<(connected: boolean) => void> = new Set();
 
-  connect(url: string = 'http://localhost:5555') {
+  connect(url: string = import.meta.env.VITE_WS_URL || import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3000') {
     if (this.socket?.connected) {
       return;
     }

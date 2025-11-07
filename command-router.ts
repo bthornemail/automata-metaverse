@@ -40,6 +40,8 @@ class CommandRouter {
         return this.routeTodoWrite(args);
       case 'todoread':
         return this.routeTodoRead(args);
+      case 'generate-metaverse':
+        return this.routeGenerateMetaverse(args);
       default:
         return this.routeGeneric(tool, args);
     }
@@ -111,6 +113,13 @@ class CommandRouter {
   
   private async routeTodoRead(_args: any[]) {
     return await this.bridge.routeCommand('todoread', {});
+  }
+
+  private async routeGenerateMetaverse(args: any[]) {
+    const params = {
+      outputPath: args[0] || './generate.metaverse.jsonl'
+    };
+    return await this.bridge.routeCommand('generate-metaverse', params);
   }
   
   private async routeGeneric(tool: string, args: any[]) {
@@ -214,7 +223,7 @@ if (require.main === module) {
   
   if (args.length === 0) {
     console.log('Usage: command-router <tool> <args...>');
-    console.log('Available tools: read, edit, write, bash, glob, grep, task, todowrite, todoread');
+    console.log('Available tools: read, edit, write, bash, glob, grep, task, todowrite, todoread, generate-metaverse');
     process.exit(1);
   }
   

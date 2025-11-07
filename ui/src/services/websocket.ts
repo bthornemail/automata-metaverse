@@ -8,7 +8,7 @@ class WebSocketService {
   private reconnectDelay = 1000;
   private handlers: Partial<RealtimeUpdates> = {};
 
-  connect(url: string = 'http://localhost:5555') {
+  connect(url: string = import.meta.env.VITE_WS_URL || import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3000') {
     try {
       this.socket = io(url, {
         transports: ['websocket', 'polling'],

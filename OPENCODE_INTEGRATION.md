@@ -42,6 +42,7 @@
 - **automaton-execute**: Quantum superposition
 - **config-manager**: Qubit state management
 - **report-generator**: Entanglement visualization
+- **generate-metaverse**: Unified topology generation (λmetaverse.generate(unified-topology))
 
 ## Interface Agents Integration
 
@@ -69,7 +70,7 @@ const visualizeOperation = (tool, params) => {
 ```json
 {
   "type": "opencode-command",
-  "tool": "read|edit|bash|task|todo",
+  "tool": "read|edit|bash|task|todo|generate-metaverse",
   "dimension": "0D|1D|2D|3D|4D|5D|6D|7D",
   "parameters": {...},
   "church-encoding": "lambda-expression"
@@ -120,7 +121,7 @@ class OpenCodeBridge {
 :OpenCodeCommand a sh:NodeShape ;
   sh:property [
     sh:path opencode:tool ;
-    sh:in (read edit write bash glob grep task todo) ;
+    sh:in (read edit write bash glob grep task todo generate-metaverse) ;
     sh:minCount 1 ;
   ] ;
   sh:property [

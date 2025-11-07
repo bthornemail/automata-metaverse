@@ -58,7 +58,8 @@ const TOOL_DIMENSIONS = {
   'automaton-query': '6D',
   'automaton-execute': '7D',
   'config-manager': '7D',
-  'report-generator': '7D'
+  'report-generator': '7D',
+  'generate-metaverse': '7D'
 };
 
 class OpenCodeBridge {
@@ -163,6 +164,8 @@ class OpenCodeBridge {
         return this.encodeTodo(params.todos);
       case 'todoread':
         return this.encodeTodoRead();
+      case 'generate-metaverse':
+        return this.encodeGenerateMetaverse(params.outputPath);
       default:
         return this.encodeGeneric(tool, params);
     }
@@ -294,6 +297,16 @@ class OpenCodeBridge {
       dimension: '5D'
     };
   }
+
+  encodeGenerateMetaverse(outputPath?: string) {
+    // Generate metaverse as unified topology operation
+    return {
+      type: 'metaverse-generation',
+      outputPath: outputPath || './generate.metaverse.jsonl',
+      church: 'λmetaverse.generate(unified-topology)',
+      dimension: '7D'
+    };
+  }
   
   /**
    * Execute operation through dimensional hierarchy
@@ -377,7 +390,7 @@ class OpenCodeBridge {
         const patternParts = globPattern.split('/');
         const searchDir = path.resolve(searchPath);
         
-        function walkDir(dir: string, depth: number = 0): void {
+        const walkDir = (dir: string, depth: number = 0): void => {
           try {
             const entries = readdirSync(dir);
             for (const entry of entries) {
@@ -397,7 +410,7 @@ class OpenCodeBridge {
           } catch (error) {
             // Skip directories we can't read
           }
-        }
+        };
         
         walkDir(searchDir);
         
@@ -587,6 +600,11 @@ class OpenCodeBridge {
   
   execute7D(operation: any) {
     // 7D: Quantum superposition
+    if (operation.type === 'metaverse-generation') {
+      // Generate the metaverse JSONL file
+      return this.generateMetaverseFile(operation.outputPath);
+    }
+    
     return {
       ...operation,
       quantum: true,
@@ -594,6 +612,349 @@ class OpenCodeBridge {
       entangled: true,
       dimension: '7D-quantum'
     };
+  }
+
+  /**
+   * Generate generate.metaverse.jsonl file
+   */
+  private generateMetaverseFile(outputPath: string) {
+    const metaverseContent = this.buildMetaverseContent();
+    
+    try {
+      writeFileSync(outputPath, metaverseContent, 'utf8');
+      return {
+        type: 'metaverse-generation',
+        outputPath,
+        success: true,
+        lines: metaverseContent.split('\n').filter(l => l.trim()).length,
+        message: `Successfully generated ${outputPath}`
+      };
+    } catch (error: any) {
+      return {
+        type: 'metaverse-generation',
+        outputPath,
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * Build the complete metaverse JSONL content
+   */
+  private buildMetaverseContent(): string {
+    const lines: string[] = [];
+    
+    // Self-reference node
+    lines.push(JSON.stringify({
+      id: "metaverse-self-ref",
+      type: "file",
+      x: 0,
+      y: 0,
+      width: 320,
+      height: 140,
+      color: "1",
+      file: "generate.metaverse.jsonl",
+      metadata: {
+        purpose: "Self-reference to metaverse generator",
+        regenerate: true,
+        selfReference: {
+          file: "generate.metaverse.jsonl",
+          line: 1,
+          pattern: "meta-meta-circular"
+        }
+      }
+    }));
+
+    // Reference nodes for each automaton file
+    const references = [
+      {
+        id: "metaverse-ref-canvas-space",
+        target: "automaton.canvas.space.jsonl",
+        x: -600,
+        y: 200,
+        color: "2",
+        text: "# Canvas Space Reference\n\n**File**: `automaton.canvas.space.jsonl`\n\n**Purpose**: Meta-layer for constraint enforcement and bipartite interfaces\n\n**Capabilities**:\n- Kernel/seed constraint validation\n- Bipartite input/output interfaces\n- Bipartite data/URI interfaces\n- Rendering pipeline for automaton.jsonl\n\n**R5RS Functions**:\n- `r5rs:parse-jsonl-canvas(\"automaton.canvas.space.jsonl\")`\n- `r5rs:shacl-validate`\n- `r5rs:sparql-query`",
+        role: "constraint-enforcement"
+      },
+      {
+        id: "metaverse-ref-kernel-seed",
+        target: "automaton-kernel.seed.jsonl",
+        x: -200,
+        y: 200,
+        color: "3",
+        text: "# Kernel Seed Reference\n\n**File**: `automaton-kernel.seed.jsonl`\n\n**Purpose**: Minimal seed for kernel regeneration\n\n**Capabilities**:\n- Self-regeneration metadata\n- Church encoding patterns\n- Dimensional progression (0D-7D)\n- Bootstrap sequence\n\n**R5RS Functions**:\n- `r5rs:parse-jsonl-canvas(\"automaton-kernel.seed.jsonl\")`\n- `r5rs:invoke-from-jsonl`\n- `r5rs:church-zero`",
+        role: "kernel-bootstrap"
+      },
+      {
+        id: "metaverse-ref-kernel",
+        target: "automaton-kernel.jsonl",
+        x: 200,
+        y: 200,
+        color: "4",
+        text: "# Kernel Reference\n\n**File**: `automaton-kernel.jsonl`\n\n**Purpose**: Full kernel with R5RS function trie\n\n**Capabilities**:\n- Complete dimensional topology (0D-7D)\n- R5RS function registry\n- SHACL/RFC2119/ASP/Prolog/Datalog constraints\n- Self-referential automata\n\n**R5RS Functions**:\n- `r5rs:parse-jsonl-canvas(\"automaton-kernel.jsonl\")`\n- `r5rs:extract-facts`\n- `r5rs:jsonl-to-rdf`",
+        role: "full-implementation"
+      },
+      {
+        id: "metaverse-ref-automaton",
+        target: "automaton.jsonl",
+        x: 600,
+        y: 200,
+        color: "5",
+        text: "# Automaton Reference\n\n**File**: `automaton.jsonl`\n\n**Purpose**: Operational automaton with OpenCode operations\n\n**Capabilities**:\n- Dimensional topology nodes\n- OpenCode operation history\n- Canvas rendering data\n- Self-modification patterns\n\n**R5RS Functions**:\n- `r5rs:parse-jsonl-canvas(\"automaton.jsonl\")`\n- `r5rs:query-facts`\n- `r5rs:sparql-query`",
+        role: "operational"
+      },
+      {
+        id: "metaverse-ref-r5rs-functions",
+        target: "r5rs-functions-trie.jsonl",
+        x: 400,
+        y: 200,
+        color: "6",
+        text: "# R5RS Functions Reference\n\n**File**: `r5rs-functions-trie.jsonl`\n\n**Purpose**: R5RS function definitions and registry\n\n**Capabilities**:\n- Complete R5RS function trie structure\n- Function registry with metadata\n- Module organization (primitives, parser, etc.)\n- Pure function definitions\n\n**R5RS Functions**:\n- `r5rs:parse-jsonl-canvas(\"r5rs-functions-trie.jsonl\")`\n- `r5rs:extract-facts`\n- `r5rs:query-facts`",
+        role: "function-registry"
+      }
+    ];
+
+    // Add reference nodes
+    for (const ref of references) {
+      lines.push(JSON.stringify({
+        id: ref.id,
+        type: "reference",
+        target: ref.target,
+        x: ref.x,
+        y: ref.y,
+        width: 280,
+        height: 160,
+        color: ref.color,
+        text: ref.text,
+        metadata: {
+          regenerate: {
+            function: "r5rs:parse-jsonl-canvas",
+            args: [ref.target]
+          },
+          reference: {
+            file: ref.target,
+            type: ref.target.includes('canvas') ? 'canvas-space' : 
+                  ref.target.includes('seed') ? 'seed' :
+                  ref.target.includes('kernel') ? 'kernel' :
+                  ref.target.includes('r5rs') ? 'r5rs-functions' : 'automaton',
+            role: ref.role
+          }
+        }
+      }));
+    }
+
+    // Add unified syntax node
+    lines.push(JSON.stringify({
+      id: "metaverse-unified-syntax",
+      type: "syntax",
+      x: 0,
+      y: 400,
+      width: 400,
+      height: 220,
+      color: "6",
+      text: "# Unified Syntax\n\n**Unified Syntax Across All Automaton Files**\n\n**JSONL Structure**:\n```json\n{\n  \"id\": \"unique-id\",\n  \"type\": \"node|edge|file|reference|...\",\n  \"metadata\": {\n    \"regenerate\": {\n      \"function\": \"r5rs:function-name\",\n      \"args\": [...]\n    }\n  }\n}\n```\n\n**Common Fields**:\n- `id`: Unique identifier\n- `type`: Node/edge type\n- `metadata.regenerate`: Regeneration function\n- `selfReference`: Self-reference pattern\n- `function`: R5RS function name\n- `args`: Function arguments\n\n**Syntax Patterns**:\n- **Self-Reference**: `selfReference.file` + `selfReference.line`\n- **Regeneration**: `metadata.regenerate.function` + `args`\n- **Constraints**: `type: \"shacl\"` + `constraints` array\n- **Interfaces**: `partition: \"left|right\"` + `category`\n\n**R5RS Functions**:\n- `r5rs:parse-jsonl-canvas`\n- `r5rs:extract-facts`\n- `r5rs:invoke-from-jsonl`",
+      metadata: {
+        regenerate: {
+          function: "r5rs:parse-jsonl-canvas",
+          args: ["generate.metaverse.jsonl"]
+        },
+        syntax: {
+          unified: true,
+          pattern: "jsonl-with-metadata"
+        }
+      }
+    }));
+
+    // Add epistemic topology node
+    lines.push(JSON.stringify({
+      id: "metaverse-epistemic-topology",
+      type: "topology",
+      category: "epistemic",
+      x: -400,
+      y: 650,
+      width: 350,
+      height: 240,
+      color: "7",
+      text: "# Epistemic Topology\n\n**Semantic Knowledge Structure Across Automaton Files**\n\n**Knowledge Layers**:\n1. **0D-Epistemic**: Vacuum knowledge (empty set)\n2. **1D-Epistemic**: Temporal knowledge (successor)\n3. **2D-Epistemic**: Bipartite knowledge (data/code)\n4. **3D-Epistemic**: Algebraic knowledge (operations)\n5. **4D-Epistemic**: Network knowledge (spacetime)\n6. **5D-Epistemic**: Consensus knowledge (agreement)\n7. **6D-Epistemic**: Intelligence knowledge (AI)\n8. **7D-Epistemic**: Quantum knowledge (superposition)\n\n**Epistemic Relations**:\n- **Knows**: `knows(A, B)` - A knows B\n- **Believes**: `believes(A, P)` - A believes proposition P\n- **Validates**: `validates(A, C)` - A validates constraint C\n- **Generates**: `generates(A, B)` - A generates B\n\n**RDF Triples**:\n```turtle\nmetaverse:canvas-space metaverse:knows metaverse:kernel .\nmetaverse:kernel metaverse:generates metaverse:automaton .\nmetaverse:seed metaverse:validates metaverse:kernel .\n```\n\n**R5RS Functions**:\n- `r5rs:jsonl-to-rdf`\n- `r5rs:rdf-query`\n- `r5rs:sparql-query`",
+      metadata: {
+        regenerate: {
+          function: "r5rs:jsonl-to-rdf",
+          args: ["facts"]
+        },
+        topology: {
+          type: "epistemic",
+          dimensions: [0, 1, 2, 3, 4, 5, 6, 7]
+        }
+      }
+    }));
+
+    // Add semantic topology node
+    lines.push(JSON.stringify({
+      id: "metaverse-semantic-topology",
+      type: "topology",
+      category: "semantic",
+      x: 400,
+      y: 650,
+      width: 350,
+      height: 240,
+      color: "1",
+      text: "# Semantic Topology\n\n**Meaning Structure Across Automaton Files**\n\n**Semantic Relations**:\n- **Means**: `means(A, B)` - A means B\n- **Implies**: `implies(A, B)` - A implies B\n- **References**: `references(A, B)` - A references B\n- **Renders**: `renders(A, B)` - A renders B\n\n**Semantic Mapping**:\n- **Canvas Space** → Constraint enforcement semantics\n- **Kernel Seed** → Bootstrap semantics\n- **Kernel** → Full implementation semantics\n- **Automaton** → Operational semantics\n\n**SPARQL Query**:\n```sparql\nSELECT ?source ?target ?relation\nWHERE {\n  ?source metaverse:references ?target .\n  ?source metaverse:relation ?relation .\n}\n```\n\n**R5RS Functions**:\n- `r5rs:sparql-query`\n- `r5rs:rdf-query`\n- `r5rs:rdfs-entail`",
+      metadata: {
+        regenerate: {
+          function: "r5rs:sparql-query",
+          args: ["query-str", "triples"]
+        },
+        topology: {
+          type: "semantic",
+          relations: ["means", "implies", "references", "renders"]
+        }
+      }
+    }));
+
+    // Add generation pipeline node
+    lines.push(JSON.stringify({
+      id: "metaverse-generation-pipeline",
+      type: "pipeline",
+      x: 0,
+      y: 950,
+      width: 500,
+      height: 260,
+      color: "2",
+      text: "# Generation Pipeline\n\n**Generate All Automaton Files**\n\n**Pipeline Steps**:\n1. **Load Metaverse**: `r5rs:parse-jsonl-canvas(\"generate.metaverse.jsonl\")`\n2. **Extract References**: Query all `type: \"reference\"` nodes\n3. **Generate Seed**: From `automaton-kernel.seed.jsonl` reference\n4. **Generate Kernel**: From seed using regeneration metadata\n5. **Generate Canvas Space**: From `automaton.canvas.space.jsonl` reference\n6. **Generate Automaton**: From kernel + operational data\n7. **Validate**: SHACL validation on all generated files\n8. **Unify**: Create unified epistemic/semantic topologies\n\n**Generation Pattern**:\n```scheme\n(define (generate-all-automaton-files)\n  (let ((metaverse (parse-jsonl-canvas \"generate.metaverse.jsonl\")))\n    (let ((references (query-facts metaverse '(reference ?id ?target))))\n      (for-each (lambda (ref)\n                  (let ((target (get-target ref))\n                        (regenerate (get-regenerate-metadata ref)))\n                    (generate-file target regenerate)))\n                references))))\n```\n\n**R5RS Functions**:\n- `r5rs:parse-jsonl-canvas`\n- `r5rs:extract-facts`\n- `r5rs:query-facts`\n- `r5rs:invoke-from-jsonl`",
+      function: "r5rs:invoke-from-jsonl",
+      args: ["r5rs:parse-jsonl-canvas", ["generate.metaverse.jsonl"], "context"],
+      metadata: {
+        regenerate: {
+          function: "r5rs:invoke-from-jsonl",
+          args: ["r5rs:parse-jsonl-canvas", ["generate.metaverse.jsonl"], "context"]
+        }
+      }
+    }));
+
+    // Add unified topology node
+    lines.push(JSON.stringify({
+      id: "metaverse-unified-topology",
+      type: "topology",
+      category: "unified",
+      x: 0,
+      y: 1250,
+      width: 600,
+      height: 280,
+      color: "3",
+      text: "# Unified Epistemic-Semantic Topology\n\n**Unified Knowledge Structure**\n\n**Topology Structure**:\n```\nMetaverse (generate.metaverse.jsonl)\n├── Canvas Space (automaton.canvas.space.jsonl)\n│   ├── Constraint Enforcement\n│   ├── Bipartite Interfaces\n│   └── Rendering Pipeline\n├── Kernel Seed (automaton-kernel.seed.jsonl)\n│   ├── Bootstrap Sequence\n│   ├── Regeneration Metadata\n│   └── Church Encoding Patterns\n├── R5RS Functions (r5rs-functions-trie.jsonl)\n│   ├── Function Registry\n│   └── Trie Structure\n├── Kernel (automaton-kernel.jsonl)\n│   ├── Dimensional Topology (0D-7D)\n│   ├── R5RS Function Trie\n│   └── Constraint Rules\n└── Automaton (automaton.jsonl)\n    ├── Operational Nodes\n    ├── OpenCode Operations\n    └── Canvas Rendering Data\n```\n\n**Unified Relations**:\n- **Generates**: Metaverse → {Canvas Space, Seed, Kernel, Automaton}\n- **Validates**: Canvas Space → {Kernel, Seed}\n- **Bootstraps**: Seed → Kernel\n- **Implements**: Kernel → Automaton\n- **Renders**: Canvas Space → Automaton\n\n**RDF Graph**:\n```turtle\nmetaverse:metaverse metaverse:generates metaverse:canvas-space .\nmetaverse:metaverse metaverse:generates metaverse:kernel-seed .\nmetaverse:metaverse metaverse:generates metaverse:kernel .\nmetaverse:metaverse metaverse:generates metaverse:automaton .\nmetaverse:canvas-space metaverse:validates metaverse:kernel .\nmetaverse:kernel-seed metaverse:bootstraps metaverse:kernel .\nmetaverse:kernel metaverse:implements metaverse:automaton .\n```\n\n**R5RS Functions**:\n- `r5rs:jsonl-to-rdf`\n- `r5rs:sparql-query`\n- `r5rs:rdfs-entail`",
+      metadata: {
+        regenerate: {
+          function: "r5rs:jsonl-to-rdf",
+          args: ["facts"]
+        },
+        topology: {
+          type: "unified",
+          epistemic: true,
+          semantic: true
+        }
+      }
+    }));
+
+    // Add reference graph node
+    lines.push(JSON.stringify({
+      id: "metaverse-reference-graph",
+      type: "graph",
+      iri: "http://example.org/metaverse/",
+      triples: [
+        ["metaverse:metaverse", "rdf:type", "metaverse:Metaverse"],
+        ["metaverse:metaverse", "metaverse:references", "metaverse:canvas-space"],
+        ["metaverse:metaverse", "metaverse:references", "metaverse:kernel-seed"],
+        ["metaverse:metaverse", "metaverse:references", "metaverse:r5rs-functions"],
+        ["metaverse:metaverse", "metaverse:references", "metaverse:kernel"],
+        ["metaverse:metaverse", "metaverse:references", "metaverse:automaton"],
+        ["metaverse:canvas-space", "metaverse:file", "automaton.canvas.space.jsonl"],
+        ["metaverse:kernel-seed", "metaverse:file", "automaton-kernel.seed.jsonl"],
+        ["metaverse:r5rs-functions", "metaverse:file", "r5rs-functions-trie.jsonl"],
+        ["metaverse:kernel", "metaverse:file", "automaton-kernel.jsonl"],
+        ["metaverse:automaton", "metaverse:file", "automaton.jsonl"],
+        ["metaverse:canvas-space", "metaverse:validates", "metaverse:kernel"],
+        ["metaverse:canvas-space", "metaverse:validates", "metaverse:kernel-seed"],
+        ["metaverse:kernel-seed", "metaverse:generates", "metaverse:kernel"],
+        ["metaverse:kernel", "metaverse:uses", "metaverse:r5rs-functions"],
+        ["metaverse:kernel", "metaverse:implements", "metaverse:automaton"]
+      ],
+      metadata: {
+        regenerate: {
+          function: "r5rs:jsonl-to-rdf",
+          args: ["facts"]
+        }
+      }
+    }));
+
+    // Add edges (vertical and horizontal connections)
+    const edges = [
+      { from: "metaverse-self-ref", to: "metaverse-ref-canvas-space", label: "self-ref→canvas-space" },
+      { from: "metaverse-ref-canvas-space", to: "metaverse-ref-kernel-seed", label: "canvas-space→seed" },
+      { from: "metaverse-ref-kernel-seed", to: "metaverse-ref-kernel", label: "seed→kernel" },
+      { from: "metaverse-ref-kernel-seed", to: "metaverse-ref-automaton", label: "kernel→automaton" },
+      { from: "metaverse-ref-canvas-space", to: "metaverse-ref-kernel-seed", label: "canvas-space↔seed", horizontal: true },
+      { from: "metaverse-ref-kernel-seed", to: "metaverse-ref-kernel", label: "seed↔kernel", horizontal: true },
+      { from: "metaverse-ref-kernel", to: "metaverse-ref-automaton", label: "kernel↔automaton", horizontal: true },
+      { from: "metaverse-ref-kernel", to: "metaverse-ref-r5rs-functions", label: "kernel↔r5rs-functions", horizontal: true },
+      { from: "metaverse-ref-r5rs-functions", to: "metaverse-ref-automaton", label: "r5rs-functions↔automaton", horizontal: true },
+      { from: "metaverse-unified-syntax", to: "metaverse-epistemic-topology", label: "syntax→epistemic" },
+      { from: "metaverse-unified-syntax", to: "metaverse-semantic-topology", label: "syntax→semantic" },
+      { from: "metaverse-epistemic-topology", to: "metaverse-semantic-topology", label: "epistemic↔semantic", horizontal: true },
+      { from: "metaverse-epistemic-topology", to: "metaverse-unified-topology", label: "epistemic→unified" },
+      { from: "metaverse-semantic-topology", to: "metaverse-unified-topology", label: "semantic→unified" }
+    ];
+
+    for (const edge of edges) {
+      const prefix = edge.horizontal ? "h" : "v";
+      lines.push(JSON.stringify({
+        id: `${prefix}:${edge.from}→${edge.to}`,
+        fromNode: edge.from,
+        toNode: edge.to,
+        fromSide: edge.horizontal ? "right" : "bottom",
+        toSide: edge.horizontal ? "left" : "top",
+        label: edge.label,
+        metadata: {
+          regenerate: {
+            function: edge.horizontal ? "r5rs:cons" : "r5rs:church-succ",
+            args: edge.horizontal ? [edge.from.split('-').pop(), edge.to.split('-').pop()] : [edge.from.split('-').pop()]
+          }
+        }
+      }));
+    }
+
+    // Add generation instructions node
+    lines.push(JSON.stringify({
+      id: "metaverse-generation-instructions",
+      type: "instruction",
+      x: 0,
+      y: 1600,
+      width: 600,
+      height: 300,
+      color: "4",
+      text: "# Generation Instructions\n\n**Generate All Automaton Files from Metaverse**\n\n**Step 1: Load Metaverse**\n```scheme\n(define metaverse (parse-jsonl-canvas \"generate.metaverse.jsonl\"))\n(define facts (extract-facts metaverse))\n(define triples (jsonl-to-rdf facts))\n```\n\n**Step 2: Extract References**\n```scheme\n(define references (sparql-query \n  \"SELECT ?id ?target WHERE { ?id rdf:type metaverse:Reference }\"\n  triples))\n```\n\n**Step 3: Generate Each File**\n```scheme\n(for-each (lambda (ref)\n            (let ((target (get-target ref))\n                  (regenerate (get-regenerate-metadata ref)))\n              (generate-file target regenerate)))\n          references)\n```\n\n**Step 4: Create Unified Topology**\n```scheme\n(define unified-topology\n  (create-unified-topology\n    (parse-jsonl-canvas \"automaton.canvas.space.jsonl\")\n    (parse-jsonl-canvas \"automaton-kernel.seed.jsonl\")\n    (parse-jsonl-canvas \"automaton-kernel.jsonl\")\n    (parse-jsonl-canvas \"automaton.jsonl\")))\n```\n\n**Step 5: Validate**\n```scheme\n(define shapes (load-shacl-shapes unified-topology))\n(define validation-report (shacl-validate shapes (jsonl-to-rdf unified-topology)))\n```\n\n**R5RS Functions**:\n- `r5rs:parse-jsonl-canvas`\n- `r5rs:extract-facts`\n- `r5rs:jsonl-to-rdf`\n- `r5rs:sparql-query`\n- `r5rs:shacl-validate`",
+      metadata: {
+        regenerate: {
+          function: "r5rs:invoke-from-jsonl",
+          args: ["r5rs:parse-jsonl-canvas", ["generate.metaverse.jsonl"], "context"]
+        }
+      }
+    }));
+
+    // Add final reflection node
+    lines.push(JSON.stringify({
+      id: "metaverse-final-reflection",
+      type: "reflection",
+      statement: "The metaverse generator provides a unified interface to all automaton files, creating epistemic and semantic topologies that span across canvas space, kernel seed, kernel, and automaton. It enables generation of all files from a single source, maintains unified syntax across all files, and creates knowledge structures that connect constraint enforcement, bootstrap sequences, full implementations, and operational data. The unified topology enables reasoning across all automaton layers, from 0D vacuum through 7D quantum, creating a complete epistemic-semantic framework for self-referential Church encoding systems.",
+      metadata: {
+        regenerate: {
+          function: "r5rs:invoke-from-jsonl",
+          args: ["r5rs:church-zero", [], "context"]
+        }
+      }
+    }));
+
+    return lines.join('\n') + '\n';
   }
 }
 

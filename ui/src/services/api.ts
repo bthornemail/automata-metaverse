@@ -1,9 +1,9 @@
 import { DashboardState, ApiResponse } from '@/types';
 
-const API_BASE_URL = 'http://localhost:5555/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 class ApiService {
-  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
+  async request<T>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
     try {
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         headers: {
@@ -92,6 +92,18 @@ class ApiService {
 
   async getPatternAnalysis(): Promise<ApiResponse> {
     return this.request('/analysis/patterns');
+  }
+
+  // JSONL endpoints
+  async getJsonlFile(file: string): Promise<ApiResponse<any[]>> {
+    return this.request<any[]>(`/jsonl/${file}`);
+  }
+
+  async appendToJsonlFile(file: string, data: any): Promise<ApiResponse> {
+    return this.request(`/jsonl/${file}/append`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
   }
 
   // File operations
@@ -194,5 +206,17 @@ export const opencodeApi = {
   setModel: (model: string) => apiService['request']('/opencode/model/set', {
     method: 'POST',
     body: JSON.stringify({ model }),
+  }),
+  
+  // Command execution
+  executeCommand: (tool: string, args: any[] = []) => apiService['request']('/opencode/execute', {
+    method: 'POST',
+    body: JSON.stringify({ tool, args }),
+  }),
+  
+  // Metaverse generation
+  generateMetaverse: (outputPath?: string) => apiService['request']('/opencode/execute', {
+    method: 'POST',
+    body: JSON.stringify({ tool: 'generate-metaverse', args: outputPath ? [outputPath] : [] }),
   }),
 };

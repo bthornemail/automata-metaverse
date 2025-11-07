@@ -118,6 +118,9 @@ class OpenCodeIntegration {
       case 'todoread':
         params = {};
         break;
+      case 'generate-metaverse':
+        params = { outputPath: args[0] || './generate.metaverse.jsonl' };
+        break;
       default:
         params = { args };
     }
@@ -277,6 +280,7 @@ if (require.main === module) {
     console.log('Examples:');
     console.log('  opencode-integration execute read ./package.json');
     console.log('  opencode-integration execute bash "ls -la"');
+    console.log('  opencode-integration execute generate-metaverse ./generate.metaverse.jsonl');
     process.exit(0);
   }
   

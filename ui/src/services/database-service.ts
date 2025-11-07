@@ -6,6 +6,7 @@
  */
 
 import { apiService } from './api';
+import { localFileService } from './local-file-service';
 
 export interface DatabaseService {
   // JSONL operations
@@ -36,23 +37,43 @@ export interface QueryOptions {
 }
 
 class DatabaseServiceImpl implements DatabaseService {
+  /**
+   * Read JSONL file - tries local browser first, then falls back to API
+   */
   async readJSONL(file: string): Promise<any[]> {
-    const response = await apiService.request(`/jsonl/${file}`);
-    return response.success ? response.data : [];
+    // Try local file first (from public/jsonl/ directory)
+    try {
+      const data = await localFileService.loadFromPublic(file);
+      if (data.length > 0) {
+        console.log(`✓ Loaded ${data.length} items from local file: ${file}`);
+        return data;
+      }
+    } catch (localError) {
+      console.log(`Local file not found (${file}), trying API...`);
+    }
+
+    // Fallback to API (only if local fails)
+    try {
+      const response = await apiService.getJsonlFile(file);
+      if (response.success && response.data && Array.isArray(response.data)) {
+        console.log(`✓ Loaded ${response.data.length} items from API: ${file}`);
+        return response.data;
+      }
+    } catch (apiError) {
+      console.warn(`Failed to load from API: ${file}`, apiError);
+    }
+
+    // If both fail, return empty array
+    console.warn(`⚠ Could not load JSONL file: ${file} (tried local and API)`);
+    return [];
   }
 
   async writeJSONL(file: string, data: any[]): Promise<void> {
-    await apiService.request(`/jsonl/${file}`, {
-      method: 'POST',
-      body: JSON.stringify({ data })
-    });
+    await apiService.appendToJsonlFile(file, { data });
   }
 
   async appendJSONL(file: string, data: any): Promise<void> {
-    await apiService.request(`/jsonl/${file}/append`, {
-      method: 'POST',
-      body: JSON.stringify(data)
-    });
+    await apiService.appendToJsonlFile(file, data);
   }
 
   async queryJSONL(file: string, predicate: (item: any) => boolean): Promise<any[]> {
@@ -69,8 +90,8 @@ class DatabaseServiceImpl implements DatabaseService {
     const url = pattern 
       ? `/r5rs/functions?pattern=${encodeURIComponent(pattern)}`
       : '/r5rs/functions';
-    const response = await apiService.request(url);
-    return response.success ? response.data : [];
+    const response = await apiService.request<string[]>(url);
+    return response.success && Array.isArray(response.data) ? response.data : [];
   }
 
   async invokeR5RSFunction(name: string, args: any[], context?: any): Promise<any> {
@@ -89,11 +110,11 @@ class DatabaseServiceImpl implements DatabaseService {
   }
 
   async create(collection: string, data: any): Promise<string> {
-    const response = await apiService.request(`/${collection}`, {
+    const response = await apiService.request<{ id: string }>(`/${collection}`, {
       method: 'POST',
       body: JSON.stringify(data)
     });
-    return response.success ? response.data.id : '';
+    return response.success && response.data ? response.data.id : '';
   }
 
   async read(collection: string, id: string): Promise<any> {
@@ -123,8 +144,8 @@ class DatabaseServiceImpl implements DatabaseService {
     if (options?.projection) params.append('projection', options.projection.join(','));
 
     const url = `/${collection}${params.toString() ? '?' + params.toString() : ''}`;
-    const response = await apiService.request(url);
-    return response.success ? response.data : [];
+    const response = await apiService.request<any[]>(url);
+    return response.success && Array.isArray(response.data) ? response.data : [];
   }
 }
 

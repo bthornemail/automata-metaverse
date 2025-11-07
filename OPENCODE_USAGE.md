@@ -31,7 +31,7 @@ Each opencode tool is mapped to a specific dimensional agent:
 - **4D-Network**: `bash`, `fetch`, `webfetch`
 - **5D-Consensus**: `todowrite`, `todoread`, `git operations`
 - **6D-Intelligence**: `task`, `pattern-analyzer`, `automaton-query`
-- **7D-Quantum**: `automaton-execute`, `config-manager`, `report-generator`
+- **7D-Quantum**: `automaton-execute`, `config-manager`, `report-generator`, `generate-metaverse`
 
 ### Pipeline Operations
 
@@ -67,6 +67,7 @@ All commands are converted to Church encoding before execution:
 - **Read operations** become Church pairs: λx.λy.λf.fxy
 - **Edit operations** become Church addition: λm.λn.λf.λx.mf(nfx)
 - **Task operations** become AI transformations: λai.transform(attention)
+- **Metaverse generation** becomes unified topology: λmetaverse.generate(unified-topology)
 
 ## Examples
 
@@ -101,6 +102,11 @@ All commands are converted to Church encoding before execution:
 
 # Quantum operations through 7D
 ./command-router automaton-execute "evolve"
+
+# Generate metaverse JSONL file through 7D unified topology
+./command-router generate-metaverse ./generate.metaverse.jsonl
+# Or use opencode-integration:
+./opencode-integration execute generate-metaverse ./generate.metaverse.jsonl
 ```
 
 ## Integration with Existing Workflows
