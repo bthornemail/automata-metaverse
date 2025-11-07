@@ -51,7 +51,7 @@ const ExecutionHistory: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-dimensions-0d"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#6366f1]"></div>
       </div>
     );
   }
@@ -110,7 +110,7 @@ const ExecutionHistory: React.FC = () => {
               onClick={() => setSelectedView(view.id as any)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 ${
                 selectedView === view.id
-                  ? 'bg-dimensions-0d text-white'
+                  ? 'bg-[#6366f1] text-white'
                   : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
               }`}
             >
@@ -143,7 +143,7 @@ const ExecutionHistory: React.FC = () => {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="p-3 bg-gray-800 rounded-lg border-l-4 border-dimensions-0d"
+                    className="p-3 bg-gray-800 rounded-lg border-l-4 border-[#6366f1]"
                   >
                     <div className="flex items-center justify-between">
                       <div>

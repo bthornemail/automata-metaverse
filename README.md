@@ -1,37 +1,59 @@
-# Self-Referencing JSONL Automaton
+# 🌌 Church Encoding Metaverse
 
-A meta-circular evaluator that reads, executes, and modifies its own JSONL definition while progressing through 8 dimensional levels from Church encoding to quantum computing.
+A production-ready computational topology canvas that implements self-referencing Church encoding from 0D point topology to 7D quantum superposition, featuring WebGL visualization, multiplayer collaboration, and AI-driven evolution.
 
 ## 🚀 Quick Start
 
-### Option 1: Built-in Intelligence (No Ollama Required)
+### Production Deployment
 ```bash
-# Run for 50 iterations with 2-second intervals
+# Full production deployment
+./deploy.sh
+
+# Verify deployment
+./deploy.sh verify
+
+# Access the application
+./deploy.sh access
+```
+
+### Local Development
+```bash
+# Start development environment
+./start-dev.sh
+
+# Run UI development server
+./start-ui-dev.sh
+
+# Run automaton locally
 npx tsx continuous-automaton.ts --max 50
-
-# Run continuously with 1-second intervals
-npx tsx continuous-automaton.ts 1000
-
-# Run for 100 iterations with 500ms intervals
-npx tsx continuous-automaton.ts 500 --max 100
 ```
 
-### Option 2: With Ollama AI Control
+### Docker Development
 ```bash
-# Setup Ollama (one-time)
-./setup-ollama.sh
+# Build and run all services
+docker-compose up -d
 
-# Run with Ollama (default: llama3.2)
-npx tsx ollama-automaton.ts
-
-# Run with specific model and interval
-npx tsx ollama-automaton.ts qwen2.5:3b 3000
-
-# Run for limited iterations
-npx tsx ollama-automaton.ts llama3.2 2000 50
+# Development mode with hot reload
+docker-compose -f docker-compose.dev.yml up
 ```
 
-## 🧠 Architecture
+## 🏗️ Architecture
+
+### Production Infrastructure
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Church Encoding Metaverse                │
+├─────────────────────────────────────────────────────────────┤
+│  0D → 1D → 2D → 3D → 4D → 5D → 6D → 7D → WebGL → Multiplayer │
+│                                                             │
+│  🎯 Features:                                               │
+│  • WebGL 3D Visualization (Three.js)                        │
+│  • Multiplayer Collaboration (WebRTC)                       │
+│  • AI Evolution (WebLLM)                                    │
+│  • Real-time Communication (WebSocket)                     │
+│  • Self-modifying Canvas (JSONL)                            │
+└─────────────────────────────────────────────────────────────┘
+```
 
 ### Dimensional Progression
 - **0D**: Identity (λx.x) - Self-reference foundation
@@ -42,6 +64,13 @@ npx tsx ollama-automaton.ts llama3.2 2000 50
 - **5D**: Consensus (blockchain) - Self-validation
 - **6D**: Intelligence (neural_network) - Self-learning
 - **7D**: Quantum (|ψ⟩ = α|0⟩ + β|1⟩) - Self-observation
+
+### Kubernetes Stack
+- **Frontend**: Nginx + React/Vite (Port 80)
+- **Backend**: Node.js API (Port 5555)
+- **Cache**: Redis (Port 6379)
+- **Monitoring**: Prometheus + Grafana
+- **Security**: Network policies, RBAC, TLS
 
 ### Self-Reference Pattern
 Each automaton state contains:
@@ -66,61 +95,127 @@ Each automaton state contains:
 - **self-observe**: Quantum observation and collapse
 - **compose**: Compose multiple states
 
-## 📁 Files
+## 📁 Key Files
 
+### Core System
 - `automaton.jsonl` - Self-referencing automaton definition
 - `continuous-automaton.ts` - Built-in intelligence runner
 - `ollama-automaton.ts` - Ollama-powered runner
 - `advanced-automaton.ts` - Core automaton implementation
-- `setup-ollama.sh` - Ollama installation script
 
-## 🔄 Continuous Execution Features
+### Deployment
+- `deploy.sh` - Production deployment script
+- `docker-compose.yml` - Production Docker services
+- `k8s/` - Kubernetes manifests
+- `helm/` - Helm charts
 
-### Built-in Intelligence Mode
-- Periodic self-modification (every 20 iterations)
-- Dimension-specific action selection
-- Intelligent action sequencing
-- Automatic state saving and analysis
+### UI & Visualization
+- `ui/` - React/Vite frontend with WebGL
+- `src/routes/` - Backend API routes
+- `monitoring/` - Prometheus + Grafana configs
 
-### Ollama AI Mode
-- AI-driven action selection
-- Context-aware decision making
-- Learning from execution history
-- Adaptive behavior patterns
+### Documentation
+- `DEPLOYMENT_COMPLETE.md` - Full deployment status
+- `DEPLOYMENT_GUIDE.md` - Step-by-step deployment
+- `AGENTS.md` - Multi-agent system specification
 
-## 📊 Output Analysis
+## 🌟 Production Features
 
-The automaton provides:
-- Real-time dimensional progression tracking
-- Self-reference integrity monitoring
-- Dynamic object creation logging
-- Execution history analysis
-- SHACL validation reports
+### WebGL 3D Visualization
+- Real-time rendering of computational topology
+- Interactive dimensional exploration
+- GPU-accelerated polynomial rendering
+- Three.js-based 3D manifolds
+
+### Multiplayer Collaboration
+- WebRTC voice communication
+- Real-time canvas synchronization
+- Avatar-based interaction
+- Networked-Aframe framework
+
+### AI-Driven Evolution
+- WebLLM integration for code generation
+- Self-modifying JSONL canvas
+- 3D trace visualization
+- Automated mutation graphs
+
+### Enterprise Monitoring
+- Prometheus metrics collection
+- Grafana custom dashboards
+- Church encoding dimensional metrics
+- Performance and security monitoring
+
+## 📊 Monitoring & Metrics
+
+### Church Encoding Metrics
+- `automaton_church_operations_total` - Church encoding operations
+- `automaton_dimensional_transitions` - Dimension progression events
+- `automaton_self_reference_depth` - Self-reference recursion depth
+- `automaton_webgl_render_duration` - WebGL rendering performance
+
+### System Performance
+- CPU, memory, and network utilization
+- Pod health and restart counts
+- Response times and error rates
+- Database query performance
+
+### User Activity
+- Active users and sessions
+- Feature usage statistics
+- Collaboration metrics
+- WebSocket connection counts
 
 ## 🛠️ Requirements
 
+### Production
+- Kubernetes cluster (v1.20+)
+- Docker container runtime
+- Ingress controller
+- Persistent storage
+
+### Development
 - Node.js with TypeScript
+- Docker & Docker Compose
 - (Optional) Ollama for AI control
-- (Optional) Linux/macOS for setup script
+- Linux/macOS for setup scripts
 
 ## 🎯 Usage Examples
 
+### Production Deployment
 ```bash
-# Quick test run
-npx tsx continuous-automaton.ts --max 10
+# Deploy full stack
+./deploy.sh
 
-# Production run with Ollama
-./setup-ollama.sh
-npx tsx ollama-automaton.ts llama3.2 5000
+# Scale services
+kubectl scale deployment backend-deployment --replicas=5 -n automaton
 
-# Resource-efficient run
-npx tsx continuous-automaton.ts 1000 --max 1000
-
-# Development mode with fast iteration
-npx tsx continuous-automaton.ts 100 --max 100
+# Monitor performance
+kubectl top pods -n automaton
 ```
 
-## 🔬 Self-Modification Demonstration
+### Development
+```bash
+# Start all services
+./start-dev.sh
+
+# Run automaton locally
+npx tsx continuous-automaton.ts --max 100
+
+# Test with Ollama
+./setup-ollama.sh
+npx tsx ollama-automaton.ts llama3.2 2000
+```
+
+### Monitoring
+```bash
+# View logs
+kubectl logs -f deployment/backend-deployment -n automaton
+
+# Access Grafana
+kubectl port-forward -n monitoring service/grafana-service 3000:3000
+```
+
+## 🔬 Self-Modification System
 
 The automaton continuously:
 1. Reads its own JSONL file structure
@@ -131,4 +226,15 @@ The automaton continuously:
 6. Creates dynamic self-referential objects
 7. Tracks execution history and learns from patterns
 
-This creates a living computational topology that evolves and modifies itself according to dimensional progression specified in the AGENTS.md framework.
+## 🌍 Live Access
+
+### Application
+- **Main App**: https://universallifeprotocol.com
+- **API**: https://api.universallifeprotocol.com
+- **WebSocket**: wss://universallifeprotocol.com
+
+### Monitoring
+- **Grafana**: https://universallifeprotocol.com/grafana (admin/admin123)
+- **Prometheus**: https://universallifeprotocol.com/prometheus
+
+This creates a living computational topology that evolves and modifies itself according to dimensional progression specified in the AGENTS.md framework, now deployed with enterprise-grade infrastructure.

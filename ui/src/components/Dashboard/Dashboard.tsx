@@ -19,7 +19,6 @@ const Dashboard: React.FC = () => {
   const getStatusColor = () => {
     switch (state.status) {
       case 'running': return 'status-running';
-      case 'idle': return 'status-stopped';
       case 'idle': return 'status-idle';
       case 'error': return 'status-stopped';
       default: return 'status-idle';
@@ -29,7 +28,7 @@ const Dashboard: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-dimensions-0d"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#6366f1]"></div>
       </div>
     );
   }
@@ -203,7 +202,7 @@ const Dashboard: React.FC = () => {
           <button
             className={`px-3 py-1 rounded text-sm ${
               state.executionMode === 'builtin'
-                ? 'bg-dimensions-0d text-white'
+                 ? 'bg-[#6366f1] text-white'
                 : 'bg-gray-700 text-gray-400'
             }`}
           >

@@ -148,7 +148,7 @@ const SelfReferenceAnalyzer: React.FC = () => {
             placeholder="Search self-references..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-dimensions-0d"
+            className="w-full pl-10 pr-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#6366f1]"
           />
         </div>
       </div>
@@ -171,14 +171,14 @@ const SelfReferenceAnalyzer: React.FC = () => {
                 transition={{ delay: index * 0.05 }}
                 className={`p-4 bg-gray-700/50 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
                   selectedLine === ref.line
-                    ? 'border-dimensions-0d bg-dimensions-0d/20'
+                    ? 'border-[#6366f1] bg-[#6366f1]/20'
                     : 'border-gray-600 hover:border-gray-500'
                 }`}
                 onClick={() => setSelectedLine(selectedLine === ref.line ? null : ref.line)}
               >
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-dimensions-0d rounded-lg flex items-center justify-center text-white text-sm font-bold">
+                    <div className="w-8 h-8 bg-[#6366f1] rounded-lg flex items-center justify-center text-white text-sm font-bold">
                       {ref.line}
                     </div>
                     <div>

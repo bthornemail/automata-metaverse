@@ -1,0 +1,55 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: automaton-ingress
+  namespace: automaton
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "30"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "30"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "30"
+    nginx.ingress.kubernetes.io/websocket-services: "backend-service"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: automaton.local
+    http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: backend-service
+            port:
+              number: 5555
+      - path: /socket.io
+        pathType: Prefix
+        backend:
+          service:
+            name: backend-service
+            port:
+              number: 5555
+      - path: /ws
+        pathType: Prefix
+        backend:
+          service:
+            name: backend-service
+            port:
+              number: 5555
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-service
+            port:
+              number: 80
+  - host: api.automaton.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: backend-service
+            port:
+              number: 5555

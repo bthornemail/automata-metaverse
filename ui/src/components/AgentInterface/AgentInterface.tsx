@@ -155,7 +155,7 @@ const AgentInterface: React.FC = () => {
               onClick={() => setChat(prev => ({ ...prev, activeAgent: agent }))}
               className={`p-2 rounded-lg text-xs transition-all duration-200 ${
                 chat.activeAgent === agent
-                  ? 'bg-dimensions-0d text-white'
+                  ? 'bg-[#6366f1] text-white'
                   : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
               }`}
             >
@@ -190,7 +190,7 @@ const AgentInterface: React.FC = () => {
                   }`}
                 >
                   {message.role === 'agent' && (
-                    <div className="w-8 h-8 bg-dimensions-0d rounded-full flex items-center justify-center flex-shrink-0">
+                    <div className="w-8 h-8 bg-[#6366f1] rounded-full flex items-center justify-center flex-shrink-0">
                       <Bot className="w-4 h-4 text-white" />
                     </div>
                   )}
@@ -226,7 +226,7 @@ const AgentInterface: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 className="flex gap-3"
               >
-                <div className="w-8 h-8 bg-dimensions-0d rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-[#6366f1] rounded-full flex items-center justify-center">
                   <Bot className="w-4 h-4 text-white" />
                 </div>
                 <div className="bg-gray-700 rounded-lg p-3">
@@ -279,13 +279,13 @@ const AgentInterface: React.FC = () => {
           onKeyPress={handleKeyPress}
           placeholder={`Message ${chat.activeAgent.replace('-', ' ')}...`}
           disabled={isTyping}
-          className="flex-1 px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-dimensions-0d disabled:opacity-50"
+          className="flex-1 px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#6366f1] disabled:opacity-50"
         />
         
         <button
           onClick={() => sendMessage(inputMessage)}
           disabled={!inputMessage.trim() || isTyping}
-          className="control-button bg-dimensions-0d hover:bg-dimensions-1d text-white"
+          className="control-button bg-[#6366f1] hover:bg-[#8b5cf6] text-white"
         >
           <Send className="w-4 h-4" />
         </button>

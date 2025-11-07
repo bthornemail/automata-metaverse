@@ -12,7 +12,19 @@
     "lint": "eslint . --ext .ts --fix",
     "test": "jest",
     "clean": "rm -rf dist",
-    "prebuild": "npm run clean"
+    "prebuild": "npm run clean",
+    "pm2:start": "pm2 start ecosystem.config.js",
+    "pm2:start:prod": "pm2 start ecosystem.config.js --env production",
+    "pm2:stop": "pm2 stop automaton-backend",
+    "pm2:restart": "pm2 restart automaton-backend",
+    "pm2:delete": "pm2 delete automaton-backend",
+    "pm2:logs": "pm2 logs automaton-backend",
+    "pm2:monit": "pm2 monit",
+    "pm2:status": "pm2 status",
+    "pm2:save": "pm2 save",
+    "pm2:startup": "pm2 startup",
+    "deploy:pm2": "./deploy-pm2.sh",
+    "deploy:pm2:prod": "./deploy-pm2.sh production"
   },
   "dependencies": {
     "@codemirror/commands": "^6.10.0",

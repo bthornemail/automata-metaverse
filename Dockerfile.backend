@@ -13,6 +13,7 @@ RUN npm ci
 
 # Copy source code
 COPY *.ts ./
+COPY src/ ./src/
 COPY grok_files/ ./grok_files/
 
 # Build TypeScript
@@ -36,7 +37,8 @@ COPY package*.json ./
 RUN npm ci --only=production && npm cache clean --force
 
 # Copy built application and source
-COPY --from=builder /app/*.js ./
+COPY --from=builder /app/dist/*.js ./
+COPY --from=builder /app/dist/src/ ./src/
 COPY --from=builder /app/grok_files/ ./grok_files/
 COPY automaton.jsonl ./
 
