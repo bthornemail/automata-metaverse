@@ -109,7 +109,7 @@ class CommandRouter {
     return await this.bridge.routeCommand('todowrite', params);
   }
   
-  private async routeTodoRead(args: any[]) {
+  private async routeTodoRead(_args: any[]) {
     return await this.bridge.routeCommand('todoread', {});
   }
   
