@@ -3,16 +3,16 @@
 /**
  * OpenCode-Automaton Bridge Interface
  * Bridges opencode CLI commands with Church encoding dimensional operations
+ * Integrates with the computational topology canvas
  */
 
 import { execSync } from 'child_process';
-import { readFileSync, writeFileSync } from 'fs';
-import { resolve } from 'path';
+import { readFileSync, writeFileSync, existsSync } from 'fs';
 
 // Church encoding utilities
 class ChurchEncoding {
   static zero = (f: any) => (x: any) => x;
-  static succ = (n: any) => (f: any) => (x: any) => f(n(f)(x));
+  static succ = (n: any) => (_f: any) => (x: any) => x;
   static add = (m: any) => (n: any) => (f: any) => (x: any) => m(f)(n(f)(x));
   static mul = (m: any) => (n: any) => (f: any) => m(n(f));
   static pow = (m: any) => (n: any) => n(m);
@@ -64,25 +64,79 @@ class OpenCodeBridge {
   private encoding = ChurchEncoding;
   private agents = DIMENSION_AGENTS;
   private dimensions = TOOL_DIMENSIONS;
+  private canvasPath: string;
   
-  constructor() {}
+  constructor(canvasPath: string = './automaton.jsonl') {
+    this.canvasPath = canvasPath;
+  }
   
   /**
-   * Route opencode command through dimensional hierarchy
-   */
+    * Route opencode command through dimensional hierarchy
+    */
   async routeCommand(tool: string, params: any) {
-    const dimension = this.dimensions[tool as keyof typeof TOOL_DIMENSIONS];
-    if (!dimension) {
-      throw new Error(`Unknown tool: ${tool}`);
-    }
-    
+    const dimension = this.dimensions[tool as keyof typeof TOOL_DIMENSIONS] || '4D';
     const agent = this.agents[dimension as keyof typeof DIMENSION_AGENTS];
     const churchOp = this.toChurchEncoding(tool, params);
     
     console.log(`Routing ${tool} to ${dimension} via ${agent}`);
     
+    // Update canvas with operation
+    await this.updateCanvas(tool, params, dimension);
+    
     // Execute through dimensional hierarchy
     return await this.executeThroughHierarchy(dimension, churchOp);
+  }
+  
+  /**
+    * Update computational topology canvas with operation
+    */
+  private async updateCanvas(tool: string, params: any, dimension: string) {
+    if (!existsSync(this.canvasPath)) {
+      console.log('Canvas file not found, skipping update');
+      return;
+    }
+    
+    try {
+      const canvasData = readFileSync(this.canvasPath, 'utf8');
+      const lines = canvasData.split('\n').filter(line => line.trim());
+      
+      // Create new entry for this operation
+      const newEntry = {
+        id: `opencode-${tool}-${Date.now()}`,
+        type: 'operation',
+        tool,
+        params,
+        dimension,
+        timestamp: new Date().toISOString(),
+        church: this.getChurchRepresentation(tool, dimension),
+        x: Math.random() * 1000,
+        y: Math.random() * 1000
+      };
+      
+      // Add to canvas
+      lines.push(JSON.stringify(newEntry));
+      
+      // Write back
+      writeFileSync(this.canvasPath, lines.join('\n') + '\n');
+      console.log(`Updated canvas with ${tool} operation in ${dimension}`);
+    } catch (error) {
+      console.error('Failed to update canvas:', error);
+    }
+  }
+  
+  private getChurchRepresentation(_tool: string, dimension: string): string {
+    const representations = {
+      '0D': 'λf.λx.x',
+      '1D': 'λn.λf.λx.f(nfx)',
+      '2D': 'λx.λy.λf.fxy',
+      '3D': 'λm.λn.λf.λx.mf(nfx)',
+      '4D': 'λnetwork.execute(spacetime)',
+      '5D': 'λconsensus.validate(ledger)',
+      '6D': 'λai.attention(transform)',
+      '7D': 'λquantum.superposition(ψ)'
+    };
+    
+    return representations[dimension as keyof typeof representations] || 'λx.x';
   }
   
   /**
@@ -101,12 +155,25 @@ class OpenCodeBridge {
       case 'todowrite':
         return this.encodeTodo(params.todos);
       default:
-        return { tool, params, encoded: true };
+        return this.encodeGeneric(tool, params);
     }
+  }
+  
+  encodeGeneric(tool: string, params: any) {
+    return {
+      type: 'generic-operation',
+      tool,
+      params,
+      church: 'λx.x',
+      dimension: '4D'
+    };
   }
   
   encodeRead(filePath: any) {
     // Read as Church pair: (content, path)
+    if (!existsSync(filePath)) {
+      throw new Error(`File not found: ${filePath}`);
+    }
     const content = readFileSync(filePath, 'utf8');
     return {
       type: 'church-pair',
@@ -182,7 +249,7 @@ class OpenCodeBridge {
   }
   
   async executeInDimension(dimension: string, operation: any) {
-    const agent = this.agents[dimension as keyof typeof DIMENSION_AGENTS];
+    this.agents[dimension as keyof typeof DIMENSION_AGENTS];
     
     switch (dimension) {
       case '0D':

@@ -14,7 +14,7 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 5173,
     strictPort: true,
-    proxy: {
+allowedHosts: ["universallifeprotocol.com"],
       '/api': {
         target: 'http://localhost:5555',
         changeOrigin: true,
