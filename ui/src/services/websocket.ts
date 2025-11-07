@@ -1,65 +1,63 @@
 import { DashboardState, WebSocketMessage, RealtimeUpdates } from '@/types';
+import { io, Socket } from 'socket.io-client';
 
 class WebSocketService {
-  private ws: WebSocket | null = null;
+  private socket: Socket | null = null;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
   private reconnectDelay = 1000;
   private handlers: Partial<RealtimeUpdates> = {};
 
-  connect(url: string = 'ws://localhost:5555') {
+  connect(url: string = 'http://localhost:5555') {
     try {
-      this.ws = new WebSocket(url);
+      this.socket = io(url, {
+        transports: ['websocket', 'polling'],
+        timeout: 20000,
+        forceNew: true
+      });
       
-      this.ws.onopen = () => {
-        console.log('WebSocket connected');
+      this.socket.on('connect', () => {
+        console.log('Socket.IO connected');
         this.reconnectAttempts = 0;
-      };
+      });
 
-      this.ws.onmessage = (event) => {
-        try {
-          const message: WebSocketMessage = JSON.parse(event.data);
-          this.handleMessage(message);
-        } catch (error) {
-          console.error('Failed to parse WebSocket message:', error);
-        }
-      };
+      this.socket.on('status', (data: DashboardState) => {
+        this.handlers.onStatusUpdate?.(data);
+      });
 
-      this.ws.onclose = () => {
-        console.log('WebSocket disconnected');
+      this.socket.on('dimension', (data: { dimension: number }) => {
+        this.handlers.onDimensionChange?.(data.dimension);
+      });
+
+      this.socket.on('action', (data: { action: string; result: string; timestamp: number; from?: string; to?: string; iteration?: number }) => {
+        this.handlers.onActionExecuted?.(data.action, data);
+      });
+
+      this.socket.on('modification', (data: any) => {
+        this.handlers.onSelfModification?.(data);
+      });
+
+      this.socket.on('error', (data: any) => {
+        this.handlers.onError?.(data.error || data);
+      });
+
+      this.socket.on('disconnect', () => {
+        console.log('Socket.IO disconnected');
         this.attemptReconnect();
-      };
+      });
 
-      this.ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
-        this.handlers.onError?.('WebSocket connection error');
-      };
+      this.socket.on('connect_error', (error) => {
+        console.error('Socket.IO connection error:', error);
+        this.handlers.onError?.('Socket.IO connection error');
+      });
 
     } catch (error) {
-      console.error('Failed to create WebSocket connection:', error);
-      this.handlers.onError?.('Failed to connect to WebSocket');
+      console.error('Failed to create Socket.IO connection:', error);
+      this.handlers.onError?.('Failed to connect to Socket.IO');
     }
   }
 
-  private handleMessage(message: WebSocketMessage) {
-    switch (message.type) {
-      case 'status':
-        this.handlers.onStatusUpdate?.(message.payload as DashboardState);
-        break;
-      case 'dimension':
-        this.handlers.onDimensionChange?.(message.payload.dimension);
-        break;
-      case 'action':
-        this.handlers.onActionExecuted?.(message.payload.action, message.payload.result);
-        break;
-      case 'modification':
-        this.handlers.onSelfModification?.(message.payload);
-        break;
-      case 'error':
-        this.handlers.onError?.(message.payload);
-        break;
-    }
-  }
+  // Message handling is now done through individual event listeners above
 
   private attemptReconnect() {
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
@@ -71,7 +69,7 @@ class WebSocketService {
       }, this.reconnectDelay * this.reconnectAttempts);
     } else {
       console.error('Max reconnection attempts reached');
-      this.handlers.onError?.('Failed to reconnect to WebSocket');
+      this.handlers.onError?.('Failed to reconnect to Socket.IO');
     }
   }
 
@@ -82,32 +80,26 @@ class WebSocketService {
 
   // Send messages to server
   sendAction(action: string, params?: any) {
-    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      this.ws.send(JSON.stringify({
-        type: 'action',
-        payload: { action, params }
-      }));
+    if (this.socket && this.socket.connected) {
+      this.socket.emit('action', { action, params });
     }
   }
 
   sendCommand(command: string, params?: any) {
-    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      this.ws.send(JSON.stringify({
-        type: 'command',
-        payload: { command, params }
-      }));
+    if (this.socket && this.socket.connected) {
+      this.socket.emit('command', { command, params });
     }
   }
 
   disconnect() {
-    if (this.ws) {
-      this.ws.close();
-      this.ws = null;
+    if (this.socket) {
+      this.socket.disconnect();
+      this.socket = null;
     }
   }
 
   isConnected(): boolean {
-    return this.ws?.readyState === WebSocket.OPEN;
+    return this.socket?.connected || false;
   }
 }
 

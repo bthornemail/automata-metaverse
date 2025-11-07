@@ -162,3 +162,10 @@ The editor process exited with an error: spawn code ENOENT.
   File: /home/main/automaton/ui/src/components/Dashboard/Dashboard.tsx
 (node:123083) [DEP0060] DeprecationWarning: The `util._extend` API is deprecated. Please use Object.assign() instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
+1:37:34 AM [vite] vite.config.ts changed, restarting server...
+1:37:34 AM [vite] server restarted.
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: http://172.238.45.134:3000/
+  ➜  Network: http://172.18.0.1:3000/
+1:38:12 AM [vite] page reload dist/index.html

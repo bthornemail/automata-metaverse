@@ -1,6 +1,12 @@
 import { AdvancedSelfReferencingAutomaton } from './advanced-automaton';
 import { createServer } from 'http';
 import { Server as SocketIOServer } from 'socket.io';
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import compression from 'compression';
+import morgan from 'morgan';
+import WordNetIntegration from './src/services/wordnet';
 
 const HTTP_PORT = 5555;
 const WS_PORT = 5556;
@@ -18,8 +24,9 @@ const httpServer = createServer((req, res) => {
     return;
   }
 
-  const url = new URL(req.url || '', `http://localhost:${HTTP_PORT}`);
-  const path = url.pathname;
+  const requestUrl = req.url ?? `http://localhost:${HTTP_PORT}`;
+  const url = new URL(requestUrl, `http://localhost:${HTTP_PORT}`);
+  const path = url.pathname || '';
 
   // API Routes
   if (path.startsWith('/api/')) {
@@ -42,6 +49,7 @@ const io = new SocketIOServer({
 let automaton: AdvancedSelfReferencingAutomaton;
 let isRunning = false;
 let intervalId: NodeJS.Timeout | null = null;
+const wordNet = new WordNetIntegration();
 
 // Initialize automaton
 try {
@@ -54,7 +62,7 @@ try {
 
 // API Request Handler
 async function handleAPIRequest(path: string, req: any, res: any) {
-  const apiPath = path.replace('/api/', '');
+    const apiPath = path.replace('/api/', '') || '';
   
   try {
     let response: any = { success: true, timestamp: Date.now() };
@@ -244,6 +252,39 @@ async function handleAPIRequest(path: string, req: any, res: any) {
         }
         break;
 
+      case 'wordnet/lookup':
+        const lookupBody = await parseRequestBody(req);
+        const lookupWord = lookupBody.word || apiPath.replace('wordnet/lookup/', '');
+        if (lookupWord) {
+          response.data = await wordNet.lookupWord(lookupWord);
+        } else {
+          response.success = false;
+          response.error = 'No word specified';
+        }
+        break;
+
+      case 'wordnet/analyze':
+        const analyzeBody = await parseRequestBody(req);
+        const analyzeWord = analyzeBody.word || apiPath.replace('wordnet/analyze/', '');
+        if (analyzeWord) {
+          response.data = await wordNet.analyzeSemanticTopology(analyzeWord);
+        } else {
+          response.success = false;
+          response.error = 'No word specified';
+        }
+        break;
+
+      case 'wordnet/relationships':
+        const relBody = await parseRequestBody(req);
+        const relWords = relBody.words || [relBody.word1, relBody.word2];
+        if (relWords && relWords.length >= 2) {
+          response.data = await wordNet.findSemanticRelationships(relWords[0], relWords[1]);
+        } else {
+          response.success = false;
+          response.error = 'Two words required for relationship analysis';
+        }
+        break;
+
       default:
         response.success = false;
         response.error = 'Unknown endpoint';
@@ -327,11 +368,17 @@ function stopAutomaton() {
 function executeAction(action: string) {
   try {
     console.log(`🎯 Executing: ${action}`);
+    
+    const currentDim = (automaton as any).currentDimension;
+    const iterationCount = (automaton as any).executionHistory?.length || 0;
+    let fromDim = currentDim;
+    let toDim = currentDim;
 
     switch (action) {
       case 'evolve':
         (automaton as any).executeEvolution();
         progressDimension();
+        toDim = (automaton as any).currentDimension;
         break;
       case 'self-reference':
         (automaton as any).executeSelfReference();
@@ -357,8 +404,29 @@ function executeAction(action: string) {
         break;
     }
 
-    // Emit action execution
-    io.emit('action', { action, result: 'success', timestamp: Date.now() });
+    // Add to execution history
+    const historyEntry = {
+      iteration: iterationCount,
+      action,
+      from: `${fromDim}D`,
+      to: `${toDim}D`,
+      timestamp: Date.now()
+    };
+    
+    if (!(automaton as any).executionHistory) {
+      (automaton as any).executionHistory = [];
+    }
+    (automaton as any).executionHistory.push(historyEntry);
+
+    // Emit action execution with proper data
+    io.emit('action', { 
+      action, 
+      result: 'success', 
+      timestamp: Date.now(),
+      from: `${fromDim}D`,
+      to: `${toDim}D`,
+      iteration: iterationCount
+    });
 
   } catch (error) {
     console.error(`❌ Failed to execute action ${action}:`, error);
@@ -554,7 +622,7 @@ async function handleAgentMessage(agent: string, message: string): Promise<strin
     ]
   };
   
-  const agentResponses = responses[agent] || ['I am a specialized automaton agent. How can I help you?'];
+  const agentResponses = responses[agent as keyof typeof responses] || ['I am a specialized automaton agent. How can I help you?'];
   const randomResponse = agentResponses[Math.floor(Math.random() * agentResponses.length)];
   
   // Add context-specific responses
@@ -566,18 +634,19 @@ async function handleAgentMessage(agent: string, message: string): Promise<strin
     return `${randomResponse}\n\nCurrent dimension: ${(automaton as any).currentDimension || 0}D`;
   }
   
-  return randomResponse;
+  return randomResponse || '';
 }
 
 function parseRequestBody(req: any): Promise<any> {
   return new Promise((resolve) => {
     let body = '';
-    req.on('data', chunk => {
+    req.on('data', (chunk: any) => {
       body += chunk.toString();
     });
     req.on('end', () => {
       try {
-        resolve(JSON.parse(body));
+        const parsedBody = body ? JSON.parse(body) : {};
+        resolve(parsedBody);
       } catch {
         resolve({});
       }

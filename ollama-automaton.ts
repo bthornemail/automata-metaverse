@@ -237,7 +237,7 @@ Action:`;
     console.log('📊 Current Status:');
     console.log(`  Running: ${this.isRunning}`);
     console.log(`  Iteration: ${this.iterationCount}`);
-    console.log(`  Dimension: ${(this.automaton as any).currentDimension}`);
+    console.log(`  Dimension: ${(this.automaton as any).currentDimension || 0}`);
     console.log(`  Model: ${this.ollamaModel}`);
   }
 }
@@ -246,7 +246,7 @@ Action:`;
 async function main() {
   const args = process.argv.slice(2);
   const model = args[0] || 'llama3.2';
-  const interval = parseInt(args[1]) || 3000;
+  const interval = parseInt(args[1] || '3000') || 3000;
   const maxIterations = args[2] ? parseInt(args[2]) : undefined;
 
   console.log('🤖 Ollama-Powered Self-Referencing Automaton');
