@@ -12,7 +12,7 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0',
-    port: 3000,
+    port: 5173,
     strictPort: true,
     proxy: {
       '/api': {
@@ -21,7 +21,7 @@ export default defineConfig({
         secure: false,
       },
       '/socket.io': {
-        target: 'http://localhost:9001',
+        target: 'http://localhost:5555',
         changeOrigin: true,
         ws: true,
       },

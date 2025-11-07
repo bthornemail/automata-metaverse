@@ -66,11 +66,13 @@ class AdvancedSelfReferencingAutomaton {
     
     this.objects = [];
     for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim();
+      const line = lines[i]!.trim();
       if (line.startsWith('{') && line.endsWith('}')) {
         try {
           const obj = JSON.parse(line);
-          this.objects.push(obj);
+          if (obj && typeof obj === 'object') {
+            this.objects.push(obj);
+          }
         } catch (error) {
           console.warn(`Failed to parse line ${i + 1}: ${line}`);
         }
@@ -92,7 +94,7 @@ class AdvancedSelfReferencingAutomaton {
       (obj as AutomatonState).dimensionalLevel === level
     ) as AutomatonState[];
     
-    return automata.length > 0 ? automata[0] : null;
+    return automata.length > 0 ? automata[0]! : null;
   }
 
   getCurrentAutomaton(): AutomatonState | null {
@@ -105,7 +107,7 @@ class AdvancedSelfReferencingAutomaton {
       (obj as VerticalTransition).fromNode === fromId
     ) as VerticalTransition[];
     
-    return transitions.length > 0 ? transitions[0] : null;
+    return transitions.length > 0 ? transitions[0]! : null;
   }
 
   evaluateCondition(condition: string, context: any = {}): boolean {
@@ -204,7 +206,7 @@ class AdvancedSelfReferencingAutomaton {
   private executeComposition(): void {
     const automata = this.objects.filter(obj => obj.type === 'automaton') as AutomatonState[];
     if (automata.length >= 2) {
-      console.log(`Composed automata: ${automata[0].id} + ${automata[1].id}`);
+      console.log(`Composed automata: ${automata[0]!.id} + ${automata[1]!.id}`);
     }
   }
 
@@ -225,7 +227,7 @@ class AdvancedSelfReferencingAutomaton {
   private executeSelfTraining(): void {
     const actionCounts = new Map<string, number>();
     this.executionHistory.forEach(entry => {
-      const action = entry.split(':')[0];
+      const action = entry.split(':')[0] || 'unknown';
       actionCounts.set(action, (actionCounts.get(action) || 0) + 1);
     });
     

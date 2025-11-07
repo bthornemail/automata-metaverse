@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ExecutionData } from '@/types';
 import { apiService } from '@/services/api';
+import { wsService } from '@/services/websocket';
 
 export const useExecutionHistory = () => {
   const [data, setData] = useState<ExecutionData>({
@@ -77,6 +78,29 @@ export const useExecutionHistory = () => {
       performanceMetrics: { avgExecutionTime: 0, successRate: 0 },
     });
   }, []);
+
+  // Set up WebSocket for real-time updates
+  useEffect(() => {
+    wsService.connect();
+
+    const handleActionExecuted = (action: string, result: any) => {
+      addToHistory({
+        action,
+        timestamp: Date.now(),
+        from: 'unknown', // These would be determined by the actual action
+        to: 'unknown',
+        iteration: data.history.length
+      });
+    };
+
+    wsService.onUpdateHandlers({
+      onActionExecuted: handleActionExecuted
+    });
+
+    return () => {
+      wsService.disconnect();
+    };
+  }, [data.history.length, addToHistory]);
 
   // Auto-load history on mount
   useEffect(() => {

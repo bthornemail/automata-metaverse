@@ -197,8 +197,8 @@ async function main() {
   const useOllama = args.includes('--ollama');
   const model = args.find(arg => arg.startsWith('--model='))?.split('=')[1] || 'llama3.2';
   const interval = parseInt(args.find(arg => !isNaN(parseInt(arg))) || '2000');
-  const maxIterations = args.find(arg => arg.startsWith('--max='))?.split('=')[1] ? 
-    parseInt(args.find(arg => arg.startsWith('--max='))!.split('=')[1]) : undefined;
+  const maxIterationsArg = args.find(arg => arg.startsWith('--max='))?.split('=')[1];
+  const maxIterations = maxIterationsArg ? parseInt(maxIterationsArg) : undefined;
 
   console.log('🤖 Continuous Self-Referencing Automaton');
   console.log('=' .repeat(50));

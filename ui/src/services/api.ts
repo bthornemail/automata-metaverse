@@ -1,6 +1,6 @@
 import { DashboardState, ApiResponse } from '@/types';
 
-const API_BASE_URL = '/api';
+const API_BASE_URL = 'http://localhost:5555/api';
 
 class ApiService {
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {

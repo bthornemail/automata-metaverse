@@ -69,7 +69,7 @@ class SelfReferencingAutomaton {
     
     this.objects = [];
     for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim();
+      const line = lines[i]!.trim();
       if (line.startsWith('{') && line.endsWith('}')) {
         try {
           const obj = JSON.parse(line);
@@ -98,7 +98,7 @@ class SelfReferencingAutomaton {
 
   getCurrentAutomaton(): AutomatonState | null {
     const automata = this.getAutomataByDimension(this.currentLine % 8);
-    return automata.length > 0 ? automata[0] : null;
+    return automata.length > 0 ? automata[0]! : null;
   }
 
   getTransitionsFrom(automatonId: string): Transition[] {
@@ -190,7 +190,7 @@ class SelfReferencingAutomaton {
     // Compose two automata states
     const automata = this.getAutomataByDimension(0);
     if (automata.length >= 2) {
-      console.log(`Composed automata: ${automata[0].id} + ${automata[1].id}`);
+      console.log(`Composed automata: ${automata[0]!.id} + ${automata[1]!.id}`);
     }
   }
 
@@ -215,7 +215,7 @@ class SelfReferencingAutomaton {
     // Learn from execution history
     const actionCounts = new Map<string, number>();
     this.executionHistory.forEach(entry => {
-      const action = entry.split(':')[0];
+      const action = entry.split(':')[0] || 'unknown';
       actionCounts.set(action, (actionCounts.get(action) || 0) + 1);
     });
     
