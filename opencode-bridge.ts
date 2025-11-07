@@ -426,7 +426,7 @@ class OpenCodeBridge {
         const include = operation.include || '';
         const cmd = `grep -r "${pattern}" ${searchPath} ${include}`;
         const output = execSync(cmd, { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024 });
-        const matches = output.split('\n').filter(line => line.trim());
+        const matches = output.split('\n').filter((line: string) => line.trim());
         return {
           ...operation,
           matches,

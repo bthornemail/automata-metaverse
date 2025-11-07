@@ -15,13 +15,13 @@ module.exports = {
     max_restarts: parseInt(process.env.MAX_RESTARTS) || 10,
     env: {
       NODE_ENV: 'development',
-      PORT: process.env.PORT || 5555,
-      WS_PORT: process.env.WS_PORT || 5556
+      PORT: process.env.PORT || 3000,
+      WS_PORT: process.env.WS_PORT || 3001
     },
     env_production: {
       NODE_ENV: process.env.NODE_ENV || 'production',
-      PORT: process.env.PORT || 5555,
-      WS_PORT: process.env.WS_PORT || 5556,
+      PORT: process.env.PORT || 3000,
+      WS_PORT: process.env.WS_PORT || 3001,
       DOMAIN: process.env.DOMAIN_COM || 'universallifeprotocol.com',
       BASE_URL: process.env.BASE_URL_COM || 'https://universallifeprotocol.com',
       API_URL: process.env.API_URL_COM || 'https://universallifeprotocol.com/api',
@@ -39,8 +39,8 @@ module.exports = {
     },
     env_net: {
       NODE_ENV: process.env.NODE_ENV || 'production',
-      PORT: process.env.PORT || 5555,
-      WS_PORT: process.env.WS_PORT || 5556,
+      PORT: process.env.PORT || 3000,
+      WS_PORT: process.env.WS_PORT || 3001,
       DOMAIN: process.env.DOMAIN_NET || 'universallifeprotocol.net',
       BASE_URL: process.env.BASE_URL_NET || 'https://universallifeprotocol.net',
       API_URL: process.env.API_URL_NET || 'https://universallifeprotocol.net/api',
@@ -58,8 +58,8 @@ module.exports = {
     },
     env_online: {
       NODE_ENV: process.env.NODE_ENV || 'production',
-      PORT: process.env.PORT || 5555,
-      WS_PORT: process.env.WS_PORT || 5556,
+      PORT: process.env.PORT || 3000,
+      WS_PORT: process.env.WS_PORT || 3001,
       DOMAIN: process.env.DOMAIN_ONLINE || 'universallifeprotocol.online',
       BASE_URL: process.env.BASE_URL_ONLINE || 'https://universallifeprotocol.online',
       API_URL: process.env.API_URL_ONLINE || 'https://universallifeprotocol.online/api',

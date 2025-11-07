@@ -5,8 +5,8 @@ metadata:
   namespace: ${K8S_NAMESPACE:-automaton}
 data:
   NODE_ENV: "${NODE_ENV:-production}"
-  PORT: "${PORT:-5555}"
-  WS_PORT: "${WS_PORT:-5556}"
+  PORT: "${PORT:-3000}"
+  WS_PORT: "${WS_PORT:-3001}"
   LOG_LEVEL: "${LOG_LEVEL:-info}"
   DOMAIN_NET: "${DOMAIN_NET:-universallifeprotocol.net}"
   BASE_URL_NET: "${BASE_URL_NET:-https://universallifeprotocol.net}"

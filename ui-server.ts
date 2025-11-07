@@ -11,8 +11,8 @@ import { join, extname } from 'path';
 import WordNetIntegration from './src/services/wordnet';
 import { simpleOpenCodeService } from './src/services/simple-opencode';
 
-const HTTP_PORT = 3000;
-const WS_PORT = 3001;
+const HTTP_PORT = parseInt(process.env.PORT || '3000', 10);
+const WS_PORT = parseInt(process.env.WS_PORT || '3001', 10);
 const UI_DIST_PATH = join(__dirname, '../ui/dist');
 
 // MIME types for static files
@@ -48,6 +48,13 @@ const httpServer = createServer((req, res) => {
   const requestUrl = req.url ?? `http://localhost:${HTTP_PORT}`;
   const url = new URL(requestUrl, `http://localhost:${HTTP_PORT}`);
   const path = url.pathname || '';
+
+  // Health check endpoint
+  if (path === '/health' || path === '/api/health') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ status: 'healthy', timestamp: Date.now() }));
+    return;
+  }
 
   // API Routes
   if (path.startsWith('/api/')) {
@@ -127,6 +134,39 @@ async function handleAPIRequest(path: string, req: any, res: any) {
   
   try {
     let response: any = { success: true, timestamp: Date.now() };
+
+    // Handle JSONL endpoints first (before switch)
+    if (apiPath.startsWith('jsonl/')) {
+      const fileName = apiPath.replace('jsonl/', '');
+      try {
+        const { readFileSync, existsSync } = require('fs');
+        const { join } = require('path');
+        const filePath = join(__dirname, '..', fileName);
+        
+        if (!existsSync(filePath)) {
+          response.success = false;
+          response.error = `File not found: ${fileName}`;
+        } else {
+          const content = readFileSync(filePath, 'utf-8');
+          const lines = content.trim().split('\n').filter((line: string) => line.trim());
+          const data = lines.map((line: string) => {
+            try {
+              return JSON.parse(line);
+            } catch (e) {
+              return null;
+            }
+          }).filter(Boolean);
+          response.data = data;
+        }
+      } catch (error: any) {
+        response.success = false;
+        response.error = error.message || 'Failed to read JSONL file';
+      }
+      
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(response));
+      return;
+    }
 
     switch (apiPath) {
       case 'status':

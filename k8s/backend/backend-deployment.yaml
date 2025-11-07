@@ -26,7 +26,7 @@ spec:
         version: v1.0.0
       annotations:
         prometheus.io/scrape: "true"
-        prometheus.io/port: "5555"
+        prometheus.io/port: "3000"
         prometheus.io/path: "/api/metrics"
     spec:
       containers:
@@ -34,10 +34,10 @@ spec:
         image: automaton/backend:1.0.0
         imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 5555
+        - containerPort: 3000
           name: http
           protocol: TCP
-        - containerPort: 9001
+        - containerPort: 3001
           name: websocket
           protocol: TCP
         env:
@@ -81,7 +81,7 @@ spec:
         livenessProbe:
           httpGet:
             path: /api/status
-            port: 5555
+            port: 3000
           initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 5
@@ -89,7 +89,7 @@ spec:
         readinessProbe:
           httpGet:
             path: /api/status
-            port: 5555
+            port: 3000
           initialDelaySeconds: 5
           periodSeconds: 5
           timeoutSeconds: 3
@@ -122,12 +122,12 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - port: 5555
-    targetPort: 5555
+  - port: 3000
+    targetPort: 3000
     protocol: TCP
     name: http
-  - port: 9001
-    targetPort: 9001
+  - port: 3001
+    targetPort: 3001
     protocol: TCP
     name: websocket
   selector:
@@ -146,11 +146,11 @@ spec:
   type: ClusterIP
   clusterIP: None
   ports:
-  - port: 5555
-    targetPort: 5555
+  - port: 3000
+    targetPort: 3000
     name: http
-  - port: 9001
-    targetPort: 9001
+  - port: 3001
+    targetPort: 3001
     name: websocket
   selector:
     app: automaton

@@ -8,8 +8,8 @@ metadata:
     component: backend
 data:
   NODE_ENV: "production"
-  PORT: "5555"
-  WS_PORT: "9001"
+  PORT: "3000"
+  WS_PORT: "3001"
   LOG_LEVEL: "info"
   AUTOMATON_FILE: "./automaton.jsonl"
   REDIS_HOST: "automaton-redis"
@@ -24,8 +24,8 @@ metadata:
     app: automaton
     component: frontend
 data:
-  VITE_API_URL: "http://automaton-backend.automaton.svc.cluster.local:5555/api"
-  VITE_WS_URL: "ws://automaton-backend.automaton.svc.cluster.local:9001"
+  VITE_API_URL: "http://automaton-backend.automaton.svc.cluster.local:3000/api"
+  VITE_WS_URL: "ws://automaton-backend.automaton.svc.cluster.local:3001"
 ---
 apiVersion: v1
 kind: Secret

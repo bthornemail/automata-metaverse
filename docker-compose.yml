@@ -9,16 +9,21 @@ services:
     container_name: automaton-backend
     restart: unless-stopped
     ports:
-      - "5555:5555"
-      - "9001:9001"
+      - "3000:3000"
+      - "3001:3001"
     environment:
       - NODE_ENV=production
-      - PORT=5555
-      - WS_PORT=9001
+      - PORT=3000
+      - WS_PORT=3001
       - AUTOMATON_FILE=./automaton.jsonl
       - LOG_LEVEL=info
     volumes:
       - ./automaton.jsonl:/app/automaton.jsonl:ro
+      - ./automaton-kernel.jsonl:/app/automaton-kernel.jsonl:ro
+      - ./automaton-kernel.seed.jsonl:/app/automaton-kernel.seed.jsonl:ro
+      - ./automaton.canvas.space.jsonl:/app/automaton.canvas.space.jsonl:ro
+      - ./generate.metaverse.jsonl:/app/generate.metaverse.jsonl:ro
+      - ./r5rs-functions-trie.jsonl:/app/r5rs-functions-trie.jsonl:ro
       - ./logs:/app/logs
       - ./grok_files:/app/grok_files:ro
     networks:
@@ -42,8 +47,8 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - VITE_API_URL=http://localhost:5555/api
-      - VITE_WS_URL=ws://localhost:9001
+      - VITE_API_URL=http://localhost:3000/api
+      - VITE_WS_URL=ws://localhost:3001
     networks:
       - automaton-network
     depends_on:
