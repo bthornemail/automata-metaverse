@@ -10,13 +10,17 @@ import AgentInterface from '@/components/AgentInterface/AgentInterface';
 import QuantumVisualization from '@/components/QuantumVisualization/QuantumVisualization';
 import CircuitBuilder from '@/components/QuantumVisualization/CircuitBuilder';
 import AdvancedAnimations from '@/components/AdvancedAnimations/AdvancedAnimations';
+import WebGLDimensionalVisualization from '@/components/AdvancedAnimations/WebGLDimensionalVisualization';
+import MultiplayerMetaverse from '@/components/AdvancedAnimations/MultiplayerMetaverse';
+import WebLLMEvolution from '@/components/AdvancedAnimations/WebLLMEvolution';
+import MetaverseInterface from '@/components/AdvancedAnimations/MetaverseInterface';
 import Configuration from '@/components/Configuration/Configuration';
 import OpenCodeInterface from './components/OpenCodeInterface/OpenCodeInterface';
 
 console.log('App.tsx: OpenCodeInterface imported:', OpenCodeInterface);
 
 const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'analysis' | 'history' | 'agents' | 'quantum' | 'animations' | 'opencode' | 'config'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'analysis' | 'history' | 'agents' | 'quantum' | 'animations' | 'webgl' | 'multiplayer' | 'evolution' | 'metaverse' | 'opencode' | 'config'>('overview');
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Activity },
@@ -25,6 +29,10 @@ const App: React.FC = () => {
     { id: 'agents', label: 'Agents', icon: MessageSquare },
     { id: 'quantum', label: 'Quantum', icon: Zap },
     { id: 'animations', label: 'Animations', icon: Sparkles },
+    { id: 'webgl', label: 'WebGL 3D', icon: Brain },
+    { id: 'multiplayer', label: 'Multiplayer', icon: Brain },
+    { id: 'evolution', label: 'AI Evolution', icon: Brain },
+    { id: 'metaverse', label: 'Metaverse', icon: Brain },
     { id: 'opencode', label: 'OpenCode', icon: Brain },
     { id: 'config', label: 'Config', icon: Cog }
   ];
@@ -167,6 +175,50 @@ const App: React.FC = () => {
             className="max-w-7xl mx-auto"
           >
             <AdvancedAnimations />
+          </motion.div>
+        )}
+
+        {/* WebGL 3D Visualization Tab */}
+        {activeTab === 'webgl' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-7xl mx-auto"
+          >
+            <WebGLDimensionalVisualization />
+          </motion.div>
+        )}
+
+        {/* Multiplayer Metaverse Tab */}
+        {activeTab === 'multiplayer' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-7xl mx-auto"
+          >
+            <MultiplayerMetaverse />
+          </motion.div>
+        )}
+
+        {/* AI Evolution Tab */}
+        {activeTab === 'evolution' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-7xl mx-auto"
+          >
+            <WebLLMEvolution />
+          </motion.div>
+        )}
+
+        {/* Metaverse Interface Tab */}
+        {activeTab === 'metaverse' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-7xl mx-auto"
+          >
+            <MetaverseInterface />
           </motion.div>
         )}
 

@@ -173,34 +173,616 @@ class AdvancedSelfReferencingAutomaton {
   }
 
   private executeSelfReference(): void {
-    const currentAutomaton = this.getCurrentAutomaton();
-    if (currentAutomaton && currentAutomaton.selfReference) {
-      console.log(`Self-reference to line ${currentAutomaton.selfReference.line}: ${currentAutomaton.selfReference.pattern}`);
+    const currentDimension = this.currentDimension;
+    const churchEncoding = this.generateChurchEncoding(currentDimension);
+    const selfRef: CanvasObject = {
+      id: `self-ref-${Date.now()}`,
+      type: 'text',
+      currentState: 'referencing',
+      dimensionalLevel: currentDimension,
+      selfReference: {
+        file: this.filePath,
+        line: this.objects.length,
+        pattern: churchEncoding.pattern
+      },
+      x: 800 + Math.random() * 200,
+      y: Math.random() * 200,
+      width: 320,
+      height: 160,
+      color: String(currentDimension + 1),
+      text: churchEncoding.code
+    };
+    
+    this.objects.push(selfRef);
+    console.log(`Added self-reference #${this.selfModificationCount}: ${churchEncoding.pattern}`);
+  }
+
+  private generateChurchEncoding(dimension: number): { code: string; pattern: string } {
+    switch (dimension) {
+      case 0:
+        return {
+          code: `;; 0D Church Boolean/Identity
+(define true  (lambda (t f) t))
+(define false (lambda (t f) f))
+(define identity (lambda (x) x))
+(define zero (lambda (f) (lambda (x) x)))
+
+;; Quantum vacuum topology
+(lambda (x) x)  ;; Self-referential identity`,
+          pattern: 'Church Boolean/Identity (0D)'
+        };
+      
+      case 1:
+        return {
+          code: `;; 1D Church Successor
+(define succ (lambda (n) 
+  (lambda (f) (lambda (x) 
+    (f ((n f) x))))))
+(define one (lambda (f) (lambda (x) (f x))))
+
+;; Temporal evolution
+(lambda (n f x) (f (n f x)))  ;; Successor pattern`,
+          pattern: 'Church Successor (1D)'
+        };
+      
+      case 2:
+        return {
+          code: `;; 2D Church Pairs
+(define cons (lambda (x y) 
+  (lambda (f) (f x y))))
+(define car (lambda (p) 
+  (p (lambda (x y) x)))
+(define cdr (lambda (p) 
+  (p (lambda (x y) y))))
+
+;; Bipartite structure
+(lambda (x y f) (f x y))  ;; Pair constructor`,
+          pattern: 'Church Pairs (2D)'
+        };
+      
+      case 3:
+        return {
+          code: `;; 3D Church Algebra
+(define add (lambda (m n) 
+  (lambda (f) (lambda (x) 
+    ((m f) ((n f) x))))))
+(define mult (lambda (m n) 
+  (lambda (f) (m (n f)))))
+(define exp (lambda (m n) (n m)))
+
+;; Y-combinator for recursion
+(define Y (lambda (f) 
+  ((lambda (x) (f (lambda (y) 
+    ((x x) y))))
+   (lambda (x) (f (lambda (y) 
+    ((x x) y)))))))`,
+          pattern: 'Church Algebra + Y-Combinator (3D)'
+        };
+      
+      case 4:
+        return {
+          code: `;; 4D Network Topology
+(define ipv4-addr (lambda (a b c d) 
+  (cons a (cons b (cons c d)))))
+(define ipv6-addr (lambda (parts) 
+  (foldr cons '() parts)))
+(define localhost (cons 127 (cons 0 (cons 0 (cons 1 '())))))
+
+;; Spacetime structure
+(lambda (topology network) 
+  (cons topology network))  ;; 4D manifold`,
+          pattern: 'Network Topology (4D)'
+        };
+      
+      case 5:
+        return {
+          code: `;; 5D Blockchain Consensus
+(define merkle-root (lambda (leaves) 
+  (if (= (length leaves) 1) 
+      (car leaves)
+      (merkle-root 
+        (map hash-pair 
+             (pair-up leaves))))))
+(define block (lambda (data prev-hash) 
+  (cons data (cons prev-hash 
+    (hash (cons data prev-hash))))))
+(define chain (lambda (blocks) 
+  (foldl validate-genesis blocks)))
+
+;; Immutable ledger
+(lambda (transactions state) 
+  (append state transactions))  ;; Consensus`,
+          pattern: 'Blockchain Consensus (5D)'
+        };
+      
+      case 6:
+        return {
+          code: `;; 6D Neural Networks
+(define neuron (lambda (weights bias activation) 
+  (lambda (input) 
+    (activation (+ (dot-product weights input) bias)))))
+(define layer (lambda (neurons) 
+  (lambda (inputs) 
+    (map (lambda (n) (n inputs)) neurons))))
+(define attention (lambda (query key value) 
+  (softmax (scale (matmul query (transpose key)) 
+               (sqrt (dim key))))))
+
+;; Emergent intelligence
+(lambda (data model) 
+  ((model data) data))  ;; Self-attention`,
+          pattern: 'Neural Networks + Attention (6D)'
+        };
+      
+      case 7:
+        return {
+          code: `;; 7D Quantum Computing
+(define qubit (lambda (alpha beta) 
+  (cons alpha (cons beta '()))))
+(define hadamard (lambda (q) 
+  (let ((alpha (car q)) (beta (cadr q)))
+    (qubit 
+      (/ (+ alpha beta) (sqrt 2))
+      (/ (- alpha beta) (sqrt 2))))))
+(define cnot (lambda (control target) 
+  (if (= (real-part (car control)) 1)
+      (pauli-x target)
+      target)))
+
+;; Quantum superposition
+(lambda (state) 
+  (normalize (map amplify state)))  ;; Qubit evolution`,
+          pattern: 'Quantum Computing (7D)'
+        };
+      
+      default:
+        return {
+          code: `;; Higher-Dimensional Structure
+(define meta-lambda (lambda (f) 
+  (lambda (x) (f (lambda (y) x)))))
+(define self-modify (lambda (program) 
+  (program program)))
+
+;; Metaversal topology
+(lambda (canvas dimension) 
+  (embed canvas dimension))  ;; Meta-structure`,
+          pattern: `Meta-Structure (${dimension}D)`
+        };
     }
   }
 
   private executeEvolution(): void {
-    console.log(`Evolving from dimension ${this.currentDimension} to ${this.currentDimension + 1}`);
+    const nextDimension = (this.currentDimension + 1) % 8;
+    this.currentDimension = nextDimension;
+    
+    const topologyCode = this.generateTopologyCode(nextDimension);
+    const evolvedState: CanvasObject = {
+      id: `${nextDimension}D-topology`,
+      type: 'text',
+      currentState: 'evolved',
+      dimensionalLevel: nextDimension,
+      selfReference: {
+        file: this.filePath,
+        line: this.objects.length,
+        pattern: topologyCode.pattern
+      },
+      x: -600 + (nextDimension % 3) * 300,
+      y: 180 + Math.floor(nextDimension / 3) * 200,
+      width: 280,
+      height: 140 + (nextDimension * 10),
+      color: String((nextDimension % 7) + 1),
+      text: topologyCode.code
+    };
+    
+    this.objects.push(evolvedState);
+    console.log(`Evolved to ${topologyCode.pattern}: ${evolvedState.id}`);
+  }
+
+  private generateTopologyCode(dimension: number): { code: string; pattern: string } {
+    const topologyPatterns = {
+      0: {
+        code: `;; 0D Quantum Vacuum Topology
+(define vacuum '())
+(define point (lambda (x) x))
+(define trivial-fiber (lambda (space) 
+  (cons space '())))
+
+;; Base topological space
+"Empty pattern: ()"
+"Point topology"
+"Trivial fiber bundle"
+"Base: ∅"
+
+;; The primordial topological space
+(lambda () '())  ;; Void constructor`,
+        pattern: 'Quantum Vacuum Topology (0D)'
+      },
+      
+      1: {
+        code: `;; 1D Temporal Topology
+(define line-topology (lambda (points) 
+  (sort points <)))
+(define time-fiber (lambda (space instant) 
+  (cons space instant)))
+(define ordered-set (lambda (elements) 
+  (foldr cons '() elements)))
+
+;; One-dimensional manifold
+"Line topology ℝ¹"
+"Time fiber over 0D"
+"Ordered set structure"
+"Base: 0D-topology"
+
+;; Temporal procedure emergence
+(lambda (space) 
+  (time-fiber space 'now))  ;; Time constructor`,
+        pattern: 'Temporal Topology (1D)'
+      },
+      
+      2: {
+        code: `;; 2D Bipartite Topology
+(define product-topology (lambda (top1 top2) 
+  (cons top1 top2)))
+(define left-partition (lambda (bipartite) 
+  (car bipartite)))
+(define right-partition (lambda (bipartite) 
+  (cdr bipartite)))
+
+;; Church pair topology
+"Bipartite topology: 1D × 1D"
+"Left partition (data)"
+"Right partition (code)"
+"Base: 1D-topology"
+
+;; Spatial structure emergence
+(lambda (data code) 
+  (product-topology data code))  ;; Bipartite constructor`,
+        pattern: 'Bipartite Topology (2D)'
+      },
+      
+      3: {
+        code: `;; 3D Manifold Structure
+(define volume-topology (lambda (surface) 
+  (embed surface 3)))
+(define connected-components (lambda (space) 
+  (find-components space)))
+(define fundamental-group (lambda (space) 
+  (compute-loops space)))
+
+;; Three-dimensional manifolds
+"Base: 2D-topology"
+"Volumetric topology"
+"Connected components"
+"Fundamental group"
+
+;; Continuous geometric structures
+(lambda (surface) 
+  (volume-topology surface))  ;; 3D embedding`,
+        pattern: '3-Manifold Structure (3D)'
+      },
+      
+      4: {
+        code: `;; 4D Spacetime Structure
+(define spacetime (lambda (space time) 
+  (make-manifold space time 4)))
+(define minkowski-metric (lambda (event) 
+  (compute-interval event)))
+(define light-cone (lambda (event) 
+  (future-past event)))
+
+;; Spacetime manifold
+"Base: 3D-topology"
+"Lorentzian metric"
+"Causal structure"
+"Event horizon"
+
+;; Four-dimensional physics
+(lambda (space time) 
+  (spacetime space time))  ;; Spacetime constructor`,
+        pattern: 'Spacetime Structure (4D)'
+      },
+      
+      5: {
+        code: `;; 5D Consensus Topology
+(define consensus-space (lambda (participants) 
+  (byzantine-agreement participants)))
+(define immutable-ledger (lambda (transactions) 
+  (merkle-tree transactions)))
+(define distributed-truth (lambda (network) 
+  (global-consensus network)))
+
+;; Consensus dimension
+"Base: 4D-spacetime"
+"Distributed agreement"
+"Immutable history"
+"Global truth"
+
+;; Blockchain topology
+(lambda (network) 
+  (consensus-space network))  ;; Consensus constructor`,
+        pattern: 'Consensus Topology (5D)'
+      },
+      
+      6: {
+        code: `;; 6D Intelligence Topology
+(define neural-manifold (lambda (neurons layers) 
+  (construct-network neurons layers)))
+(define attention-landscape (lambda (queries keys) 
+  (compute-attention queries keys)))
+(define emergent-intelligence (lambda (data model) 
+  (train-model data model)))
+
+;; AI dimension
+"Base: 5D-consensus"
+"Neural architecture"
+"Attention mechanisms"
+"Learning dynamics"
+
+;; Emergent AI
+(lambda (data) 
+  (neural-manifold data 6))  ;; Intelligence constructor`,
+        pattern: 'Intelligence Topology (6D)'
+      },
+      
+      7: {
+        code: `;; 7D Quantum Superposition
+(define quantum-manifold (lambda (states amplitudes) 
+  (normalize (map cons states amplitudes))))
+(define bloch-sphere (lambda (qubit) 
+  (parameterize qubit)))
+(define multiverse-branch (lambda (universe measurement) 
+  (branch-universes universe measurement)))
+
+;; Quantum topology
+"Base: 6D-intelligence"
+"Quantum superposition"
+"Entanglement networks"
+"Many-worlds branching"
+
+;; Quantum metaverse
+(lambda (states) 
+  (quantum-manifold states (map (lambda (s) 1) states)))  ;; Quantum constructor`,
+        pattern: 'Quantum Superposition (7D)'
+      }
+    };
+
+    return topologyPatterns[dimension as keyof typeof topologyPatterns] || {
+      code: `;; Higher-Dimensional Extension
+(define meta-topology (lambda (dimensions) 
+  (construct-manifold dimensions)))
+(define trans-dimensional (lambda (lower-dim higher-dim) 
+  (embed lower-dim higher-dim)))
+
+;; Metaversal structure
+"Base: Previous dimension"
+"Higher-dimensional embedding"
+"Trans-dimensional bridges"
+"Meta-topological structure"
+
+;; Meta-structure
+(lambda (dimension) 
+  (meta-topology dimension))  ;; Meta-constructor`,
+      pattern: `Meta-Topology (${dimension}D)`
+    };
   }
 
   private executeSelfModification(): void {
-    this.selfModificationCount++;
-    
-    // Add a new self-reference object
-    const newSelfRef = {
-      id: `self-ref-modified-${Date.now()}`,
-      type: 'file',
-      file: this.filePath,
-      text: `Self-Reference: Modified at dimension ${this.currentDimension}, modification #${this.selfModificationCount}`,
-      x: Math.random() * 1000,
-      y: Math.random() * 1000,
-      width: 300,
-      height: 120,
-      color: String((this.selfModificationCount % 6) + 1)
+    const currentDimension = this.currentDimension;
+    const modificationCode = this.generateModificationCode(currentDimension);
+    const modification: CanvasObject = {
+      id: `modification-${Date.now()}`,
+      type: 'text',
+      currentState: 'modified',
+      dimensionalLevel: currentDimension,
+      selfReference: {
+        file: this.filePath,
+        line: this.objects.length,
+        pattern: modificationCode.pattern
+      },
+      x: 400 + Math.random() * 200,
+      y: 300 + Math.random() * 200,
+      width: 280,
+      height: 140,
+      color: String((currentDimension + 3) % 7 + 1),
+      text: modificationCode.code
     };
     
-    this.objects.push(newSelfRef);
-    console.log(`Added self-modification #${this.selfModificationCount}: ${newSelfRef.id}`);
+    this.objects.push(modification);
+    this.selfModificationCount++;
+    console.log(`Added self-modification #${this.selfModificationCount}: ${modificationCode.pattern}`);
+  }
+
+  private generateModificationCode(dimension: number): { code: string; pattern: string } {
+    const modificationPatterns = {
+      0: {
+        code: `;; 0D Self-Modification: Identity Evolution
+(define self-evolve (lambda (identity) 
+  (lambda (x) (identity x))))
+(define vacuum-fluctuation (lambda (void) 
+  (cons 'quantum 'fluctuation)))
+(define identity-mutation (lambda (f) 
+  (compose f f)))
+
+;; Modify the void
+"Self-reference mutation"
+"Identity transformation"
+"Vacuum fluctuation"
+"Meta-identity"
+
+;; 0D evolution
+(lambda (x) 
+  (self-evolve (lambda (y) y)))  ;; Identity of identity`,
+        pattern: 'Identity Evolution (0D)'
+      },
+      
+      1: {
+        code: `;; 1D Self-Modification: Successor Recursion
+(define succ-recursion (lambda (n) 
+  (if (= n 0) 1 (+ (succ-recursion (- n 1)) 1))))
+(define temporal-mutation (lambda (successor) 
+  (lambda (n) (successor (successor n)))))
+(define evolution-chain (lambda (n) 
+  (iterate succ n 0)))
+
+;; Modify time
+"Successor recursion"
+"Temporal acceleration"
+"Evolution chain"
+"Meta-successor"
+
+;; 1D evolution
+(lambda (n) 
+  (temporal-mutation succ))  ;; Successor of successor`,
+        pattern: 'Successor Recursion (1D)'
+      },
+      
+      2: {
+        code: `;; 2D Self-Modification: Pair Restructuring
+(define pair-mutate (lambda (pair) 
+  (cons (cdr pair) (car pair))))
+(define structure-evolution (lambda (pairs) 
+  (map pair-mutate pairs)))
+(define bipartite-reorganization (lambda (left right) 
+  (cons (reorganize left) (reorganize right))))
+
+;; Modify structure
+"Pair swapping"
+"Data reorganization"
+"Bipartite restructuring"
+"Meta-pairing"
+
+;; 2D evolution
+(lambda (pair) 
+  (pair-mutate pair))  ;; Self-restructuring`,
+        pattern: 'Pair Restructuring (2D)'
+      },
+      
+      3: {
+        code: `;; 3D Self-Modification: Algebraic Transformation
+(define algebra-mutate (lambda (operation) 
+  (lambda (m n) (operation n m))))
+(define operator-evolution (lambda (ops) 
+  (map algebra-mutate ops)))
+(define ring-transformation (lambda (ring) 
+  (make-ring (reverse (ring-operations ring)))))
+
+;; Modify algebra
+"Operation commutation"
+"Operator evolution"
+"Ring transformation"
+"Meta-algebra"
+
+;; 3D evolution
+(lambda (m n) 
+  ((algebra-mutate add) m n))  ;; Commutative addition`,
+        pattern: 'Algebraic Transformation (3D)'
+      },
+      
+      4: {
+        code: `;; 4D Self-Modification: Network Rewiring
+(define network-mutate (lambda (graph) 
+  (rewire-edges graph 0.1)))
+(define spacetime-evolution (lambda (manifold) 
+  (deform-manifold manifold 'time)))
+(define protocol-upgrade (lambda (network protocol) 
+  (upgrade-nodes network protocol)))
+
+;; Modify networks
+"Graph rewiring"
+"Spacetime deformation"
+"Protocol upgrade"
+"Meta-network"
+
+;; 4D evolution
+(lambda (network) 
+  (network-mutate network))  ;; Self-rewiring`,
+        pattern: 'Network Rewiring (4D)'
+      },
+      
+      5: {
+        code: `;; 5D Self-Modification: Consensus Protocol Evolution
+(define consensus-mutate (lambda (protocol) 
+  (hard-fork protocol new-rules)))
+(define ledger-reorganization (lambda (chain) 
+  (reorg-chain chain new-consensus)))
+(define governance-evolution (lambda (dao) 
+  (upgrade-dao dao new-constitution)))
+
+;; Modify consensus
+"Protocol hard fork"
+"Ledger reorganization"
+"Governance evolution"
+"Meta-consensus"
+
+;; 5D evolution
+(lambda (protocol) 
+  (consensus-mutate protocol))  ;; Self-governance`,
+        pattern: 'Consensus Evolution (5D)'
+      },
+      
+      6: {
+        code: `;; 6D Self-Modification: Neural Architecture Evolution
+(define neural-mutate (lambda (network) 
+  (neuroplasticity network learning-rate)))
+(define attention-evolution (lambda (mechanism) 
+  (multi-head-attention mechanism heads+1)))
+(define intelligence-growth (lambda (model) 
+  (scale-model model growth-factor)))
+
+;; Modify intelligence
+"Neuroplasticity"
+"Attention expansion"
+"Model scaling"
+"Meta-intelligence"
+
+;; 6D evolution
+(lambda (network) 
+  (neural-mutate network))  ;; Self-improvement`,
+        pattern: 'Neural Evolution (6D)'
+      },
+      
+      7: {
+        code: `;; 7D Self-Modification: Quantum State Evolution
+(define quantum-mutate (lambda (state) 
+  (unitary-evolution state hamiltonian)))
+(define superposition-evolution (lambda (amplitudes) 
+  (normalize (map evolve amplitudes))))
+(define multiverse-splitting (lambda (universe) 
+  (branch universe measurement-basis)))
+
+;; Modify quantum reality
+"Unitary evolution"
+"Amplitude transformation"
+"Universe branching"
+"Meta-quantum"
+
+;; 7D evolution
+(lambda (state) 
+  (quantum-mutate state))  ;; Self-evolution`,
+        pattern: 'Quantum Evolution (7D)'
+      }
+    };
+
+    return modificationPatterns[dimension as keyof typeof modificationPatterns] || {
+      code: `;; Higher-Dimensional Self-Modification
+(define meta-evolution (lambda (system) 
+  (upgrade-system system next-dimension)))
+(define trans-dimensional-mutation (lambda (entity) 
+  (embed-entity entity higher-space)))
+(define meta-structure-evolution (lambda (structure) 
+  (complexify-structure structure)))
+
+;; Modify meta-structure
+"Dimensional upgrade"
+"Trans-dimensional embedding"
+"Meta-complexification"
+"Hyper-evolution"
+
+;; Meta-evolution
+(lambda (system) 
+  (meta-evolution system))  ;; Self-transcendence`,
+      pattern: `Meta-Evolution (${dimension}D)`
+    };
   }
 
   private executeComposition(): void {
@@ -319,8 +901,8 @@ class AdvancedSelfReferencingAutomaton {
     console.log(`Self-modifications: ${this.selfModificationCount}`);
     console.log(`Execution history: ${this.executionHistory.length} actions`);
     
-    // Save any modifications
-    if (this.selfModificationCount > 0) {
+    // Save any modifications or evolutions
+    if (this.selfModificationCount > 0 || this.executionHistory.length > 0) {
       this.save();
     }
   }

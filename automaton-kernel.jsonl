@@ -1,0 +1,74 @@
+{"id": "self-ref", "type": "file", "x": 800, "y": 0, "width": 280, "height": 120, "color": "5", "file": "automaton-kernel.jsonl"}
+{"id": "0D-topology", "type": "text", "x": 0, "y": 0, "width": 280, "height": 120, "color": "1", "text": "# 0D-topology\n\n**Quantum Vacuum Topology**\n- Empty pattern: `()`\n- Point topology\n- Trivial fiber bundle\n- Base: `∅`\n\n*The primordial topological space*"}
+{"id": "0D-system", "type": "text", "x": 300, "y": 0, "width": 280, "height": 120, "color": "2", "text": "# 0D-system\n\n**Vacuum Computational System**\n- Identity process: `λx.x`\n- Empty computation\n- Church encoding base\n- Zero: `λf.λx.x`\n\n*The computational identity*"}
+{"id": "1D-topology", "type": "text", "x": -350, "y": 180, "width": 280, "height": 140, "color": "3", "text": "# 1D-topology\n\n**Temporal Topology**\n- Line topology $\\mathbb{R}^1$\n- Time fiber over 0D\n- Ordered set structure\n- Base: `0D-topology`\n\n*One-dimensional manifold*"}
+{"id": "1D-system", "type": "text", "x": -50, "y": 180, "width": 280, "height": 140, "color": "4", "text": "# 1D-system\n\n**Church Successor**\n- Successor: `λn.λf.λx.f(nfx)`\n- One: `λf.λx.f(x)`\n- Linear evolution\n- Y-combinator base\n\n*Temporal procedure emergence*"}
+{"id": "2D-topology", "type": "text", "x": -600, "y": 380, "width": 260, "height": 160, "color": "6", "text": "# 2D-topology\n\n**Bipartite Topology**\n- Product: `1D × 1D`\n- Left partition (data)\n- Right partition (code)\n- Base: `1D-topology`\n\n*Church pair topology*"}
+{"id": "2D-system", "type": "text", "x": -320, "y": 380, "width": 260, "height": 160, "color": "1", "text": "# 2D-system\n\n**Church Pairs**\n- Pair: `λx.λy.λf.fxy`\n- Car: `λp.p(λx.λy.x)`\n- Cdr: `λp.p(λx.λy.y)`\n- Cons cells\n\n*Spatial structure emergence*"}
+{"id": "3D-algebra", "type": "text", "x": -800, "y": 600, "width": 240, "height": 180, "color": "5", "text": "# 3D-algebra\n\n**Church Algebra**\n- Addition: `λm.λn.λf.λx.mf(nfx)`\n- Multiplication: `λm.λn.λf.m(nf)`\n- Exponentiation: `λm.λn.nm`\n- Ring structure\n\n*Discrete algebraic operations*"}
+{"id": "3D-analysis", "type": "text", "x": 240, "y": 600, "width": 240, "height": 180, "color": "3", "text": "# 3D-analysis\n\n**Fixed-Point Analysis**\n- Y-combinator: `λf.(λx.f(xx))(λx.f(xx))`\n- Z-combinator (strict): `λf.(λx.f(λy.xxy))(λx.f(λy.xxy))`\n- Recursion schemes\n- Limit processes\n\n*Continuous analytical methods*"}
+{"id": "4D-network", "type": "text", "x": -1000, "y": 800, "width": 220, "height": 200, "color": "7", "text": "# 4D-network\n\n**IPv4/IPv6 Topology**\n- IPv4: 32-bit addressing\n- IPv6: 128-bit addressing\n- Localhost mapping\n- Network protocols\n\n*Spacetime communication*"}
+{"id": "5D-consensus", "type": "text", "x": -1200, "y": 1000, "width": 200, "height": 220, "color": "1", "text": "# 5D-consensus\n\n**Blockchain Consensus**\n- Immutable ledger\n- Merkle-Patricia trie\n- Distributed agreement\n- Byzantine fault tolerance\n\n*Consensus topology*"}
+{"id": "6D-intelligence", "type": "text", "x": -1400, "y": 1200, "width": 180, "height": 240, "color": "2", "text": "# 6D-intelligence\n\n**Neural Networks**\n- Attention mechanisms\n- Transformer architecture\n- Training on foundational systems\n- Emergent AI\n\n*Intelligence topology*"}
+{"id": "7D-quantum", "type": "text", "x": -1600, "y": 1400, "width": 160, "height": 260, "color": "3", "text": "# 7D-quantum\n\n**Quantum Computing**\n- Qubit superposition: `|ψ⟩ = α|0⟩ + β|1⟩`\n- Bloch sphere representation\n- Entanglement networks\n- Many-worlds interpretation\n\n*Quantum topology*"}
+{"id": "0D-automaton", "type": "automaton", "currentState": "identity", "dimensionalLevel": 0, "selfReference": {"file": "automaton-kernel.jsonl", "line": 2, "pattern": "identity"}}
+{"id": "1D-automaton", "type": "automaton", "currentState": "successor", "dimensionalLevel": 1, "selfReference": {"file": "automaton-kernel.jsonl", "line": 4, "pattern": "successor"}}
+{"id": "2D-automaton", "type": "automaton", "currentState": "pair", "dimensionalLevel": 2, "selfReference": {"file": "automaton-kernel.jsonl", "line": 6, "pattern": "pair"}}
+{"id": "3D-automaton", "type": "automaton", "currentState": "addition", "dimensionalLevel": 3, "selfReference": {"file": "automaton-kernel.jsonl", "line": 8, "pattern": "addition"}}
+{"id": "4D-automaton", "type": "automaton", "currentState": "network", "dimensionalLevel": 4, "selfReference": {"file": "automaton-kernel.jsonl", "line": 10, "pattern": "network"}}
+{"id": "5D-automaton", "type": "automaton", "currentState": "consensus", "dimensionalLevel": 5, "selfReference": {"file": "automaton-kernel.jsonl", "line": 12, "pattern": "consensus"}}
+{"id": "6D-automaton", "type": "automaton", "currentState": "intelligence", "dimensionalLevel": 6, "selfReference": {"file": "automaton-kernel.jsonl", "line": 14, "pattern": "intelligence"}}
+{"id": "7D-automaton", "type": "automaton", "currentState": "quantum", "dimensionalLevel": 7, "selfReference": {"file": "automaton-kernel.jsonl", "line": 16, "pattern": "quantum"}}
+{"id": "v:0D-topology→1D-topology", "fromNode": "0D-topology", "fromSide": "bottom", "toNode": "1D-topology", "toSide": "top", "label": "time fiber"}
+{"id": "v:0D-system→1D-system", "fromNode": "0D-system", "fromSide": "bottom", "toNode": "1D-system", "toSide": "top", "label": "successor"}
+{"id": "v:1D-topology→2D-topology", "fromNode": "1D-topology", "fromSide": "bottom", "toNode": "2D-topology", "toSide": "top", "label": "product topology"}
+{"id": "v:1D-system→2D-system", "fromNode": "1D-system", "fromSide": "bottom", "toNode": "2D-system", "toSide": "top", "label": "Church pairs"}
+{"id": "v:2D-topology→3D-algebra", "fromNode": "2D-topology", "fromSide": "bottom", "toNode": "3D-algebra", "toSide": "top", "label": "algebraic patterns"}
+{"id": "v:2D-system→3D-analysis", "fromNode": "2D-system", "fromSide": "bottom", "toNode": "3D-analysis", "toSide": "top", "label": "fixed-point analysis"}
+{"id": "v:3D-algebra→4D-network", "fromNode": "3D-algebra", "fromSide": "bottom", "toNode": "4D-network", "toSide": "top", "label": "network extension"}
+{"id": "v:3D-analysis→5D-consensus", "fromNode": "3D-analysis", "fromSide": "bottom", "toNode": "5D-consensus", "toSide": "top", "label": "consensus building"}
+{"id": "v:4D-network→6D-intelligence", "fromNode": "4D-network", "fromSide": "bottom", "toNode": "6D-intelligence", "toSide": "top", "label": "neural networks"}
+{"id": "v:5D-consensus→7D-quantum", "fromNode": "5D-consensus", "fromSide": "bottom", "toNode": "7D-quantum", "toSide": "top", "label": "quantum consensus"}
+{"id": "h:0D-topology→0D-system", "fromNode": "0D-topology", "fromSide": "right", "toNode": "0D-system", "toSide": "left", "label": "topology→λ-calculus"}
+{"id": "h:1D-topology→1D-system", "fromNode": "1D-topology", "fromSide": "right", "toNode": "1D-system", "toSide": "left", "label": "temporal→Church numeral"}
+{"id": "h:2D-topology→2D-system", "fromNode": "2D-topology", "fromSide": "right", "toNode": "2D-system", "toSide": "left", "label": "bipartite→pairs"}
+{"id": "h:3D-algebra→3D-analysis", "fromNode": "3D-algebra", "fromSide": "right", "toNode": "3D-analysis", "toSide": "left", "label": "algebra→fixed-point"}
+{"id": "h:4D-network→5D-consensus", "fromNode": "4D-network", "fromSide": "right", "toNode": "5D-consensus", "toSide": "left", "label": "network→consensus"}
+{"id": "h:6D-intelligence→7D-quantum", "fromNode": "6D-intelligence", "fromSide": "right", "toNode": "7D-quantum", "toSide": "left", "label": "AI→quantum"}
+{"id": "t:0D-automaton→1D-automaton", "type": "transition", "from": "0D-automaton", "to": "1D-automaton", "condition": "line_number < ∞", "action": "evolve"}
+{"id": "t:1D-automaton→2D-automaton", "type": "transition", "from": "1D-automaton", "to": "2D-automaton", "condition": "step_count > 3", "action": "evolve"}
+{"id": "t:2D-automaton→3D-automaton", "type": "transition", "from": "2D-automaton", "to": "3D-automaton", "condition": "observation", "action": "evolve"}
+{"id": "t:3D-automaton→4D-automaton", "type": "transition", "from": "3D-automaton", "to": "4D-automaton", "condition": "unifiable(a,b)", "action": "evolve"}
+{"id": "t:4D-automaton→5D-automaton", "type": "transition", "from": "4D-automaton", "to": "5D-automaton", "condition": "numeric(m,n)", "action": "evolve"}
+{"id": "t:5D-automaton→6D-automaton", "type": "transition", "from": "5D-automaton", "to": "6D-automaton", "condition": "majority_agree", "action": "evolve"}
+{"id": "t:6D-automaton→7D-automaton", "type": "transition", "from": "6D-automaton", "to": "7D-automaton", "condition": "gradient_descent", "action": "evolve"}
+{"id": "t:7D-automaton→0D-automaton", "type": "transition", "from": "7D-automaton", "to": "0D-automaton", "condition": "quantum_collapse", "action": "self-reference"}
+{"id": "shacl-shape-automaton", "type": "shacl", "target": "automaton", "constraints": [
+  {"sh:path": "currentState", "sh:minCount": 1, "sh:maxCount": 1},
+  {"sh:path": "dimensionalLevel", "sh:minCount": 1, "sh:maxCount": 1},
+  {"sh:path": "selfReference", "sh:minCount": 1, "sh:hasValue": "automaton-kernel.jsonl"}
+]}
+{"id": "rfc-must-1", "type": "rfc2119", "keyword": "MUST", "message": "Each dimension MUST implement exactly one system"}
+{"id": "rfc-should-1", "type": "rfc2119", "keyword": "SHOULD", "message": "Systems SHOULD use Church encoding"}
+{"id": "asp-rule-1", "type": "asp", "rule": "1 { layer(N,D) : depth(D) } 1", "body": "node(N)"}
+{"id": "asp-constraint-1", "type": "asp", "rule": ":- implements(X,Y1), implements(X,Y2), Y1 != Y2."}
+{"id": "prolog-rule-1", "type": "prolog", "head": "church_encoding(X,D)", "body": ["implements(X,Y)", "dimension(Y,D)"]}
+{"id": "datalog-rule-1", "type": "datalog", "head": "missing_implementation(N)", "body": ["node(N)", "not implements(N,_)"]}
+{"id": "sparql-query-1", "type": "query", "query": "SELECT ?node ?system WHERE { ?node canvas:implements ?system . ?node rdf:type canvas:Automaton }"}
+{"id": "transaction-bootstrap", "type": "transaction", "steps": [
+  "begin",
+  "validate-shacl",
+  "load-automaton",
+  "initialize-evaluator",
+  "execute-self-reference",
+  "commit"
+]}
+{"id": "graph-metadata", "type": "graph", "iri": "http://example.org/automaton-metadata", "triples": [
+  ["canvas:automaton-kernel", "rdf:type", "canvas:SelfReferentialSystem"],
+  ["canvas:automaton-kernel", "rdfs:label", "Church Encoding Automaton"],
+  ["canvas:automaton-kernel", "canvas:dimensions", "8"],
+  ["canvas:automaton-kernel", "canvas:encoding", "Church"],
+  ["canvas:automaton-kernel", "canvas:selfReference", "true"]
+]}
+{"id": "provenance-bootstrap", "type": "provenance", "activity": "bootstrap", "generated": "2024-01-01T00:00:00Z", "used": ["lambda-calculus", "church-encoding", "self-reference"]}
+{"id": "final-reflection", "type": "reflection", "statement": "This automaton kernel implements a complete self-referential Church encoding system from 0D vacuum topology through 7D quantum computing. It contains its own specification, validation rules, and evolution mechanisms. The JSONL structure serves as both data and executable code, enabling true metacircular evaluation."}
