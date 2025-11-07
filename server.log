@@ -721,3 +721,67 @@ Loaded 233 objects from ./automaton.jsonl
 Performed self-I/O: read 233 objects
 🎯 Executing: evolve
 Evolving from dimension 6 to 7
+🎯 Executing: self-observe
+Self-observation: Currently at quantum (dimension 7)
+Quantum collapse: returning to 0D
+🎯 Executing: self-reference
+Self-reference to line 1: identity
+🎯 Executing: evolve
+Evolving from dimension 0 to 1
+🎯 Executing: self-modify
+Added self-modification #32: self-ref-modified-1762477861623
+🎯 Executing: evolve
+Evolving from dimension 1 to 2
+🎯 Executing: self-modify
+Added self-modification #33: self-ref-modified-1762477865627
+🎯 Executing: evolve
+Evolving from dimension 2 to 3
+🎯 Executing: evolve
+Evolving from dimension 3 to 4
+🎯 Executing: evolve
+Evolving from dimension 4 to 5
+🎯 Executing: evolve
+Evolving from dimension 5 to 6
+🎯 Executing: evolve
+Evolving from dimension 6 to 7
+🎯 Executing: self-train
+Learned action frequencies:
+🎯 Executing: self-observe
+Self-observation: Currently at quantum (dimension 7)
+Quantum collapse: returning to 0D
+🎯 Executing: self-io
+Loaded 233 objects from ./automaton.jsonl
+Performed self-I/O: read 233 objects
+🎯 Executing: self-reference
+Self-reference to line 1: identity
+🎯 Executing: evolve
+Evolving from dimension 0 to 1
+🎯 Executing: evolve
+Evolving from dimension 1 to 2
+🎯 Executing: self-modify
+Added self-modification #34: self-ref-modified-1762477889651
+🎯 Executing: evolve
+Evolving from dimension 2 to 3
+🎯 Executing: self-train
+Learned action frequencies:
+🎯 Executing: evolve
+Evolving from dimension 3 to 4
+🎯 Executing: self-io
+Loaded 233 objects from ./automaton.jsonl
+Performed self-I/O: read 233 objects
+🎯 Executing: self-io
+Loaded 233 objects from ./automaton.jsonl
+Performed self-I/O: read 233 objects
+🎯 Executing: self-modify
+Added self-modification #35: self-ref-modified-1762477901664
+🎯 Executing: self-io
+Loaded 233 objects from ./automaton.jsonl
+Performed self-I/O: read 233 objects
+🎯 Executing: self-io
+Loaded 233 objects from ./automaton.jsonl
+Performed self-I/O: read 233 objects
+🎯 Executing: self-io
+Loaded 233 objects from ./automaton.jsonl
+Performed self-I/O: read 233 objects
+🎯 Executing: self-train
+Learned action frequencies:
