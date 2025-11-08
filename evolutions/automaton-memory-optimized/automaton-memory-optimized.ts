@@ -46,7 +46,9 @@ class MemoryOptimizedAutomaton extends AdvancedSelfReferencingAutomaton {
     // Lock to dimension 0 if configured
     if (this.config.lockDimension !== undefined) {
       (this as any).currentDimension = this.config.lockDimension;
-      console.log(`🔒 Locked to dimension ${this.config.lockDimension} for Identity Evolution`);
+      if (process.env.VERBOSE === 'true') {
+        console.log(`🔒 Locked to dimension ${this.config.lockDimension} for Identity Evolution`);
+      }
     }
     
     this.startOptimization();
@@ -88,7 +90,10 @@ class MemoryOptimizedAutomaton extends AdvancedSelfReferencingAutomaton {
       const freed = (memBefore.heapUsed - memAfter.heapUsed) / 1024 / 1024;
       
       if (freed > 1) {
-        console.log(`🧹 GC freed ${freed.toFixed(2)}MB`);
+        // Reduced verbosity - only log GC in verbose mode or if significant memory freed
+        if (process.env.VERBOSE === 'true' || freed > 5.0) {
+          console.log(`🧹 GC freed ${freed.toFixed(2)}MB`);
+        }
       }
     } else {
       // Manual cleanup hints
@@ -149,7 +154,9 @@ class MemoryOptimizedAutomaton extends AdvancedSelfReferencingAutomaton {
       const currentDim = (this as any).currentDimension || 0;
       if (currentDim !== 0 && Math.random() < this.config.dimension0Probability!) {
         (this as any).currentDimension = 0;
-        console.log(`🔄 Returning to dimension 0 for Identity Evolution`);
+        if (process.env.VERBOSE === 'true') {
+          console.log(`🔄 Returning to dimension 0 for Identity Evolution`);
+        }
       }
     }
     
@@ -181,7 +188,10 @@ class MemoryOptimizedAutomaton extends AdvancedSelfReferencingAutomaton {
       const identityEvolutions = ((this as any).objects || []).filter((obj: any) => 
         obj.selfReference?.pattern === 'Identity Evolution (0D)'
       ).length;
-      console.log(`✨ Identity Evolution (0D): ${identityEvolutions} total`);
+      // Reduced verbosity - only log major milestones (every 500th) or in verbose mode
+      if (process.env.VERBOSE === 'true' || identityEvolutions % 500 === 0) {
+        console.log(`✨ Identity Evolution (0D): ${identityEvolutions} total`);
+      }
     }
   }
 

@@ -65,11 +65,14 @@ class EvolvedAutomaton extends MemoryOptimizedAutomaton {
     
     this.lastDimension = (this as any).currentDimension || 0;
     
-    console.log('🚀 Evolved Automaton initialized');
-    console.log(`   Dimension Progression: ${this.evolvedConfig.enableDimensionProgression ? '✅ Enabled' : '❌ Disabled'}`);
-    console.log(`   Modification Interval: ${this.evolvedConfig.modificationInterval}ms`);
-    console.log(`   Burst Modifications: ${this.evolvedConfig.burstModifications}`);
-    console.log(`   Phase 4 Monitoring: ${this.evolvedConfig.enablePhase4Monitoring ? '✅ Enabled' : '❌ Disabled'}`);
+    // Reduced verbosity for testing
+    if (process.env.VERBOSE === 'true') {
+      console.log('🚀 Evolved Automaton initialized');
+      console.log(`   Dimension Progression: ${this.evolvedConfig.enableDimensionProgression ? '✅ Enabled' : '❌ Disabled'}`);
+      console.log(`   Modification Interval: ${this.evolvedConfig.modificationInterval}ms`);
+      console.log(`   Burst Modifications: ${this.evolvedConfig.burstModifications}`);
+      console.log(`   Phase 4 Monitoring: ${this.evolvedConfig.enablePhase4Monitoring ? '✅ Enabled' : '❌ Disabled'}`);
+    }
     
     this.startEvolvedFeatures();
   }
@@ -101,7 +104,10 @@ class EvolvedAutomaton extends MemoryOptimizedAutomaton {
       try {
         this.executeSelfModification();
       } catch (error) {
-        console.error(`Burst modification ${i + 1} error:`, error);
+        // Only log errors in verbose mode
+        if (process.env.VERBOSE === 'true') {
+          console.error(`Burst modification ${i + 1} error:`, error);
+        }
       }
     }
   }
@@ -120,7 +126,10 @@ class EvolvedAutomaton extends MemoryOptimizedAutomaton {
         (this as any).currentDimension = nextDimension;
         this.dimensionProgressionCount++;
         
-        console.log(`🔄 Dimension progression: ${currentDim}D → ${nextDimension}D (Total progressions: ${this.dimensionProgressionCount})`);
+        // Reduced verbosity - only log significant progressions
+        if (process.env.VERBOSE === 'true' || this.dimensionProgressionCount % 5 === 0) {
+          console.log(`🔄 Dimension progression: ${currentDim}D → ${nextDimension}D (Total: ${this.dimensionProgressionCount})`);
+        }
         
         // Execute evolution action
         try {
@@ -173,16 +182,15 @@ class EvolvedAutomaton extends MemoryOptimizedAutomaton {
     
     if (isPhase4 && !this.phase4Detected) {
       this.phase4Detected = true;
-      console.log('\n⚠️  PHASE 4 GROWTH DETECTED');
-      console.log(`   Current Memory: ${memMB.toFixed(2)}MB`);
-      console.log(`   Growth Rate: ${growthRate.toFixed(4)}MB/sec`);
-      console.log(`   Memory Delta: ${memoryDelta.toFixed(2)}MB over ${timeDelta.toFixed(1)}s`);
-      console.log(`   Recommendation: Monitor closely, consider GC trigger`);
+      // Reduced verbosity - only show critical Phase 4 detection
+      console.log(`⚠️  Phase 4 growth: ${memMB.toFixed(1)}MB (${growthRate.toFixed(3)}MB/s)`);
       
       // Trigger aggressive GC
       if (global.gc) {
         global.gc();
-        console.log('   🧹 Aggressive GC triggered');
+        if (process.env.VERBOSE === 'true') {
+          console.log('   🧹 Aggressive GC triggered');
+        }
       }
       
       // Trigger object trimming
@@ -190,12 +198,14 @@ class EvolvedAutomaton extends MemoryOptimizedAutomaton {
       (this as any).trimExecutionHistory();
     } else if (!isPhase4 && this.phase4Detected) {
       this.phase4Detected = false;
-      console.log('✅ Phase 4 growth resolved - memory stabilized');
+      if (process.env.VERBOSE === 'true') {
+        console.log('✅ Phase 4 growth resolved - memory stabilized');
+      }
     }
     
-    // Log Phase 4 status periodically
-    if (this.phase4Detected && this.memoryHistory.length % 5 === 0) {
-      console.log(`📊 Phase 4 Status: ${memMB.toFixed(2)}MB, Growth: ${growthRate.toFixed(4)}MB/sec`);
+    // Reduced verbosity - only log Phase 4 status in verbose mode
+    if (this.phase4Detected && process.env.VERBOSE === 'true' && this.memoryHistory.length % 10 === 0) {
+      console.log(`📊 Phase 4: ${memMB.toFixed(1)}MB (${growthRate.toFixed(3)}MB/s)`);
     }
   }
   
@@ -252,7 +262,9 @@ class EvolvedAutomaton extends MemoryOptimizedAutomaton {
     // Call parent destroy
     super.destroy();
     
-    console.log('🛑 Evolved automaton stopped');
+    if (process.env.VERBOSE === 'true') {
+      console.log('🛑 Evolved automaton stopped');
+    }
   }
 }
 
@@ -277,12 +289,15 @@ if (require.main === module) {
   // Print stats every 30 seconds
   setInterval(() => {
     const stats = automaton.getStats();
-    console.log('\n📊 Evolved Automaton Stats:');
-    console.log(`   Dimension: ${stats.evolved.dimensionProgression.currentDimension}D (${stats.evolved.dimensionProgression.progressions} progressions)`);
-    console.log(`   Modifications/sec: ${stats.evolved.modificationFrequency.modificationsPerSecond.toFixed(1)}`);
-    console.log(`   Memory: ${stats.evolved.phase4Monitoring.currentMemory.toFixed(2)}MB`);
-    console.log(`   Growth Rate: ${stats.evolved.phase4Monitoring.growthRate.toFixed(4)}MB/sec`);
-    console.log(`   Phase 4: ${stats.evolved.phase4Monitoring.detected ? '⚠️  DETECTED' : '✅ Normal'}`);
+    // Reduced verbosity - only show stats in verbose mode
+    if (process.env.VERBOSE === 'true') {
+      console.log('\n📊 Evolved Automaton Stats:');
+      console.log(`   Dimension: ${stats.evolved.dimensionProgression.currentDimension}D (${stats.evolved.dimensionProgression.progressions} progressions)`);
+      console.log(`   Modifications/sec: ${stats.evolved.modificationFrequency.modificationsPerSecond.toFixed(1)}`);
+      console.log(`   Memory: ${stats.evolved.phase4Monitoring.currentMemory.toFixed(2)}MB`);
+      console.log(`   Growth Rate: ${stats.evolved.phase4Monitoring.growthRate.toFixed(4)}MB/sec`);
+      console.log(`   Phase 4: ${stats.evolved.phase4Monitoring.detected ? '⚠️  DETECTED' : '✅ Normal'}`);
+    }
   }, 30000);
   
   // Handle shutdown

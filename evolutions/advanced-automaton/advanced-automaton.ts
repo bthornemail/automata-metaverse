@@ -59,6 +59,42 @@ type CanvasObject = (AutomatonState | Transition | VerticalTransition) & {
   [key: string]: any;
 };
 
+// Memory pool for CanvasObject reuse to reduce memory volatility
+class ObjectPool<T> {
+  private pool: T[] = [];
+  private createFn: () => T;
+  private resetFn: (obj: T) => void;
+  private maxSize: number;
+
+  constructor(createFn: () => T, resetFn: (obj: T) => void, maxSize: number = 100) {
+    this.createFn = createFn;
+    this.resetFn = resetFn;
+    this.maxSize = maxSize;
+  }
+
+  acquire(): T {
+    if (this.pool.length > 0) {
+      return this.pool.pop()!;
+    }
+    return this.createFn();
+  }
+
+  release(obj: T): void {
+    if (this.pool.length < this.maxSize) {
+      this.resetFn(obj);
+      this.pool.push(obj);
+    }
+  }
+
+  clear(): void {
+    this.pool = [];
+  }
+
+  get size(): number {
+    return this.pool.length;
+  }
+}
+
 class AdvancedSelfReferencingAutomaton {
   private filePath: string;
   private objects: CanvasObject[] = [];
@@ -66,6 +102,21 @@ class AdvancedSelfReferencingAutomaton {
   private executionHistory: Array<string | { action: string; from?: string; to?: string; timestamp?: number; iteration?: number }> = [];
   private selfModificationCount: number = 0;
   private readonly MAX_EXECUTION_HISTORY = 1000; // Limit history to prevent memory leaks
+  
+  // Memory pool for object reuse
+  private objectPool = new ObjectPool<CanvasObject>(
+    () => ({ id: '', type: '', currentState: '', dimensionalLevel: 0 } as CanvasObject),
+    (obj) => {
+      // Reset object for reuse
+      delete obj.id;
+      delete obj.type;
+      delete obj.currentState;
+      delete obj.dimensionalLevel;
+      delete obj.selfReference;
+      delete obj.provenanceHistory;
+    },
+    200 // Max pool size
+  );
 
   constructor(filePath: string) {
     this.filePath = filePath;
@@ -623,7 +674,10 @@ class AdvancedSelfReferencingAutomaton {
         this.objects = [];
       }
       this.objects.push(evolvedState);
-      console.log(`Evolved to ${safePattern}: ${evolvedState.id}`);
+      // Reduced verbosity - only log evolution in verbose mode
+      if (process.env.VERBOSE === 'true') {
+        console.log(`Evolved to ${safePattern}: ${evolvedState.id}`);
+      }
     } else {
       console.error('Failed to create valid evolved state:', evolvedState);
     }
@@ -840,7 +894,10 @@ class AdvancedSelfReferencingAutomaton {
     
     this.objects.push(modification);
     this.selfModificationCount++;
-    console.log(`Added self-modification #${this.selfModificationCount}: ${modificationCode.pattern}`);
+    // Reduced verbosity - only log major milestones (every 500th) or in verbose mode
+    if (process.env.VERBOSE === 'true' || this.selfModificationCount % 500 === 0) {
+      console.log(`Added self-modification #${this.selfModificationCount}: ${modificationCode.pattern}`);
+    }
   }
 
   private generateModificationCode(dimension: number): { code: string; pattern: string } {

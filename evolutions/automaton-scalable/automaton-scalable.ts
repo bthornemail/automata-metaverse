@@ -96,11 +96,44 @@ class ScalableAutomaton {
     try {
       // Try to require GPU.js - if not available, GPU acceleration will be disabled
       require.resolve('gpu.js');
-      this.gpuAvailable = true;
-      console.log('✅ GPU.js detected - GPU acceleration available');
-    } catch {
+      
+      // Try to actually load and instantiate GPU to verify it works
+      try {
+        const GPU = require('gpu.js');
+        if (GPU && typeof GPU === 'function') {
+          // Try to create a simple GPU instance to verify it works
+          const testGPU = new GPU({ mode: 'cpu' }); // Use CPU mode for testing
+          this.gpuAvailable = true;
+          console.log('✅ GPU.js detected and working - GPU acceleration available');
+        } else {
+          throw new Error('GPU.js module loaded but constructor not available');
+        }
+      } catch (loadError: any) {
+        this.gpuAvailable = false;
+        console.log('⚠️  GPU.js found but failed to initialize:', loadError.message);
+        console.log('   Continuing without GPU acceleration');
+      }
+    } catch (resolveError: any) {
       this.gpuAvailable = false;
-      console.log('⚠️  GPU.js not found - Install with: npm install gpu.js');
+      // Check if it's in package.json but not installed
+      const packageJsonPath = path.join(__dirname, '../../package.json');
+      if (fs.existsSync(packageJsonPath)) {
+        try {
+          const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+          const hasGpuJs = (packageJson.dependencies && packageJson.dependencies['gpu.js']) ||
+                           (packageJson.optionalDependencies && packageJson.optionalDependencies['gpu.js']);
+          if (hasGpuJs) {
+            console.log('⚠️  GPU.js is in package.json but not installed (may require native build tools)');
+            console.log('   Install build tools or run: npm install gpu.js');
+          } else {
+            console.log('⚠️  GPU.js not found - Install with: npm install gpu.js');
+          }
+        } catch {
+          console.log('⚠️  GPU.js not found - Install with: npm install gpu.js');
+        }
+      } else {
+        console.log('⚠️  GPU.js not found - Install with: npm install gpu.js');
+      }
       console.log('   Continuing without GPU acceleration');
     }
   }

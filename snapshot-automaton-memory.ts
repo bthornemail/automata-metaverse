@@ -48,7 +48,13 @@ interface MemorySnapshot {
   };
 }
 
-const SNAPSHOT_INTERVAL = 1; // 1ms intervals
+// Adaptive sampling configuration
+const BASE_SNAPSHOT_INTERVAL = 1; // Base interval: 1ms
+const IDLE_SNAPSHOT_INTERVAL = 100; // Idle interval: 100ms (reduce frequency during idle)
+const ACTIVE_SNAPSHOT_INTERVAL = 1; // Active interval: 1ms (high frequency during active reasoning)
+const MIN_ACTIVITY_THRESHOLD = 1; // Minimum objects/modifications to consider "active"
+const IDLE_DURATION_THRESHOLD = 5000; // 5 seconds of inactivity before switching to idle mode
+
 const SNAPSHOT_DIR = path.join(__dirname, 'snapshots-memory');
 const AUTOMATON_FILE = path.join(__dirname, 'automaton.jsonl');
 const MEMORY_THRESHOLD_LOW = 50 * 1024 * 1024; // 50MB
@@ -57,6 +63,13 @@ const MEMORY_THRESHOLD_HIGH = 500 * 1024 * 1024; // 500MB
 const MEMORY_THRESHOLD_CRITICAL = 1000 * 1024 * 1024; // 1GB
 const MAX_SNAPSHOTS = 1000; // Keep only last 1000 snapshots
 const CLEANUP_INTERVAL = 60000; // Cleanup every 60 seconds
+
+// Adaptive sampling state
+let currentInterval = BASE_SNAPSHOT_INTERVAL;
+let lastActivityTime = Date.now();
+let consecutiveIdleSnapshots = 0;
+let activityWindow: Array<{ timestamp: number; newObjects: number; newModifications: number }> = [];
+const ACTIVITY_WINDOW_SIZE = 10; // Track last 10 snapshots for activity detection
 
 // Ensure snapshot directory exists
 if (!fs.existsSync(SNAPSHOT_DIR)) {
@@ -67,6 +80,58 @@ let previousSnapshot: MemorySnapshot | null = null;
 let snapshotCount = 0;
 let spawnedProcesses: ChildProcess[] = [];
 let memoryHistory: number[] = [];
+let snapshotIntervalHandle: NodeJS.Timeout | null = null;
+
+// Memory pooling for object reuse
+class MemoryPool<T> {
+  private pool: T[] = [];
+  private createFn: () => T;
+  private resetFn: (obj: T) => void;
+  private maxSize: number;
+
+  constructor(createFn: () => T, resetFn: (obj: T) => void, maxSize: number = 100) {
+    this.createFn = createFn;
+    this.resetFn = resetFn;
+    this.maxSize = maxSize;
+  }
+
+  acquire(): T {
+    if (this.pool.length > 0) {
+      return this.pool.pop()!;
+    }
+    return this.createFn();
+  }
+
+  release(obj: T): void {
+    if (this.pool.length < this.maxSize) {
+      this.resetFn(obj);
+      this.pool.push(obj);
+    }
+  }
+
+  clear(): void {
+    this.pool = [];
+  }
+}
+
+// Memory pool for snapshots (reuse objects to reduce allocation)
+const snapshotPool = new MemoryPool<MemorySnapshot>(
+  () => ({
+    timestamp: 0,
+    isoTime: '',
+    memory: { heapUsed: 0, heapTotal: 0, external: 0, rss: 0, systemTotal: 0, systemFree: 0 },
+    automatonState: { objectCount: 0, selfModificationCount: 0, currentDimension: 0, executionHistoryLength: 0 },
+    fileStats: { size: 0, mtime: 0, lineCount: 0 },
+    performance: { cpuUsage: { user: 0, system: 0 }, uptime: 0 },
+    reasoning: { newObjects: 0, newModifications: 0, memoryDelta: 0, memoryPressure: 'low' }
+  }),
+  (snapshot) => {
+    // Reset snapshot for reuse
+    snapshot.timestamp = 0;
+    snapshot.isoTime = '';
+  },
+  50 // Max pool size
+);
 
 function getMemoryUsage(): NodeJS.MemoryUsage {
   return process.memoryUsage();
@@ -140,6 +205,87 @@ function analyzeReasoning(current: MemorySnapshot, previous: MemorySnapshot | nu
   };
 }
 
+function isActiveReasoning(reasoning: MemorySnapshot['reasoning']): boolean {
+  return reasoning.newObjects >= MIN_ACTIVITY_THRESHOLD || 
+         reasoning.newModifications >= MIN_ACTIVITY_THRESHOLD ||
+         Math.abs(reasoning.memoryDelta) > 1024 * 1024; // >1MB change indicates activity
+}
+
+function updateAdaptiveSampling(reasoning: MemorySnapshot['reasoning']): void {
+  const now = Date.now();
+  const isActive = isActiveReasoning(reasoning);
+  
+  // Track activity in window
+  activityWindow.push({
+    timestamp: now,
+    newObjects: reasoning.newObjects,
+    newModifications: reasoning.newModifications
+  });
+  
+  // Keep window size manageable
+  if (activityWindow.length > ACTIVITY_WINDOW_SIZE) {
+    activityWindow.shift();
+  }
+  
+  // Calculate recent activity level
+  const recentActivity = activityWindow.reduce((sum, entry) => 
+    sum + entry.newObjects + entry.newModifications, 0);
+  
+  if (isActive || recentActivity > MIN_ACTIVITY_THRESHOLD * 2) {
+    // Active reasoning detected - use high frequency
+    lastActivityTime = now;
+    consecutiveIdleSnapshots = 0;
+    
+    if (currentInterval !== ACTIVE_SNAPSHOT_INTERVAL) {
+      currentInterval = ACTIVE_SNAPSHOT_INTERVAL;
+      console.log(`🟢 Switching to ACTIVE sampling (${ACTIVE_SNAPSHOT_INTERVAL}ms interval)`);
+      restartSnapshotInterval();
+    }
+  } else {
+    // Idle period - check if we should reduce frequency
+    consecutiveIdleSnapshots++;
+    const timeSinceActivity = now - lastActivityTime;
+    
+    if (timeSinceActivity > IDLE_DURATION_THRESHOLD && currentInterval !== IDLE_SNAPSHOT_INTERVAL) {
+      currentInterval = IDLE_SNAPSHOT_INTERVAL;
+      console.log(`🟡 Switching to IDLE sampling (${IDLE_SNAPSHOT_INTERVAL}ms interval) - ${consecutiveIdleSnapshots} idle snapshots`);
+      restartSnapshotInterval();
+    }
+  }
+}
+
+function restartSnapshotInterval(): void {
+  if (snapshotIntervalHandle) {
+    clearInterval(snapshotIntervalHandle);
+  }
+  
+  snapshotIntervalHandle = setInterval(async () => {
+    try {
+      const snapshot = await takeSnapshot();
+      
+      // Only save snapshots during active reasoning or periodically during idle
+      const shouldSave = isActiveReasoning(snapshot.reasoning) || 
+                        snapshotCount % 10 === 0; // Save every 10th snapshot during idle
+      
+      if (shouldSave) {
+        saveSnapshot(snapshot);
+      }
+      
+      // Update adaptive sampling
+      updateAdaptiveSampling(snapshot.reasoning);
+      
+      // Print every 100th saved snapshot to avoid spam
+      if (shouldSave && snapshotCount % 100 === 0) {
+        printSnapshot(snapshot);
+      }
+      
+      previousSnapshot = snapshot;
+    } catch (error) {
+      console.error('❌ Error taking snapshot:', error);
+    }
+  }, currentInterval);
+}
+
 async function takeSnapshot(): Promise<MemorySnapshot> {
   const now = Date.now();
   const isoTime = new Date(now).toISOString();
@@ -163,39 +309,32 @@ async function takeSnapshot(): Promise<MemorySnapshot> {
     executionHistoryLength: apiState?.executionHistory?.length || 0
   };
 
-  const snapshot: MemorySnapshot = {
-    timestamp: now,
-    isoTime,
-    memory: {
-      heapUsed: memory.heapUsed,
-      heapTotal: memory.heapTotal,
-      external: memory.external,
-      rss: memory.rss,
-      systemTotal: systemMem.total,
-      systemFree: systemMem.free
-    },
-    automatonState,
-    fileStats: {
-      size: fileStats.size,
-      mtime: fileStats.mtimeMs,
-      lineCount
-    },
-    performance: {
-      cpuUsage,
-      uptime: process.uptime()
-    },
-    reasoning: {
-      newObjects: 0,
-      newModifications: 0,
-      memoryDelta: 0,
-      memoryPressure: assessMemoryPressure(memory)
-    }
-  };
+  // Use memory pool to reduce allocations
+  const snapshot = snapshotPool.acquire();
+  
+  snapshot.timestamp = now;
+  snapshot.isoTime = isoTime;
+  snapshot.memory.heapUsed = memory.heapUsed;
+  snapshot.memory.heapTotal = memory.heapTotal;
+  snapshot.memory.external = memory.external;
+  snapshot.memory.rss = memory.rss;
+  snapshot.memory.systemTotal = systemMem.total;
+  snapshot.memory.systemFree = systemMem.free;
+  snapshot.automatonState.objectCount = automatonState.objectCount;
+  snapshot.automatonState.selfModificationCount = automatonState.selfModificationCount;
+  snapshot.automatonState.currentDimension = automatonState.currentDimension;
+  snapshot.automatonState.executionHistoryLength = automatonState.executionHistoryLength;
+  snapshot.fileStats.size = fileStats.size;
+  snapshot.fileStats.mtime = fileStats.mtimeMs;
+  snapshot.fileStats.lineCount = lineCount;
+  snapshot.performance.cpuUsage = cpuUsage;
+  snapshot.performance.uptime = process.uptime();
+  snapshot.reasoning.memoryPressure = assessMemoryPressure(memory);
 
   // Analyze reasoning compared to previous
   snapshot.reasoning = analyzeReasoning(snapshot, previousSnapshot);
   
-  // Track memory history
+  // Track memory history (limit size to reduce memory volatility)
   memoryHistory.push(memory.heapUsed);
   if (memoryHistory.length > 100) {
     memoryHistory.shift();
@@ -342,22 +481,8 @@ async function main() {
   saveSnapshot(initialSnapshot);
   printSnapshot(initialSnapshot);
 
-  // Set up interval (1ms)
-  const interval = setInterval(async () => {
-    try {
-      const snapshot = await takeSnapshot();
-      saveSnapshot(snapshot);
-      
-      // Print every 100th snapshot to avoid spam
-      if (snapshotCount % 100 === 0) {
-        printSnapshot(snapshot);
-      }
-      
-      previousSnapshot = snapshot;
-    } catch (error) {
-      console.error('❌ Error taking snapshot:', error);
-    }
-  }, SNAPSHOT_INTERVAL);
+  // Start adaptive sampling interval
+  restartSnapshotInterval();
   
   // Set up periodic cleanup and GC triggers
   const cleanupInterval = setInterval(() => {
@@ -394,7 +519,13 @@ async function main() {
     process.exit(0);
   });
 
-  console.log('\n⏳ Monitoring at 1ms intervals... Press Ctrl+C to stop\n');
+  console.log('\n⏳ Monitoring with adaptive sampling...');
+  console.log(`   Base interval: ${BASE_SNAPSHOT_INTERVAL}ms`);
+  console.log(`   Active interval: ${ACTIVE_SNAPSHOT_INTERVAL}ms (during reasoning)`);
+  console.log(`   Idle interval: ${IDLE_SNAPSHOT_INTERVAL}ms (during inactivity)`);
+  console.log(`   Activity threshold: ${MIN_ACTIVITY_THRESHOLD} objects/modifications`);
+  console.log(`   Idle threshold: ${IDLE_DURATION_THRESHOLD}ms`);
+  console.log('   Press Ctrl+C to stop\n');
 }
 
 if (require.main === module) {

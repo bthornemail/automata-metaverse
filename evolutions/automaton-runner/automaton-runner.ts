@@ -1,6 +1,47 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join } from 'path';
 
+// Type declaration for global.gc (requires --expose-gc flag)
+declare global {
+  var gc: (() => void) | undefined;
+}
+
+// Memory pool for CanvasObject reuse to reduce memory volatility
+class ObjectPool<T> {
+  private pool: T[] = [];
+  private createFn: () => T;
+  private resetFn: (obj: T) => void;
+  private maxSize: number;
+
+  constructor(createFn: () => T, resetFn: (obj: T) => void, maxSize: number = 100) {
+    this.createFn = createFn;
+    this.resetFn = resetFn;
+    this.maxSize = maxSize;
+  }
+
+  acquire(): T {
+    if (this.pool.length > 0) {
+      return this.pool.pop()!;
+    }
+    return this.createFn();
+  }
+
+  release(obj: T): void {
+    if (this.pool.length < this.maxSize) {
+      this.resetFn(obj);
+      this.pool.push(obj);
+    }
+  }
+
+  clear(): void {
+    this.pool = [];
+  }
+
+  get size(): number {
+    return this.pool.length;
+  }
+}
+
 interface AutomatonState {
   id: string;
   type: string;
@@ -63,10 +104,42 @@ class SelfReferencingAutomaton {
   private objects: CanvasObject[] = [];
   private currentLine: number = 0;
   private executionHistory: Array<string | { action: string; from?: string; to?: string; timestamp?: number; iteration?: number }> = [];
+  private readonly MAX_EXECUTION_HISTORY = 1000; // Limit history to prevent memory leaks
+  
+  // Memory pool for object reuse
+  private objectPool = new ObjectPool<CanvasObject>(
+    () => ({ id: '', type: '', currentState: '', dimensionalLevel: 0 } as CanvasObject),
+    (obj) => {
+      // Reset object for reuse
+      delete obj.id;
+      delete obj.type;
+      delete obj.currentState;
+      delete obj.dimensionalLevel;
+      delete obj.selfReference;
+      delete obj.provenanceHistory;
+    },
+    200 // Max pool size
+  );
 
   constructor(filePath: string) {
     this.filePath = filePath;
     this.load();
+  }
+  
+  // Cleanup method for memory management
+  cleanup(): void {
+    // Trim execution history
+    if (this.executionHistory.length > this.MAX_EXECUTION_HISTORY) {
+      this.executionHistory = this.executionHistory.slice(-this.MAX_EXECUTION_HISTORY);
+    }
+    
+    // Trigger GC if available
+    if (global.gc) {
+      global.gc();
+    }
+    
+    // Clear object pool if needed
+    // (Keep pool for reuse, but can clear if memory pressure is high)
   }
 
   private load(): void {
@@ -374,6 +447,16 @@ class SelfReferencingAutomaton {
     }
     
     this.executionHistory.push(`${action}:${fromState}→${toState}`);
+    
+    // Trim execution history to prevent memory leaks
+    if (this.executionHistory.length > this.MAX_EXECUTION_HISTORY) {
+      this.executionHistory = this.executionHistory.slice(-this.MAX_EXECUTION_HISTORY);
+    }
+    
+    // Periodic cleanup
+    if (this.executionHistory.length % 100 === 0) {
+      this.cleanup();
+    }
   }
 
   private executeSelfReference(): void {
@@ -385,7 +468,10 @@ class SelfReferencingAutomaton {
 
   private executeEvolution(): void {
     this.currentLine = (this.currentLine + 1) % this.objects.length;
-    console.log(`Evolved to line ${this.currentLine}`);
+    // Reduced verbosity - only log evolution in verbose mode
+    if (process.env.VERBOSE === 'true') {
+      console.log(`Evolved to line ${this.currentLine}`);
+    }
   }
 
   private executeSelfModification(): void {
@@ -400,7 +486,10 @@ class SelfReferencingAutomaton {
     };
     
     this.objects.push(newSelfRef);
-    console.log(`Added self-modification reference: ${newSelfRef.id}`);
+    // Reduced verbosity - only log in verbose mode
+    if (process.env.VERBOSE === 'true') {
+      console.log(`Added self-modification reference: ${newSelfRef.id}`);
+    }
   }
 
   private executeComposition(): void {

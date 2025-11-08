@@ -88,5 +88,8 @@
     "self-reference"
   ],
   "author": "Automaton Team",
-  "license": "MIT"
+  "license": "MIT",
+  "optionalDependencies": {
+    "gpu.js": "^2.16.0"
+  }
 }
