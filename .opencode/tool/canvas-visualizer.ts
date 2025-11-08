@@ -1,8 +1,21 @@
 import { tool } from "@opencode-ai/plugin"
 import * as fs from "fs"
 
+/**
+ * Canvas Visualizer Tool
+ * 
+ * Related Commands:
+ * - /visualize-system - Comprehensive system visualization generation
+ * - /explore-canvas - Visual exploration of Grok topology
+ * - /run-experiments - Visualization as part of experiment suite
+ * 
+ * This tool is used by:
+ * - visualize-system.md - Primary command for system visualization
+ * - explore-canvas.md - Visual representation of canvas structure
+ * - run-experiments.md - Visualization phase of experiments
+ */
 export default tool({
-  description: "🎨 Visualize the computational topology canvas and generate dimensional insights. Create ASCII art, JSON structures, and evolution graphs from the Church encoding system.",
+  description: "I'm your visualization artist - I turn the computational topology canvas into visual stories. I create ASCII art, JSON structures, and evolution graphs that help you see what's happening in the Church encoding system. Whether you want to see the full canvas, focus on a specific dimension, explore self-reference patterns, or track evolution - I'll make it visual and understandable.",
   args: {
     type: tool.schema.enum(["canvas", "dimension", "self-reference", "evolution"]).describe("🎨 Visualization type: 'canvas' shows full topology, 'dimension' focuses on specific level, 'self-reference' displays recursion patterns, 'evolution' shows progression timeline"),
     format: tool.schema.enum(["text", "json", "ascii"]).describe("📋 Output format: 'text' for readable descriptions, 'json' for structured data, 'ascii' for visual art (default: text)"),

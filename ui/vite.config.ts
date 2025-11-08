@@ -8,7 +8,20 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
+      // Force single instance of CodeMirror packages
+      '@codemirror/state': resolve(__dirname, 'node_modules/@codemirror/state'),
+      '@codemirror/view': resolve(__dirname, 'node_modules/@codemirror/view'),
     },
+    dedupe: [
+      '@codemirror/state',
+      '@codemirror/view',
+      '@codemirror/commands',
+      '@codemirror/lang-javascript',
+      '@codemirror/lang-markdown',
+      '@codemirror/theme-one-dark',
+      '@lezer/common',
+      '@lezer/highlight'
+    ],
   },
   server: {
     host: '0.0.0.0',
@@ -39,12 +52,32 @@ export default defineConfig({
           three: ['three', '@react-three/fiber', '@react-three/drei'],
           ui: ['framer-motion', 'lucide-react'],
           charts: ['recharts', 'd3'],
+          codemirror: [
+            '@codemirror/state',
+            '@codemirror/view',
+            '@codemirror/commands',
+            '@codemirror/lang-javascript',
+            '@codemirror/lang-markdown',
+            '@codemirror/theme-one-dark',
+            '@lezer/common',
+            '@lezer/highlight'
+          ],
         },
       },
     },
     chunkSizeWarningLimit: 1000,
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'three'],
+    include: [
+      'react', 
+      'react-dom', 
+      'three',
+      '@codemirror/state',
+      '@codemirror/view',
+      '@codemirror/commands',
+      '@codemirror/lang-javascript',
+      '@codemirror/lang-markdown',
+      '@codemirror/theme-one-dark'
+    ],
   },
 })

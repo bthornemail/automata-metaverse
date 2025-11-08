@@ -1,3 +1,31 @@
+---
+id: deployment-guide
+title: "Production Deployment Guide"
+level: practical
+type: guide
+tags: [deployment, production, docker, kubernetes, helm, monitoring]
+keywords: [production-deployment, deployment-guide, docker, kubernetes, helm, r5rs-canvas-engine, blackboard-architecture, automaton-self-building]
+prerequisites: [readme-main, environment-setup-guide]
+enables: [k8s-access-guide, production-deployment-guide, docker-setup-guide]
+related: [r5rs-canvas-engine, blackboard-architecture-guide, readme-main]
+readingTime: 60
+difficulty: 4
+blackboard:
+  status: active
+  assignedAgent: null
+  lastUpdate: null
+  dependencies: [r5rs-canvas-engine]
+  watchers: []
+  r5rsEngine: "r5rs-canvas-engine.scm"
+  selfBuilding:
+    enabled: true
+    source: "r5rs-canvas-engine.scm"
+    pattern: "blackboard-architecture"
+    regeneration:
+      function: "r5rs:parse-jsonl-canvas"
+      args: ["generate.metaverse.jsonl"]
+---
+
 # 🚀 **Production Deployment Guide**
 
 ## Overview

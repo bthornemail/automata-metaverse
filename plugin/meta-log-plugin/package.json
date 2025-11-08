@@ -1,0 +1,42 @@
+{
+  "name": "meta-log-plugin",
+  "version": "1.0.0",
+  "description": "Native plugin package for Meta-Log (common interface for OpenCode and Obsidian)",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run build",
+    "test": "jest"
+  },
+  "keywords": [
+    "meta-log",
+    "plugin",
+    "opencode",
+    "obsidian",
+    "common-interface"
+  ],
+  "author": "Automaton System",
+  "license": "MIT",
+  "dependencies": {
+    "meta-log-db": "^1.0.0"
+  },
+  "peerDependencies": {
+    "@opencode-ai/plugin": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

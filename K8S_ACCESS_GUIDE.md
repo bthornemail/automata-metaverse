@@ -1,3 +1,31 @@
+---
+id: k8s-access-guide
+title: "Automaton Kubernetes Access Guide"
+level: practical
+type: guide
+tags: [kubernetes, k8s, access-guide, deployment, ingress, nodeport]
+keywords: [kubernetes-access, k8s-access-guide, deployment, r5rs-canvas-engine, blackboard-architecture, automaton-self-building]
+prerequisites: [deployment-guide]
+enables: []
+related: [r5rs-canvas-engine, blackboard-architecture-guide, deployment-guide, production-deployment-guide]
+readingTime: 25
+difficulty: 2
+blackboard:
+  status: active
+  assignedAgent: null
+  lastUpdate: null
+  dependencies: [r5rs-canvas-engine]
+  watchers: []
+  r5rsEngine: "r5rs-canvas-engine.scm"
+  selfBuilding:
+    enabled: true
+    source: "r5rs-canvas-engine.scm"
+    pattern: "blackboard-architecture"
+    regeneration:
+      function: "r5rs:parse-jsonl-canvas"
+      args: ["generate.metaverse.jsonl"]
+---
+
 # 🌐 Automaton Kubernetes Access Guide
 
 ## Access Methods

@@ -15,7 +15,9 @@ import { tinyMLService } from '@/services/tinyml-service';
 import { databaseService } from '@/services/database-service';
 import { llmService, LLMProviderConfig } from '@/services/llm-service';
 import WebGLMetaverseEvolution, { dimensionConfig } from '@/components/AdvancedAnimations/WebGLMetaverseEvolution';
-import JSONLCanvasEditor from '@/components/JSONLCanvasEditor/JSONLCanvasEditor';
+import MetaverseCanvas3D from '@/components/MetaverseCanvas3D/MetaverseCanvas3D';
+import UnifiedEditor from '@/components/UnifiedEditor';
+import UnifiedMetaverseView from '@/components/UnifiedMetaverseView';
 
 interface AIMutation {
   id: string;
@@ -153,6 +155,7 @@ const AIPortal: React.FC = () => {
   const [activeAITab, setActiveAITab] = useState<'evolution' | 'metrics' | 'canvas'>('evolution');
   const [showCanvasEditor, setShowCanvasEditor] = useState(false);
   const [selectedJSONLFile, setSelectedJSONLFile] = useState<string>('automaton-kernel.jsonl');
+  const [metaverseMode, setMetaverseMode] = useState<'abstract' | 'canvasl-3d' | 'unified'>('unified');
   
   // Metaverse Stats State
   const [metaverseStats, setMetaverseStats] = useState<{
@@ -817,6 +820,58 @@ Generate a helpful, informative response:
           </div>
           
           <div className="flex items-center gap-2">
+            {/* Metaverse Mode Toggle */}
+            <div className="flex items-center gap-2 bg-gray-700 rounded-lg p-1">
+              <button
+                onClick={() => setMetaverseMode('unified')}
+                className={`px-3 py-1 rounded text-sm transition-colors ${
+                  metaverseMode === 'unified' 
+                    ? 'bg-blue-600 text-white' 
+                    : 'text-gray-400 hover:text-white'
+                }`}
+                title="Unified View (Major/Minor Modes)"
+              >
+                Unified
+              </button>
+              <button
+                onClick={() => setMetaverseMode('abstract')}
+                className={`px-3 py-1 rounded text-sm transition-colors ${
+                  metaverseMode === 'abstract' 
+                    ? 'bg-blue-600 text-white' 
+                    : 'text-gray-400 hover:text-white'
+                }`}
+                title="Abstract Metaverse Only"
+              >
+                Abstract
+              </button>
+              <button
+                onClick={() => setMetaverseMode('canvasl-3d')}
+                className={`px-3 py-1 rounded text-sm transition-colors ${
+                  metaverseMode === 'canvasl-3d' 
+                    ? 'bg-blue-600 text-white' 
+                    : 'text-gray-400 hover:text-white'
+                }`}
+                title="CanvasL 3D Only"
+              >
+                CanvasL 3D
+              </button>
+            </div>
+            
+            {/* File Selection (for CanvasL 3D mode) */}
+            {metaverseMode === 'canvasl-3d' && (
+              <select
+                value={selectedJSONLFile}
+                onChange={(e) => setSelectedJSONLFile(e.target.value)}
+                className="px-3 py-1 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm"
+              >
+                <option value="automaton-kernel.jsonl">automaton-kernel.jsonl</option>
+                <option value="generate.metaverse.jsonl">generate.metaverse.jsonl</option>
+                <option value="automaton.jsonl">automaton.jsonl</option>
+                <option value="automaton.canvas.space.jsonl">automaton.canvas.space.jsonl</option>
+                <option value="automaton-kernel.canvasl">automaton-kernel.canvasl</option>
+                <option value="generate.metaverse.canvasl">generate.metaverse.canvasl</option>
+              </select>
+            )}
             {/* View Changes / Chat Toggle */}
             <button
               onClick={() => setShowChatPanel(!showChatPanel)}
@@ -862,15 +917,38 @@ Generate a helpful, informative response:
       <div className="flex-1 overflow-hidden relative">
         {/* 3D Metaverse Portal - Main Interface */}
         <div className="w-full h-full">
-          <WebGLMetaverseEvolution 
-            onOpenAIModal={() => setShowAIEvolutionModal(true)}
-            onDimensionChange={(dimension) => {
-              automatonActions.setDimension(dimension);
-            }}
-            onStatsUpdate={(stats) => {
-              setMetaverseStats(stats);
-            }}
-          />
+          {metaverseMode === 'unified' ? (
+            <UnifiedMetaverseView
+              initialMajorMode="environment"
+              initialMinorMode="abstract"
+              onModeChange={(major, minor) => {
+                addEvolutionLog(`Mode changed: ${major}/${minor}`);
+              }}
+              onSymbolSelect={(symbol) => {
+                if (symbol) {
+                  addEvolutionLog(`Selected symbol: ${symbol.name} (${symbol.type})`);
+                }
+              }}
+              height="100%"
+            />
+          ) : metaverseMode === 'abstract' ? (
+            <WebGLMetaverseEvolution 
+              onOpenAIModal={() => setShowAIEvolutionModal(true)}
+              onDimensionChange={(dimension) => {
+                automatonActions.setDimension(dimension);
+              }}
+              onStatsUpdate={(stats) => {
+                setMetaverseStats(stats);
+              }}
+            />
+          ) : (
+            <MetaverseCanvas3D
+              filename={selectedJSONLFile}
+              onSave={(canvas3D) => {
+                addEvolutionLog(`Saved 3D canvas: ${selectedJSONLFile}`);
+              }}
+            />
+          )}
         </div>
 
         {/* Chat Panel Overlay - Toggleable */}
@@ -2061,10 +2139,12 @@ Generate a helpful, informative response:
                   </select>
                 </div>
                 <div className="border border-gray-700 rounded-lg overflow-hidden" style={{ height: '600px' }}>
-                  <JSONLCanvasEditor
+                  <UnifiedEditor
                     filename={selectedJSONLFile}
-                    onSave={(content) => {
-                      addEvolutionLog(`Saved canvas: ${selectedJSONLFile}`);
+                    initialMode="auto"
+                    height="100%"
+                    onSave={(content, format) => {
+                      addEvolutionLog(`Saved canvas: ${selectedJSONLFile} (${format})`);
                     }}
                   />
                 </div>

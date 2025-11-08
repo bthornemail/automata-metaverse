@@ -1,3 +1,35 @@
+---
+id: unified-ui-architecture
+title: "Unified UI Architecture - Implementation Summary"
+level: practical
+type: implementation
+tags: [ui-architecture, unified-ui, zustand, state-management, api-service]
+keywords: [unified-ui-architecture, ui-architecture, zustand, state-management, r5rs-canvas-engine, blackboard-architecture, automaton-self-building]
+prerequisites: [readme-main]
+enables: [code-editor-integration-complete]
+related: [r5rs-canvas-engine, blackboard-architecture-guide, readme-main]
+readingTime: 40
+difficulty: 3
+blackboard:
+  status: active
+  assignedAgent: null
+  lastUpdate: null
+  dependencies: [r5rs-canvas-engine]
+  watchers: []
+  r5rsEngine: "r5rs-canvas-engine.scm"
+  selfBuilding:
+    enabled: true
+    source: "r5rs-canvas-engine.scm"
+    pattern: "blackboard-architecture"
+    regeneration:
+      function: "r5rs:parse-jsonl-canvas"
+      args: ["generate.metaverse.jsonl"]
+  architecture:
+    stateManagement: "Zustand store with persistent state"
+    apiService: "Unified API service with caching and deduplication"
+    crossComponent: "Cross-component communication system"
+---
+
 # Unified UI Architecture - Implementation Summary
 
 ## Overview

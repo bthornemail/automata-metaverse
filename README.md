@@ -1,3 +1,31 @@
+---
+id: readme-main
+title: "Church Encoding Metaverse"
+level: gateway
+type: navigation
+tags: [readme, main, church-encoding, metaverse, production, quick-start]
+keywords: [church-encoding-metaverse, production-deployment, r5rs-canvas-engine, blackboard-architecture, automaton-self-building, dimensional-progression-0d-7d]
+prerequisites: []
+enables: [agents-multi-agent-system, deployment-guide, environment-setup-guide]
+related: [r5rs-canvas-engine, blackboard-architecture-guide, agents-multi-agent-system]
+readingTime: 15
+difficulty: 1
+blackboard:
+  status: active
+  assignedAgent: null
+  lastUpdate: null
+  dependencies: []
+  watchers: []
+  r5rsEngine: "r5rs-canvas-engine.scm"
+  selfBuilding:
+    enabled: true
+    source: "r5rs-canvas-engine.scm"
+    pattern: "blackboard-architecture"
+    regeneration:
+      function: "r5rs:parse-jsonl-canvas"
+      args: ["generate.metaverse.jsonl"]
+---
+
 # 🌌 Church Encoding Metaverse
 
 A production-ready computational topology canvas that implements self-referencing Church encoding from 0D point topology to 7D quantum superposition, featuring WebGL visualization, multiplayer collaboration, and AI-driven evolution.

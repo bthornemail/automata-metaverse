@@ -6,6 +6,8 @@ import {
 } from 'lucide-react';
 import { jsonlCanvasService, CanvasGraph, JSONLNode, JSONLEdge } from '../../services/jsonl-canvas-service';
 import { databaseService } from '../../services/database-service';
+import { BasesManager } from '../BasesManager';
+import { basesService } from '../../services/bases-service';
 
 interface JSONLCanvasEditorProps {
   filename: string;
@@ -35,7 +37,7 @@ const JSONLCanvasEditor: React.FC<JSONLCanvasEditorProps> = ({
   const [selectedEdge, setSelectedEdge] = useState<JSONLEdge | null>(null);
   const [editingNode, setEditingNode] = useState<JSONLNode | null>(null);
   const [editingEdge, setEditingEdge] = useState<JSONLEdge | null>(null);
-  const [viewMode, setViewMode] = useState<'graph' | 'raw' | 'split'>('split');
+  const [viewMode, setViewMode] = useState<'graph' | 'raw' | 'split' | 'base'>('split');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
   const [isLoading, setIsLoading] = useState(true);
@@ -264,6 +266,12 @@ const JSONLCanvasEditor: React.FC<JSONLCanvasEditorProps> = ({
             >
               Split
             </button>
+            <button
+              onClick={() => setViewMode('base')}
+              className={`px-3 py-1 rounded ${viewMode === 'base' ? 'bg-blue-600' : 'bg-gray-700'} transition-colors`}
+            >
+              Base View
+            </button>
           </div>
 
           <div className="flex items-center gap-2 flex-1">
@@ -443,6 +451,27 @@ const JSONLCanvasEditor: React.FC<JSONLCanvasEditorProps> = ({
               }}
               className="w-full h-full p-4 bg-gray-950 text-green-400 font-mono text-sm resize-none focus:outline-none"
               spellCheck={false}
+            />
+          </div>
+        )}
+
+        {viewMode === 'base' && (
+          <div className="w-full h-full overflow-hidden">
+            <BasesManager
+              initialFile={filename.replace(/\.(jsonl|canvasl)$/, '.base')}
+              showEmbedPreview={true}
+              onFileSelect={(file) => {
+                // Handle file selection if needed
+              }}
+              onConvert={async (from, to) => {
+                // Convert current JSONL to base
+                try {
+                  const base = await basesService.convertToBase(filename);
+                  // Base is loaded in BasesManager component
+                } catch (err) {
+                  setError(err instanceof Error ? err.message : 'Failed to convert to base');
+                }
+              }}
             />
           </div>
         )}

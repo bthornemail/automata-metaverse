@@ -1,3 +1,57 @@
+---
+id: seed-regeneration-guide
+title: "Automaton Kernel Seed - Self-Regeneration Guide"
+level: practical
+type: guide
+tags: [seed-regeneration, self-regeneration, bootstrap, kernel, automaton]
+keywords: [seed-regeneration, automaton-kernel-seed, self-regeneration, r5rs-canvas-engine, blackboard-architecture, automaton-self-building, bootstrap-pattern]
+prerequisites: [agents-multi-agent-system, multiverse-canvas-rfc2119-spec]
+enables: [optimized-self-instantiation]
+related: [r5rs-canvas-engine, blackboard-architecture-guide, agents-multi-agent-system, generate-metaverse]
+readingTime: 40
+difficulty: 4
+blackboard:
+  status: active
+  assignedAgent: null
+  lastUpdate: null
+  dependencies: [r5rs-canvas-engine]
+  watchers: []
+  r5rsEngine: "r5rs-canvas-engine.scm"
+  selfBuilding:
+    enabled: true
+    source: "r5rs-canvas-engine.scm"
+    pattern: "blackboard-architecture"
+    regeneration:
+      function: "r5rs:parse-jsonl-canvas"
+      args: ["automaton-kernel.seed.jsonl"]
+      context:
+        module: "MODULE 2: JSONL Parser & Canvas Loader"
+        functions: ["r5rs:parse-jsonl-canvas", "r5rs:extract-facts", "r5rs:invoke-from-jsonl"]
+        pipeline:
+          - step: "load-seed"
+            function: "r5rs:parse-jsonl-canvas"
+            args: ["automaton-kernel.seed.jsonl"]
+          - step: "extract-regeneration-metadata"
+            function: "r5rs:extract-facts"
+            args: ["parsed-objects"]
+          - step: "generate-nodes"
+            function: "r5rs:invoke-from-jsonl"
+            args: ["regenerate-function", "regenerate-args"]
+          - step: "generate-edges"
+            function: "r5rs:invoke-from-jsonl"
+            args: ["church-succ", "from-node"]
+          - step: "validate"
+            function: "r5rs:shacl-validate"
+            args: ["shapes", "triples"]
+  seedStructure:
+    selfReference: "Points to automaton-kernel.jsonl"
+    dimensionalNodes: "0D-7D topology/system nodes with regeneration metadata"
+    automatonInstances: "Self-referential automaton instances"
+    transitionRules: "Regeneration functions for transitions"
+    codeGeneration: "Pipeline pattern definition"
+    regenerationInstructions: "Complete Scheme code examples"
+---
+
 # Automaton Kernel Seed - Self-Regeneration Guide
 
 ## Overview

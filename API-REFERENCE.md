@@ -1,3 +1,43 @@
+---
+id: api-reference-r5rs
+title: "R5RS Canvas Engine - API Reference"
+level: practical
+type: reference
+tags: [api-reference, r5rs, function-registry, api-documentation]
+keywords: [api-reference, r5rs-canvas-engine, function-registry, r5rs-functions, blackboard-architecture, automaton-self-building]
+prerequisites: [r5rs-engine-readme]
+enables: []
+related: [r5rs-canvas-engine, blackboard-architecture-guide, r5rs-engine-readme, meta-log-implementation-guide]
+readingTime: 60
+difficulty: 3
+blackboard:
+  status: active
+  assignedAgent: null
+  lastUpdate: null
+  dependencies: [r5rs-canvas-engine]
+  watchers: []
+  r5rsEngine: "r5rs-canvas-engine.scm"
+  selfBuilding:
+    enabled: true
+    source: "r5rs-canvas-engine.scm"
+    pattern: "blackboard-architecture"
+    regeneration:
+      function: "r5rs:parse-jsonl-canvas"
+      args: ["generate.metaverse.jsonl"]
+  modules:
+    module1: "Foundation & Primitives - Church encoding, Y-combinator"
+    module2: "JSONL Parser & Canvas Loader"
+    module3: "RDF Layer"
+    module4: "OWL Reasoning"
+    module5: "SHACL Validation"
+    module6: "Logic Programming - Prolog, Datalog"
+    module7: "SPARQL Engine"
+    module8: "NLP & M/S-Expressions"
+    module9: "Quantum & AI"
+    module10: "REPL & Interactive"
+    module11: "Public API & Function Registry"
+---
+
 # R5RS Canvas Engine - API Reference
 
 ## Function Registry

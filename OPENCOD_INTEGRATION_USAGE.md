@@ -1,3 +1,31 @@
+---
+id: opencod-integration-usage
+title: "OpenCode-Automaton Integration Usage Guide"
+level: practical
+type: guide
+tags: [opencode-integration-usage, cli-integration, church-encoding, dimensional-operations]
+keywords: [opencode-integration-usage, cli-integration, church-encoding, r5rs-canvas-engine, blackboard-architecture, automaton-self-building]
+prerequisites: [opencode-integration, opencode-usage]
+enables: []
+related: [r5rs-canvas-engine, blackboard-architecture-guide, opencode-integration, opencode-usage]
+readingTime: 30
+difficulty: 3
+blackboard:
+  status: active
+  assignedAgent: null
+  lastUpdate: null
+  dependencies: [r5rs-canvas-engine]
+  watchers: []
+  r5rsEngine: "r5rs-canvas-engine.scm"
+  selfBuilding:
+    enabled: true
+    source: "r5rs-canvas-engine.scm"
+    pattern: "blackboard-architecture"
+    regeneration:
+      function: "r5rs:parse-jsonl-canvas"
+      args: ["generate.metaverse.jsonl"]
+---
+
 # OpenCode-Automaton Integration Usage Guide
 
 This guide demonstrates how to use the OpenCode-Automaton integration system that bridges CLI commands with Church encoding dimensional operations.

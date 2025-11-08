@@ -1,19 +1,15 @@
-import { ItemView, WorkspaceLeaf, TFile, Notice } from 'obsidian';
+import { ItemView, TFile, Notice } from 'obsidian';
 import { EditorView } from '@codemirror/view';
 import { EditorState } from '@codemirror/state';
-import { javascript } from '@codemirror/lang-javascript';
-import { oneDark } from '@codemirror/theme-one-dark';
 import { defaultKeymap } from '@codemirror/commands';
-import { keymap, lineNumbers, highlightActiveLineGutter, highlightSpecialChars, drawSelection, dropCursor, rectangularSelection, crosshairCursor, highlightActiveLine } from '@codemirror/view';
-import { foldGutter, foldKeymap } from '@codemirror/fold';
-import { bracketMatching } from '@codemirror/matchbrackets';
-import { closeBrackets, autocompletion, closeBracketsKeymap, completionKeymap } from '@codemirror/autocomplete';
-// import { defaultHighlightStyle } from '@codemirror/highlight'; // Not used currently
+import { keymap, lineNumbers, highlightActiveLineGutter, drawSelection, dropCursor, rectangularSelection, crosshairCursor, highlightActiveLine } from '@codemirror/view';
 import { history, defaultKeymap as historyKeymap } from '@codemirror/commands';
 import { searchKeymap, highlightSelectionMatches } from '@codemirror/search';
 import { lintKeymap } from '@codemirror/lint';
-import { markdownWithFrontMatter } from '../extensions/markdown-frontmatter';
-import { canvaslLanguage } from '../extensions/canvasl-language';
+
+// Import unified configuration
+import { createUnifiedExtensions, createObsidianConfig, detectLanguageFromExtension, detectLanguageFromContent, UnifiedCodeMirrorConfig } from '../shared/codemirror-config';
+
 import { FilePickerModal } from '../modals/FilePickerModal';
 import { NewFileModal, NewFileOptions } from '../modals/NewFileModal';
 import UniversalLifeProtocolPlugin from '../../main';
@@ -118,72 +114,29 @@ export class CodeEditorView extends ItemView {
   }
 
   private async initializeEditor(container: HTMLElement): Promise<void> {
-    const extensions: any[] = [
-      lineNumbers(),
-      highlightActiveLineGutter(),
-      highlightSpecialChars(),
-      history(),
-      foldGutter(),
-      drawSelection(),
-      dropCursor(),
-      EditorState.allowMultipleSelections.of(true),
-      bracketMatching(),
-      closeBrackets(),
-      autocompletion(),
-      rectangularSelection(),
-      crosshairCursor(),
-      highlightActiveLine(),
-      highlightSelectionMatches(),
-      keymap.of([
-        ...defaultKeymap,
-        ...historyKeymap,
-        ...foldKeymap,
-        ...closeBracketsKeymap,
-        ...completionKeymap,
-        ...searchKeymap,
-        ...lintKeymap,
-        {
-          key: 'Mod-s',
-          run: () => {
-            this.saveFile();
-            return true;
+    // Create unified configuration for Obsidian
+    const unifiedConfig: UnifiedCodeMirrorConfig = createObsidianConfig({
+      language: this.currentLanguage,
+      theme: this.settings.theme,
+      fontSize: this.settings.fontSize,
+      showLineNumbers: this.settings.showLineNumbers,
+      wordWrap: this.settings.wordWrap,
+      tabSize: this.settings.tabSize,
+      customExtensions: [
+        keymap.of([
+          {
+            key: 'Mod-s',
+            run: () => {
+              this.saveFile();
+              return true;
+            },
           },
-        },
-      ] as any) as any,
-    ];
+        ]),
+      ],
+    });
 
-    // Add language-specific extensions
-    const languageExtensions = this.getLanguageExtensions(this.currentLanguage);
-    extensions.push(...languageExtensions);
-
-    // Add theme
-    if (this.settings.theme === 'dark') {
-      extensions.push(oneDark);
-    }
-
-    // Add base theme for Obsidian integration
-    extensions.push(
-      EditorView.theme({
-        '&': {
-          height: '100%',
-          fontSize: `${this.settings.fontSize}px`,
-        },
-        '.cm-content': {
-          padding: '10px',
-          minHeight: '100%',
-        },
-        '.cm-focused': {
-          outline: 'none',
-        },
-        '.cm-scroller': {
-          fontFamily: 'var(--font-monospace)',
-          overflow: 'auto',
-        },
-        '.cm-editor': {
-          height: '100%',
-        },
-      })
-    );
+    // Create extensions using unified configuration
+    const extensions = createUnifiedExtensions(unifiedConfig);
 
     const state = EditorState.create({
       doc: this.getInitialContent(),
@@ -199,18 +152,7 @@ export class CodeEditorView extends ItemView {
     this.editorView.focus();
   }
 
-  private getLanguageExtensions(language: Language): any[] {
-    switch (language) {
-      case 'javascript':
-        return [javascript()];
-      case 'markdown':
-        return markdownWithFrontMatter();
-      case 'canvasl':
-        return canvaslLanguage();
-      default:
-        return [];
-    }
-  }
+  // Language extensions are now handled by unified configuration
 
   private getInitialContent(): string {
     switch (this.currentLanguage) {
@@ -248,66 +190,30 @@ Start writing your markdown content here...`;
     
     if (this.editorView) {
       const content = this.editorView.state.doc.toString();
-      const languageExtensions = this.getLanguageExtensions(language);
       
-      // Rebuild editor with new language
-      const extensions: any[] = [
-        lineNumbers(),
-        highlightActiveLineGutter(),
-        highlightSpecialChars(),
-        history(),
-        foldGutter(),
-        drawSelection(),
-        dropCursor(),
-        EditorState.allowMultipleSelections.of(true),
-        bracketMatching(),
-        closeBrackets(),
-        autocompletion(),
-        rectangularSelection(),
-        crosshairCursor(),
-        highlightActiveLine(),
-        highlightSelectionMatches(),
-      keymap.of([
-        ...defaultKeymap,
-        ...historyKeymap,
-        ...foldKeymap,
-        ...closeBracketsKeymap,
-        ...completionKeymap,
-        ...searchKeymap,
-        ...lintKeymap,
-        {
-          key: 'Mod-s',
-          run: () => {
-            this.saveFile();
-            return true;
-          },
-        },
-      ] as any),
-        ...languageExtensions,
-      ];
+      // Create unified configuration for new language
+      const unifiedConfig: UnifiedCodeMirrorConfig = createObsidianConfig({
+        language: this.currentLanguage,
+        theme: this.settings.theme,
+        fontSize: this.settings.fontSize,
+        showLineNumbers: this.settings.showLineNumbers,
+        wordWrap: this.settings.wordWrap,
+        tabSize: this.settings.tabSize,
+        customExtensions: [
+          keymap.of([
+            {
+              key: 'Mod-s',
+              run: () => {
+                this.saveFile();
+                return true;
+              },
+            },
+          ]),
+        ],
+      });
 
-      if (this.settings.theme === 'dark') {
-        extensions.push(oneDark);
-      }
-
-      extensions.push(
-        EditorView.theme({
-          '&': {
-            height: '100%',
-            fontSize: `${this.settings.fontSize}px`,
-          },
-          '.cm-content': {
-            padding: '10px',
-            minHeight: '100%',
-          },
-          '.cm-focused': {
-            outline: 'none',
-          },
-          '.cm-scroller': {
-            fontFamily: 'var(--font-monospace)',
-          },
-        })
-      );
+      // Create extensions using unified configuration
+      const extensions = createUnifiedExtensions(unifiedConfig);
 
       const state = EditorState.create({
         doc: content,

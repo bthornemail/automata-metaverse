@@ -1,8 +1,23 @@
 import { tool } from "@opencode-ai/plugin"
 import { AdvancedSelfReferencingAutomaton } from "../../advanced-automaton"
 
+/**
+ * Automaton Query Tool
+ * 
+ * Related Commands:
+ * - /start-automaton - Checks initial state after starting
+ * - /monitor-performance - Queries state for performance monitoring
+ * - /execute-operations - Queries state after operations
+ * - /start-ai-automaton - Monitors AI decision patterns
+ * 
+ * This tool is used by:
+ * - start-automaton.md - Initial state check
+ * - monitor-performance.md - Real-time state monitoring
+ * - execute-operations.md - State verification after operations
+ * - start-ai-automaton.md - History tracking for AI decisions
+ */
 export default tool({
-  description: "🔍 Query and analyze the automaton's internal state, self-reference patterns, dimensional progression, and execution history. Provides deep insights into the Church encoding system's current configuration.",
+  description: "I'm your information specialist - I can query and analyze what's happening inside the automaton right now. Want to know the current state? Self-reference patterns? How far we've progressed through dimensions? I'll dig into the system and give you clear insights about the Church encoding configuration. Think of me as your system inspector.",
   args: {
     query: tool.schema.enum(["state", "self-reference", "dimension", "modifications", "history"]).describe("📊 Query type: 'state' for current configuration, 'self-reference' for recursive patterns, 'dimension' for dimensional analysis, 'modifications' for mutation count, 'history' for execution timeline"),
     automatonFile: tool.schema.string().optional().describe("📁 Path to the automaton's self-referential JSONL data file (default: ./automaton.jsonl)")

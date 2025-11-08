@@ -1,3 +1,31 @@
+---
+id: dns-configuration
+title: "DNS Configuration Guide"
+level: practical
+type: guide
+tags: [dns-configuration, domain-configuration, dns-records, nameservers]
+keywords: [dns-configuration, domain-configuration, dns-records, r5rs-canvas-engine, blackboard-architecture, automaton-self-building]
+prerequisites: [production-deployment-guide]
+enables: []
+related: [r5rs-canvas-engine, blackboard-architecture-guide, production-deployment-guide, dns-configuration-guide]
+readingTime: 30
+difficulty: 3
+blackboard:
+  status: active
+  assignedAgent: null
+  lastUpdate: null
+  dependencies: [r5rs-canvas-engine]
+  watchers: []
+  r5rsEngine: "r5rs-canvas-engine.scm"
+  selfBuilding:
+    enabled: true
+    source: "r5rs-canvas-engine.scm"
+    pattern: "blackboard-architecture"
+    regeneration:
+      function: "r5rs:parse-jsonl-canvas"
+      args: ["generate.metaverse.jsonl"]
+---
+
 # DNS Configuration Guide
 
 ## Domain Information

@@ -1,3 +1,31 @@
+---
+id: opencode-usage
+title: "OpenCode Integration Usage Guide"
+level: practical
+type: guide
+tags: [opencode-usage, cli, dimensional-agents, command-routing]
+keywords: [opencode-usage, cli-guide, dimensional-agents, r5rs-canvas-engine, blackboard-architecture, automaton-self-building]
+prerequisites: [opencode-integration]
+enables: []
+related: [r5rs-canvas-engine, blackboard-architecture-guide, opencode-integration]
+readingTime: 25
+difficulty: 2
+blackboard:
+  status: active
+  assignedAgent: null
+  lastUpdate: null
+  dependencies: [r5rs-canvas-engine]
+  watchers: []
+  r5rsEngine: "r5rs-canvas-engine.scm"
+  selfBuilding:
+    enabled: true
+    source: "r5rs-canvas-engine.scm"
+    pattern: "blackboard-architecture"
+    regeneration:
+      function: "r5rs:parse-jsonl-canvas"
+      args: ["generate.metaverse.jsonl"]
+---
+
 # OpenCode Integration Usage Guide
 
 ## Quick Start

@@ -1,3 +1,31 @@
+---
+id: code-mirror-lezer-integration
+title: "CodeMirror Lezer Integration"
+level: practical
+type: implementation
+tags: [codemirror, lezer, integration, implementation]
+keywords: [codemirror-6, lezer-grammar, integration, r5rs-canvas-engine, blackboard-architecture, automaton-self-building]
+prerequisites: [canvasl-ast-lsp, lezer-grammar-compatibility]
+enables: [implementation-final]
+related: [r5rs-canvas-engine, blackboard-architecture-guide, grammar-reference]
+readingTime: 35
+difficulty: 4
+blackboard:
+  status: active
+  assignedAgent: null
+  lastUpdate: null
+  dependencies: [r5rs-canvas-engine]
+  watchers: []
+  r5rsEngine: "r5rs-canvas-engine.scm"
+  selfBuilding:
+    enabled: true
+    source: "r5rs-canvas-engine.scm"
+    pattern: "blackboard-architecture"
+    regeneration:
+      function: "r5rs:parse-jsonl-canvas"
+      args: ["automaton-kernel.jsonl"]
+---
+
 # CodeMirror Lezer Integration
 
 ## Overview

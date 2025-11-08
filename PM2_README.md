@@ -1,3 +1,31 @@
+---
+id: pm2-readme
+title: "PM2 Process Management"
+level: practical
+type: guide
+tags: [pm2, process-management, production, deployment]
+keywords: [pm2-process-management, pm2-configuration, production-deployment, r5rs-canvas-engine, blackboard-architecture, automaton-self-building]
+prerequisites: [deployment-guide]
+enables: []
+related: [r5rs-canvas-engine, blackboard-architecture-guide, deployment-guide, production-deployment-guide]
+readingTime: 20
+difficulty: 2
+blackboard:
+  status: active
+  assignedAgent: null
+  lastUpdate: null
+  dependencies: [r5rs-canvas-engine]
+  watchers: []
+  r5rsEngine: "r5rs-canvas-engine.scm"
+  selfBuilding:
+    enabled: true
+    source: "r5rs-canvas-engine.scm"
+    pattern: "blackboard-architecture"
+    regeneration:
+      function: "r5rs:parse-jsonl-canvas"
+      args: ["generate.metaverse.jsonl"]
+---
+
 # PM2 Process Management
 
 This project includes PM2 configuration for production-ready process management.

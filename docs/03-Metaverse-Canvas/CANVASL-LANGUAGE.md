@@ -1,3 +1,34 @@
+---
+id: canvasl-language-overview
+title: "CanvasL Language Specification"
+level: foundational
+type: concept
+tags: [canvasl, language, grammar, specification]
+keywords: [canvasl, jsonl, r5rs-canvas-engine, blackboard-architecture, automaton-self-building, lezer-grammar]
+prerequisites: [metaverse-canvas-docs-readme]
+enables: [canvasl-ast-lsp, canvasl-summary, canvasl-rfc2119-spec]
+related: [r5rs-canvas-engine, blackboard-architecture-guide, canvasl-rfc2119-spec, grammar-reference]
+readingTime: 30
+difficulty: 3
+blackboard:
+  status: active
+  assignedAgent: null
+  lastUpdate: null
+  dependencies: [r5rs-canvas-engine]
+  watchers: []
+  r5rsEngine: "r5rs-canvas-engine.scm"
+  selfBuilding:
+    enabled: true
+    source: "r5rs-canvas-engine.scm"
+    pattern: "blackboard-architecture"
+    regeneration:
+      function: "r5rs:parse-jsonl-canvas"
+      args: ["automaton-kernel.jsonl"]
+      context:
+        module: "MODULE 2: JSONL Parser & Canvas Loader"
+        functions: ["r5rs:parse-jsonl-canvas", "r5rs:extract-facts"]
+---
+
 # CanvasL Language Specification
 
 ## Overview

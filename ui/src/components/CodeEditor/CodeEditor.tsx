@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Code, Zap, Terminal, Settings, Loader2, CheckCircle, AlertCircle, X, Bot, Cpu, Database, MessageSquare, Sliders, Play, Search, ChevronUp, ChevronDown, Send } from 'lucide-react';
+import { Code, Zap, Terminal, Settings, Loader2, CheckCircle, AlertCircle, X, Bot, Cpu, Database, MessageSquare, Sliders, Play, Search, ChevronUp, ChevronDown, Send, Sparkles, Brain } from 'lucide-react';
 import { schemeREPLService, SchemeREPLResult } from '../../services/scheme-repl-service';
 import { opencodeApi } from '../../services/api';
-import { EditorView } from '@codemirror/view';
-import { EditorState } from '@codemirror/state';
+import { unifiedCodeEditorService } from '../../services/unified-code-editor-service';
+import { EditorView, lineNumbers } from '@codemirror/view';
+import { EditorState, Extension } from '@codemirror/state';
 import { javascript } from '@codemirror/lang-javascript';
 import { markdown } from '@codemirror/lang-markdown';
 import { oneDark } from '@codemirror/theme-one-dark';
@@ -13,6 +14,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { frontMatterParser } from '../../utils/front-matter-parser';
 import { markdownService } from '../../services/markdown-service';
 import { databaseService } from '../../services/database-service';
+import { markdownWithFrontMatter } from '../../extensions/markdown-frontmatter';
+import { canvaslLanguage } from '../../extensions/canvasl-language';
+import { prologLanguage } from '../../extensions/prolog-language';
+import { datalogLanguage } from '../../extensions/datalog-language';
+import { createUnifiedExtensions } from '../../../../../src/shared/codemirror-config';
 
 interface AnalysisResult {
   patterns: string[];
@@ -104,7 +110,7 @@ console.log(fibonacci(10));`);
   const [isExecutingAgent, setIsExecutingAgent] = useState(false);
   const [isGeneratingMetaverse, setIsGeneratingMetaverse] = useState(false);
   const [metaverseResult, setMetaverseResult] = useState<string | null>(null);
-  const [activeOpenCodeTab, setActiveOpenCodeTab] = useState<'analysis' | 'agents' | 'config'>('analysis');
+  const [activeOpenCodeTab, setActiveOpenCodeTab] = useState<'analysis' | 'agents' | 'config' | 'webllm' | 'queries'>('analysis');
   const [showConfigModal, setShowConfigModal] = useState(false);
   const [showAgentModal, setShowAgentModal] = useState(false);
   const [conversations, setConversations] = useState<AgentConversation[]>([]);
@@ -121,10 +127,21 @@ console.log(fibonacci(10));`);
     wordWrap: true
   });
   const [currentModel, setCurrentModel] = useState('llama2');
-  const [fileLanguage, setFileLanguage] = useState<'javascript' | 'markdown' | 'canvasl'>('javascript');
+  const [fileLanguage, setFileLanguage] = useState<'javascript' | 'markdown' | 'canvasl' | 'prolog' | 'datalog'>('javascript');
   const [fileExtension, setFileExtension] = useState<string>('.js');
   const [frontMatter, setFrontMatter] = useState<any>({});
   const [jsonlReferences, setJsonlReferences] = useState<string[]>([]);
+  
+  // WebLLM Integration State
+  const [isGeneratingCode, setIsGeneratingCode] = useState(false);
+  const [aiGeneratedCode, setAiGeneratedCode] = useState<string>('');
+  const [codePrompt, setCodePrompt] = useState<string>('');
+  
+  // Prolog/Datalog Integration State
+  const [queryType, setQueryType] = useState<'prolog' | 'datalog' | 'sparql'>('prolog');
+  const [queryInput, setQueryInput] = useState<string>('');
+  const [queryResults, setQueryResults] = useState<SchemeREPLResult | null>(null);
+  const [isExecutingQuery, setIsExecutingQuery] = useState(false);
   const editorRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
 
@@ -152,47 +169,56 @@ console.log(fibonacci(10));`);
     // Create new editor with appropriate language
     // Use Lezer-compatible markdown with front matter support
     // Support .canvasl extension as extended JSONL canvas format
-    let languageExtension: any;
-    if (fileLanguage === 'markdown') {
-      languageExtension = markdownWithFrontMatter();
-    } else if (fileLanguage === 'canvasl' || fileExtension === '.canvasl') {
-      languageExtension = canvaslLanguage();
-    } else {
-      languageExtension = javascript();
+    // Support Prolog and Datalog for query interface
+    // Import extensions dynamically to ensure single CodeMirror instance
+    let languageExtensions: Extension[];
+    try {
+      if (fileLanguage === 'markdown') {
+        languageExtensions = markdownWithFrontMatter();
+      } else if (fileLanguage === 'canvasl' || fileExtension === '.canvasl') {
+        languageExtensions = canvaslLanguage();
+      } else if (fileLanguage === 'prolog' || fileExtension === '.pl' || fileExtension === '.prolog') {
+        languageExtensions = prologLanguage();
+      } else if (fileLanguage === 'datalog' || fileExtension === '.dl' || fileExtension === '.datalog') {
+        languageExtensions = datalogLanguage();
+      } else {
+        languageExtensions = [javascript()];
+      }
+    } catch (error) {
+      console.error('Error loading language extensions:', error);
+      // Fallback to JavaScript if extension loading fails
+      languageExtensions = [javascript()];
     }
     
+    // Build extensions array with OpenCode configuration integration
+    // Ensure all extensions are valid Extension instances
+    const baseExtensions: Extension[] = [
+      ...languageExtensions,
+      ...(config.showLineNumbers ? [lineNumbers()] : []),
+      ...(config.theme === 'dark' ? [oneDark] : []),
+      keymap.of(defaultKeymap as any[]),
+      EditorView.updateListener.of((update) => {
+        if (update.docChanged) {
+          setCode(update.state.doc.toString());
+        }
+      }),
+      EditorView.theme({
+        '&': {
+          height: '100%',
+          fontSize: `${config.fontSize}px`
+        },
+        '.cm-scroller': {
+          overflow: 'auto'
+        },
+        '.cm-content': {
+          padding: '12px'
+        }
+      })
+    ];
+
     const startState = EditorState.create({
       doc: code,
-      extensions: [
-        languageExtension,
-        oneDark,
-        keymap.of(defaultKeymap),
-        EditorView.updateListener.of((update) => {
-          if (update.docChanged) {
-            const newCode = update.state.doc.toString();
-            setCode(newCode);
-            
-            // Parse front matter if markdown
-            if (fileLanguage === 'markdown') {
-              const parsed = frontMatterParser.parse(newCode);
-              setFrontMatter(parsed.frontMatter);
-              setJsonlReferences(frontMatterParser.extractJSONLReferences(parsed.frontMatter));
-            }
-          }
-        }),
-        EditorView.theme({
-          '&': {
-            height: '100%',
-            fontSize: '14px'
-          },
-          '.cm-scroller': {
-            overflow: 'auto'
-          },
-          '.cm-content': {
-            padding: '12px'
-          }
-        })
-      ]
+      extensions: baseExtensions
     });
 
     viewRef.current = new EditorView({
@@ -206,7 +232,7 @@ console.log(fibonacci(10));`);
         viewRef.current = null;
       }
     };
-  }, [fileLanguage]);
+  }, [fileLanguage, fileExtension, config.theme, config.fontSize, config.showLineNumbers]);
 
   // Parse front matter when code changes (for markdown)
   useEffect(() => {
@@ -448,12 +474,96 @@ console.log(fibonacci(10));`);
     
     setIsAnalyzing(true);
     try {
-      const response = await opencodeApi.analyzeCode(code);
-      setAnalysis(response.data as AnalysisResult);
+      // Use unified service for analysis
+      const result = await unifiedCodeEditorService.analyzeCode(code);
+      setAnalysis(result as AnalysisResult);
     } catch (error) {
       console.error('Analysis failed:', error);
     } finally {
       setIsAnalyzing(false);
+    }
+  };
+
+  // WebLLM Code Generation
+  const generateCodeWithAI = async () => {
+    if (!codePrompt.trim()) return;
+    
+    setIsGeneratingCode(true);
+    try {
+      const generated = await unifiedCodeEditorService.generateCodeWithAI(codePrompt, code);
+      setAiGeneratedCode(generated);
+      
+      // Optionally insert generated code at cursor
+      if (viewRef.current && generated) {
+        const state = viewRef.current.state;
+        const selection = state.selection.main;
+        const transaction = state.update({
+          changes: {
+            from: selection.from,
+            to: selection.to,
+            insert: generated
+          }
+        });
+        viewRef.current.dispatch(transaction);
+      }
+    } catch (error) {
+      console.error('Code generation failed:', error);
+    } finally {
+      setIsGeneratingCode(false);
+    }
+  };
+
+  const completeCode = async () => {
+    if (!code.trim()) return;
+    
+    setIsGeneratingCode(true);
+    try {
+      const completion = await unifiedCodeEditorService.completeCode(code, fileLanguage);
+      if (viewRef.current && completion) {
+        const state = viewRef.current.state;
+        const transaction = state.update({
+          changes: {
+            from: state.doc.length,
+            insert: '\n' + completion
+          }
+        });
+        viewRef.current.dispatch(transaction);
+      }
+    } catch (error) {
+      console.error('Code completion failed:', error);
+    } finally {
+      setIsGeneratingCode(false);
+    }
+  };
+
+  // Prolog/Datalog Query Execution
+  const executeQuery = async () => {
+    if (!queryInput.trim()) return;
+    
+    setIsExecutingQuery(true);
+    setQueryResults(null);
+    
+    try {
+      let result: SchemeREPLResult;
+      
+      if (queryType === 'prolog') {
+        result = await unifiedCodeEditorService.executePrologQuery(queryInput);
+      } else if (queryType === 'datalog') {
+        result = await unifiedCodeEditorService.executeDatalogQuery(queryInput);
+      } else {
+        // SPARQL query
+        const sparqlResult = await unifiedCodeEditorService.analyzeAndQuery(code, 'sparql', queryInput);
+        result = sparqlResult as SchemeREPLResult;
+      }
+      
+      setQueryResults(result);
+    } catch (error) {
+      setQueryResults({
+        success: false,
+        error: error instanceof Error ? error.message : 'Query execution failed'
+      });
+    } finally {
+      setIsExecutingQuery(false);
     }
   };
 
@@ -645,18 +755,24 @@ console.log(fibonacci(10));`);
                 <span className="text-sm text-gray-400">
                   {fileLanguage === 'markdown' ? 'Markdown Editor' : 
                    fileLanguage === 'canvasl' ? 'CanvasL Editor' : 
+                   fileLanguage === 'prolog' ? 'Prolog Editor' :
+                   fileLanguage === 'datalog' ? 'Datalog Editor' :
                    'JavaScript Editor'}
                 </span>
                 <select
                   value={fileLanguage}
                   onChange={(e) => {
-                    const lang = e.target.value as 'javascript' | 'markdown' | 'canvasl';
+                    const lang = e.target.value as 'javascript' | 'markdown' | 'canvasl' | 'prolog' | 'datalog';
                     setFileLanguage(lang);
                     // Set extension based on language
                     if (lang === 'canvasl') {
                       setFileExtension('.canvasl');
                     } else if (lang === 'markdown') {
                       setFileExtension('.md');
+                    } else if (lang === 'prolog') {
+                      setFileExtension('.pl');
+                    } else if (lang === 'datalog') {
+                      setFileExtension('.dl');
                     } else {
                       setFileExtension('.js');
                     }
@@ -666,6 +782,8 @@ console.log(fibonacci(10));`);
                   <option value="javascript">JavaScript</option>
                   <option value="markdown">Markdown</option>
                   <option value="canvasl">CanvasL (.canvasl)</option>
+                  <option value="prolog">Prolog (.pl)</option>
+                  <option value="datalog">Datalog (.dl)</option>
                 </select>
                 {fileLanguage === 'markdown' && jsonlReferences.length > 0 && (
                   <div className="flex items-center gap-1 text-xs text-blue-400">
@@ -712,6 +830,28 @@ console.log(fibonacci(10));`);
                   }`}
                 >
                   <Settings className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setActiveOpenCodeTab('webllm')}
+                  className={`px-4 py-2 text-sm font-medium transition-colors ${
+                    activeOpenCodeTab === 'webllm' 
+                      ? 'bg-gray-700 text-blue-400' 
+                      : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                  }`}
+                  title="WebLLM AI Code Generation"
+                >
+                  <Sparkles className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setActiveOpenCodeTab('queries')}
+                  className={`px-4 py-2 text-sm font-medium transition-colors ${
+                    activeOpenCodeTab === 'queries' 
+                      ? 'bg-gray-700 text-blue-400' 
+                      : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                  }`}
+                  title="Prolog/Datalog Queries"
+                >
+                  <Brain className="w-4 h-4" />
                 </button>
               </div>
 
@@ -885,6 +1025,187 @@ console.log(fibonacci(10));`);
                       </div>
                     </div>
                   )}
+                </div>
+              )}
+
+              {activeOpenCodeTab === 'webllm' && (
+                <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Sparkles className="w-5 h-5 text-blue-400" />
+                    <h3 className="text-lg font-semibold">WebLLM AI Code Generation</h3>
+                  </div>
+                  
+                  {/* Code Generation Prompt */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-300">Generate Code</label>
+                    <textarea
+                      value={codePrompt}
+                      onChange={(e) => setCodePrompt(e.target.value)}
+                      placeholder="Describe what code you want to generate..."
+                      className="w-full h-24 px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <button
+                      onClick={generateCodeWithAI}
+                      disabled={isGeneratingCode || !codePrompt.trim()}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg transition-colors"
+                    >
+                      {isGeneratingCode ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>Generating...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="w-4 h-4" />
+                          <span>Generate Code</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Code Completion */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-300">Code Completion</label>
+                    <button
+                      onClick={completeCode}
+                      disabled={isGeneratingCode || !code.trim()}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg transition-colors"
+                    >
+                      {isGeneratingCode ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>Completing...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Zap className="w-4 h-4" />
+                          <span>Complete Code</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Generated Code Display */}
+                  {aiGeneratedCode && (
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-300">Generated Code</label>
+                      <div className="p-3 bg-gray-700 border border-gray-600 rounded text-sm font-mono text-green-400 max-h-48 overflow-y-auto">
+                        <pre className="whitespace-pre-wrap">{aiGeneratedCode}</pre>
+                      </div>
+                      <button
+                        onClick={() => setAiGeneratedCode('')}
+                        className="w-full px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded-lg transition-colors text-sm"
+                      >
+                        Clear
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeOpenCodeTab === 'queries' && (
+                <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Brain className="w-5 h-5 text-purple-400" />
+                    <h3 className="text-lg font-semibold">Prolog/Datalog Queries</h3>
+                  </div>
+                  
+                  {/* Query Type Selection */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-300">Query Type</label>
+                    <select
+                      value={queryType}
+                      onChange={(e) => setQueryType(e.target.value as 'prolog' | 'datalog' | 'sparql')}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    >
+                      <option value="prolog">Prolog</option>
+                      <option value="datalog">Datalog</option>
+                      <option value="sparql">SPARQL</option>
+                    </select>
+                  </div>
+
+                  {/* Query Input */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-300">
+                      {queryType === 'prolog' ? 'Prolog Query' : 
+                       queryType === 'datalog' ? 'Datalog Query' : 
+                       'SPARQL Query'}
+                    </label>
+                    <textarea
+                      value={queryInput}
+                      onChange={(e) => setQueryInput(e.target.value)}
+                      placeholder={
+                        queryType === 'prolog' ? 'e.g., inherits(?x, "canvas:0D-topology")' :
+                        queryType === 'datalog' ? 'e.g., (inherits ?x "canvas:0D-topology")' :
+                        'SELECT ?x WHERE { ?x rdf:type canvas:Node }'
+                      }
+                      className="w-full h-32 px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm font-mono resize-none focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                    <button
+                      onClick={executeQuery}
+                      disabled={isExecutingQuery || !queryInput.trim()}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg transition-colors"
+                    >
+                      {isExecutingQuery ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>Executing...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Play className="w-4 h-4" />
+                          <span>Execute Query</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Query Results */}
+                  {queryResults && (
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-300">Results</label>
+                      <div className={`p-3 border rounded text-sm font-mono max-h-64 overflow-y-auto ${
+                        queryResults.success 
+                          ? 'bg-gray-700 border-green-600 text-green-400' 
+                          : 'bg-gray-700 border-red-600 text-red-400'
+                      }`}>
+                        {queryResults.success ? (
+                          <pre className="whitespace-pre-wrap">
+                            {JSON.stringify(queryResults.result || queryResults.output, null, 2)}
+                          </pre>
+                        ) : (
+                          <div className="text-red-400">
+                            <strong>Error:</strong> {queryResults.error || 'Unknown error'}
+                          </div>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => setQueryResults(null)}
+                        className="w-full px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded-lg transition-colors text-sm"
+                      >
+                        Clear Results
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Example Queries */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-300">Example Queries</label>
+                    <div className="space-y-1 text-xs text-gray-400">
+                      <div className="p-2 bg-gray-700 rounded cursor-pointer hover:bg-gray-600"
+                           onClick={() => setQueryInput('inherits(?x, "canvas:0D-topology")')}>
+                        <strong>Prolog:</strong> Find all nodes inheriting from 0D-topology
+                      </div>
+                      <div className="p-2 bg-gray-700 rounded cursor-pointer hover:bg-gray-600"
+                           onClick={() => setQueryInput('(shacl-violation ?node)')}>
+                        <strong>Datalog:</strong> Find SHACL violations
+                      </div>
+                      <div className="p-2 bg-gray-700 rounded cursor-pointer hover:bg-gray-600"
+                           onClick={() => setQueryInput('SELECT ?x WHERE { ?x rdf:type canvas:Node }')}>
+                        <strong>SPARQL:</strong> Find all canvas nodes
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>

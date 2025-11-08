@@ -219,4 +219,17 @@ export const opencodeApi = {
     method: 'POST',
     body: JSON.stringify({ tool: 'generate-metaverse', args: outputPath ? [outputPath] : [] }),
   }),
+  
+  // AI code generation
+  generateCode: (params: { prompt: string; context?: string; model?: string; temperature?: number; maxTokens?: number }) => 
+    apiService['request']('/opencode/generate', {
+      method: 'POST',
+      body: JSON.stringify(params),
+    }),
+  
+  completeCode: (params: { code: string; language?: string; model?: string; temperature?: number; maxTokens?: number }) => 
+    apiService['request']('/opencode/complete', {
+      method: 'POST',
+      body: JSON.stringify(params),
+    }),
 };

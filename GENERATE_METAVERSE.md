@@ -1,3 +1,38 @@
+---
+id: generate-metaverse
+title: "Generate Metaverse JSONL via OpenCode"
+level: practical
+type: guide
+tags: [generate-metaverse, opencode, metaverse-generation, jsonl-generation]
+keywords: [generate-metaverse, metaverse-generation, opencode-integration, r5rs-canvas-engine, blackboard-architecture, automaton-self-building]
+prerequisites: [opencode-integration, agents-multi-agent-system]
+enables: []
+related: [r5rs-canvas-engine, blackboard-architecture-guide, opencode-integration, seed-regeneration-guide]
+readingTime: 20
+difficulty: 3
+blackboard:
+  status: active
+  assignedAgent: null
+  lastUpdate: null
+  dependencies: [r5rs-canvas-engine]
+  watchers: []
+  r5rsEngine: "r5rs-canvas-engine.scm"
+  selfBuilding:
+    enabled: true
+    source: "r5rs-canvas-engine.scm"
+    pattern: "blackboard-architecture"
+    regeneration:
+      function: "r5rs:parse-jsonl-canvas"
+      args: ["generate.metaverse.jsonl"]
+      context:
+        module: "MODULE 2: JSONL Parser & Canvas Loader"
+        functions: ["r5rs:parse-jsonl-canvas", "r5rs:extract-facts", "r5rs:jsonl-to-rdf"]
+  generationMethods:
+    commandRouter: "./command-router generate-metaverse [output-path]"
+    opencodeIntegration: "./opencode-integration execute generate-metaverse [output-path]"
+    defaultOutput: "./generate.metaverse.jsonl"
+---
+
 # Generate Metaverse JSONL via OpenCode
 
 The `generate-metaverse` command has been integrated into the OpenCode-Automaton system, allowing you to generate `generate.metaverse.jsonl` through the dimensional agent system.

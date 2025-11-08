@@ -1,3 +1,43 @@
+---
+id: r5rs-engine-readme
+title: "R5RS Canvas Engine - Unified Modular Codebase"
+level: foundational
+type: specification
+tags: [r5rs-engine, scheme, canvas-engine, unified-codebase, modular]
+keywords: [r5rs-canvas-engine, scheme, r5rs, blackboard-architecture, automaton-self-building, church-encoding, pure-functions]
+prerequisites: []
+enables: [api-reference-r5rs, meta-log-docs-readme, agents-multi-agent-system]
+related: [blackboard-architecture-guide, multiverse-canvas-rfc2119-spec, agents-multi-agent-system]
+readingTime: 30
+difficulty: 3
+blackboard:
+  status: active
+  assignedAgent: null
+  lastUpdate: null
+  dependencies: []
+  watchers: []
+  r5rsEngine: "r5rs-canvas-engine.scm"
+  selfBuilding:
+    enabled: true
+    source: "r5rs-canvas-engine.scm"
+    pattern: "blackboard-architecture"
+    regeneration:
+      function: "r5rs:parse-jsonl-canvas"
+      args: ["generate.metaverse.jsonl"]
+  modules:
+    module1: "Foundation & Primitives"
+    module2: "JSONL Parser & Canvas Loader"
+    module3: "RDF Layer"
+    module4: "OWL Reasoning"
+    module5: "SHACL Validation"
+    module6: "Logic Programming"
+    module7: "SPARQL Engine"
+    module8: "NLP & M/S-Expressions"
+    module9: "Quantum & AI"
+    module10: "REPL & Interactive"
+    module11: "Public API & Function Registry"
+---
+
 # R5RS Canvas Engine - Unified Modular Codebase
 
 ## Overview

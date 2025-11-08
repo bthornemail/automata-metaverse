@@ -1,3 +1,31 @@
+---
+id: implementation-summary
+title: "Implementation Summary"
+level: practical
+type: implementation
+tags: [implementation, summary, overview]
+keywords: [implementation-summary, jsonl-canvas-editing, r5rs-canvas-engine, blackboard-architecture, automaton-self-building]
+prerequisites: [implementation-complete, jsonl-canvas-editing]
+enables: []
+related: [r5rs-canvas-engine, blackboard-architecture-guide, implementation-final]
+readingTime: 25
+difficulty: 2
+blackboard:
+  status: active
+  assignedAgent: null
+  lastUpdate: null
+  dependencies: [r5rs-canvas-engine]
+  watchers: []
+  r5rsEngine: "r5rs-canvas-engine.scm"
+  selfBuilding:
+    enabled: true
+    source: "r5rs-canvas-engine.scm"
+    pattern: "blackboard-architecture"
+    regeneration:
+      function: "r5rs:parse-jsonl-canvas"
+      args: ["automaton-kernel.jsonl"]
+---
+
 # Implementation Summary
 
 ## Overview

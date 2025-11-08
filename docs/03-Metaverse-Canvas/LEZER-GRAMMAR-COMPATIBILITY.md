@@ -1,3 +1,31 @@
+---
+id: lezer-grammar-compatibility
+title: "Lezer Grammar Compatibility"
+level: practical
+type: implementation
+tags: [lezer, grammar, compatibility, codemirror]
+keywords: [lezer-grammar, compatibility, codemirror-6, r5rs-canvas-engine, blackboard-architecture, automaton-self-building]
+prerequisites: [canvasl-language-overview, metaverse-canvas-docs-readme]
+enables: [code-mirror-lezer-integration, grammar-reference]
+related: [r5rs-canvas-engine, blackboard-architecture-guide, canvasl-rfc2119-spec]
+readingTime: 30
+difficulty: 3
+blackboard:
+  status: active
+  assignedAgent: null
+  lastUpdate: null
+  dependencies: [r5rs-canvas-engine]
+  watchers: []
+  r5rsEngine: "r5rs-canvas-engine.scm"
+  selfBuilding:
+    enabled: true
+    source: "r5rs-canvas-engine.scm"
+    pattern: "blackboard-architecture"
+    regeneration:
+      function: "r5rs:parse-jsonl-canvas"
+      args: ["automaton-kernel.jsonl"]
+---
+
 # Lezer Grammar Compatibility
 
 ## Overview

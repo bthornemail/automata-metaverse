@@ -1,3 +1,39 @@
+---
+id: agent-usage
+title: "Natural Language Interface Agents for Continuous Automaton"
+level: practical
+type: guide
+tags: [agent-usage, natural-language-interface, agents, continuous-automaton]
+keywords: [agent-usage, natural-language-interface, automaton-interface, r5rs-canvas-engine, blackboard-architecture, automaton-self-building]
+prerequisites: [agents-multi-agent-system]
+enables: []
+related: [r5rs-canvas-engine, blackboard-architecture-guide, agents-multi-agent-system]
+readingTime: 20
+difficulty: 2
+blackboard:
+  status: active
+  assignedAgent: null
+  lastUpdate: null
+  dependencies: [r5rs-canvas-engine]
+  watchers: []
+  r5rsEngine: "r5rs-canvas-engine.scm"
+  selfBuilding:
+    enabled: true
+    source: "r5rs-canvas-engine.scm"
+    pattern: "blackboard-architecture"
+    regeneration:
+      function: "r5rs:parse-jsonl-canvas"
+      args: ["generate.metaverse.jsonl"]
+  agents:
+    primary: "automaton-interface"
+    subagents:
+      - "automaton-control"
+      - "automaton-analyzer"
+      - "dimensional-guide"
+      - "church-encoding-expert"
+      - "automaton-visualizer"
+---
+
 # Natural Language Interface Agents for Continuous Automaton
 
 This directory contains specialized agents for natural language interaction with your continuous self-referencing automaton system.

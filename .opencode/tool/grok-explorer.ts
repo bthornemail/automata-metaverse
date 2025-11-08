@@ -2,8 +2,21 @@ import { tool } from "@opencode-ai/plugin"
 import * as fs from "fs"
 import * as path from "path"
 
+/**
+ * Grok Explorer Tool
+ * 
+ * Related Commands:
+ * - /explore-canvas - Comprehensive exploration of 59-file Grok topology
+ * - /analyze-church - Church encoding pattern search across Grok files
+ * - /run-experiments - Baseline analysis using Grok explorer
+ * 
+ * This tool is used by:
+ * - explore-canvas.md - Primary command for canvas exploration
+ * - analyze-church.md - Searching for Church encoding patterns
+ * - run-experiments.md - Baseline establishment phase
+ */
 export default tool({
-  description: "🗺️ Explore the 59 Grok files that form the computational topology canvas from 0D point topology to 7D quantum superposition. Navigate the Church encoding progression and discover dimensional patterns.",
+  description: "I'm your Grok files explorer - I know my way around all 59 files that make up the computational topology canvas. From 0D point topology to 7D quantum superposition, I can help you navigate, search, read, and analyze these files. Think of me as your librarian who knows exactly where everything is in this Church encoding progression. Want to find something specific? I'll help you discover it.",
   args: {
     action: tool.schema.enum(["list", "read", "search", "analyze"]).describe("🎯 Action: 'list' shows all 59 files, 'read' displays specific file content, 'search' finds terms across canvas, 'analyze' provides statistical insights"),
     fileNumber: tool.schema.number().optional().describe("📄 Specific Grok file number to read (1-59). Each file represents a step in the Church encoding progression"),

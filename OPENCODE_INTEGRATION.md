@@ -1,3 +1,40 @@
+---
+id: opencode-integration
+title: "OpenCode-Automaton Integration Bridge"
+level: practical
+type: implementation
+tags: [opencode-integration, bridge, command-mapping, dimensional-routing]
+keywords: [opencode-integration, automaton-bridge, command-to-dimension-mapping, r5rs-canvas-engine, blackboard-architecture, automaton-self-building]
+prerequisites: [agents-multi-agent-system]
+enables: [opencode-usage, opencod-integration-usage]
+related: [r5rs-canvas-engine, blackboard-architecture-guide, agents-multi-agent-system]
+readingTime: 30
+difficulty: 3
+blackboard:
+  status: active
+  assignedAgent: null
+  lastUpdate: null
+  dependencies: [r5rs-canvas-engine]
+  watchers: []
+  r5rsEngine: "r5rs-canvas-engine.scm"
+  selfBuilding:
+    enabled: true
+    source: "r5rs-canvas-engine.scm"
+    pattern: "blackboard-architecture"
+    regeneration:
+      function: "r5rs:parse-jsonl-canvas"
+      args: ["generate.metaverse.jsonl"]
+  commandMapping:
+    "0D-Topology": ["opencode status", "opencode --version", "help"]
+    "1D-Temporal": ["bash with time", "history", "cd"]
+    "2D-Structural": ["read", "glob", "grep", "list"]
+    "3D-Algebraic": ["edit", "write", "replaceAll"]
+    "4D-Network": ["bash", "fetch", "webfetch"]
+    "5D-Consensus": ["todowrite", "todoread", "git operations"]
+    "6D-Intelligence": ["task", "pattern-analyzer", "automaton-query"]
+    "7D-Quantum": ["automaton-execute", "config-manager", "report-generator", "generate-metaverse"]
+---
+
 # OpenCode-Automaton Integration Bridge
 
 ## Command-to-Dimension Mapping

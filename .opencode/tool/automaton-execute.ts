@@ -2,8 +2,19 @@ import { tool } from "@opencode-ai/plugin"
 import * as fs from "fs"
 import * as path from "path"
 
+/**
+ * Automaton Execute Tool
+ * 
+ * Related Commands:
+ * - /execute-operations - Execute specific automaton operations for targeted experimentation
+ * - /run-experiments - Comprehensive experiment suite including operation testing
+ * 
+ * This tool is used by:
+ * - execute-operations.md - Primary command for operation execution
+ * - run-experiments.md - Part of comprehensive experiment suite
+ */
 export default tool({
-  description: "⚡ Execute specific automaton operations and mutations on demand. Trigger individual Church encoding operations, self-modifications, or dimensional transitions without running the full continuous loop.",
+  description: "I'm your execution specialist - I know how to run specific automaton operations on demand. Think of me as your precision operator who can trigger individual Church encoding operations, self-modifications, or dimensional transitions without running the whole continuous loop. Perfect when you want to test something specific or execute a targeted operation.",
   args: {
     operation: tool.schema.enum(["evolve", "self-reference", "self-modify", "self-io", "validate", "train", "observe", "compose"]).describe("🎯 Operation type: 'evolve' advances dimensional progression, 'self-reference' triggers recursion, 'self-modify' mutates structure, 'self-io' performs I/O, 'validate' checks constraints, 'train' learns patterns, 'observe' analyzes state, 'compose' combines operations"),
     automatonFile: tool.schema.string().optional().describe("📁 Path to the automaton's self-referential JSONL data file (default: ./automaton.jsonl)"),

@@ -1,3 +1,31 @@
+---
+id: grammar-reference
+title: "Grammar Reference Guide"
+level: practical
+type: reference
+tags: [grammar, reference, lezer, syntax]
+keywords: [grammar-reference, lezer-grammar, r5rs-canvas-engine, blackboard-architecture, automaton-self-building, syntax-reference]
+prerequisites: [canvasl-language-overview, code-mirror-lezer-integration]
+enables: []
+related: [r5rs-canvas-engine, blackboard-architecture-guide, canvasl-rfc2119-spec]
+readingTime: 40
+difficulty: 3
+blackboard:
+  status: active
+  assignedAgent: null
+  lastUpdate: null
+  dependencies: [r5rs-canvas-engine]
+  watchers: []
+  r5rsEngine: "r5rs-canvas-engine.scm"
+  selfBuilding:
+    enabled: true
+    source: "r5rs-canvas-engine.scm"
+    pattern: "blackboard-architecture"
+    regeneration:
+      function: "r5rs:parse-jsonl-canvas"
+      args: ["automaton-kernel.jsonl"]
+---
+
 # Grammar Reference Guide
 
 ## Overview

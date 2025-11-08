@@ -3,8 +3,10 @@ export interface OpenCodeConfig {
   enabled: boolean;
   baseUrl?: string;
   webllmUrl?: string;
+  webllmModel?: string;
   model?: string;
   useWebLLM?: boolean;
+  useOllama?: boolean;
 }
 
 export interface MockAnalysisResult {
@@ -40,6 +42,10 @@ class SimpleOpenCodeService {
     this.config = config;
     this.currentModel = config.model || config.webllmModel || 'Llama-3.2-3B-Instruct-q4f16_1-MLC';
     this.initializeAgents();
+  }
+
+  private get webllmUrl(): string {
+    return this.config.webllmUrl || 'http://localhost:3000';
   }
 
   private initializeAgents(): void {
@@ -87,6 +93,21 @@ class SimpleOpenCodeService {
     }
   }
 
+  private async initializeWebLLM(): Promise<void> {
+    try {
+      if (!this.config.webllmUrl) {
+        console.warn('⚠️ WebLLM URL not configured');
+        return;
+      }
+      await this.checkWebLLMConnection();
+      await this.fetchAvailableModels();
+      console.log('✅ WebLLM initialized successfully');
+    } catch (error) {
+      console.warn('⚠️ WebLLM initialization failed:', error);
+      throw error;
+    }
+  }
+
   private async checkWebLLMConnection(): Promise<void> {
     try {
       const response = await fetch(`${this.webllmUrl}/models`);
@@ -116,12 +137,12 @@ class SimpleOpenCodeService {
     const dimension = automatonData.currentDimension || 0;
     const iterations = automatonData.iterationCount || 0;
     
-    // Try Ollama analysis first if available
-    if (this.config.useOllama !== false && this.availableModels.length > 0) {
+    // Try WebLLM analysis first if available
+    if (this.config.useWebLLM !== false && this.availableModels.length > 0) {
       try {
-        return await this.analyzeWithOllama(automatonData);
+        return await this.analyzeWithWebLLM(automatonData);
       } catch (error) {
-        console.warn('⚠️ Ollama analysis failed, using fallback:', error);
+        console.warn('⚠️ WebLLM analysis failed, using fallback:', error);
       }
     }
     
@@ -217,12 +238,12 @@ Focus on:
   }
 
   async getSuggestionsForAction(currentDimension: number, availableActions: string[]): Promise<string[]> {
-    // Try Ollama for intelligent suggestions
-    if (this.config.useOllama !== false && this.availableModels.length > 0) {
+    // Try WebLLM for intelligent suggestions
+    if (this.config.useWebLLM !== false && this.availableModels.length > 0) {
       try {
-        return await this.getSuggestionsWithOllama(currentDimension, availableActions);
+        return await this.getSuggestionsWithWebLLM(currentDimension, availableActions);
       } catch (error) {
-        console.warn('⚠️ Ollama suggestions failed, using fallback:', error);
+        console.warn('⚠️ WebLLM suggestions failed, using fallback:', error);
       }
     }
     
@@ -291,7 +312,7 @@ Provide 3 specific suggestions in JSON format:
     // Enhanced search with agent assistance
     if (this.config.useWebLLM !== false && this.availableModels.length > 0) {
       try {
-        return await this.searchWithWebLLM(pattern);
+        return await this.searchWithOllama(pattern);
       } catch (error) {
         console.warn('⚠️ WebLLM search failed, using fallback:', error);
       }
@@ -359,7 +380,7 @@ Provide search results in JSON format:
 
     if (this.config.useWebLLM !== false && this.availableModels.length > 0) {
       try {
-        return await this.executeAgentWithWebLLM(agent, task);
+        return await this.executeAgentWithOllama(agent, task);
       } catch (error) {
         console.warn('⚠️ Agent execution failed, using fallback:', error);
       }

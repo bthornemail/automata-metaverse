@@ -1,3 +1,31 @@
+---
+id: backward-compatibility
+title: "Backward Compatibility Verification"
+level: practical
+type: verification
+tags: [backward-compatibility, verification, testing, compatibility]
+keywords: [backward-compatibility, verification, r5rs-canvas-engine, blackboard-architecture, automaton-self-building, jsonl-compatibility]
+prerequisites: [jsonl-canvas-editing, metaverse-canvas-docs-readme]
+enables: [implementation-complete]
+related: [r5rs-canvas-engine, blackboard-architecture-guide, metaverse-canvas-complete]
+readingTime: 30
+difficulty: 2
+blackboard:
+  status: active
+  assignedAgent: null
+  lastUpdate: null
+  dependencies: [r5rs-canvas-engine]
+  watchers: []
+  r5rsEngine: "r5rs-canvas-engine.scm"
+  selfBuilding:
+    enabled: true
+    source: "r5rs-canvas-engine.scm"
+    pattern: "blackboard-architecture"
+    regeneration:
+      function: "r5rs:parse-jsonl-canvas"
+      args: ["automaton-kernel.jsonl"]
+---
+
 # Backward Compatibility Verification
 
 This document verifies backward compatibility with the implementation ideas from `docs/00-Inbox/`.

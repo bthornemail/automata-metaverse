@@ -1,3 +1,38 @@
+---
+id: opencode-readme
+title: "OpenCode Plugin for Continuous Automaton"
+level: gateway
+type: navigation
+tags: [opencode, plugin, automaton, church-encoding, computational-topology, blackboard-architecture]
+keywords: [opencode-plugin, automaton-system, church-encoding, computational-topology, r5rs-canvas-engine, automaton-self-building, blackboard-architecture, grok-files, dimensional-progression, tools, commands]
+prerequisites: []
+enables: [opencode-plugin-guide, opencode-integration-map]
+related: [opencode-plugin-guide, opencode-integration-map, blackboard-architecture-guide, agents-md]
+readingTime: 20
+difficulty: 2
+blackboard:
+  status: active
+  assignedAgent: null
+  lastUpdate: null
+  dependencies: []
+  watchers: []
+  r5rsEngine: "r5rs-canvas-engine.scm"
+  selfBuilding:
+    enabled: true
+    source: "r5rs-canvas-engine.scm"
+    pattern: "blackboard-architecture"
+    regeneration:
+      function: "r5rs:parse-jsonl-canvas"
+      args: ["automaton-kernel.jsonl"]
+      context:
+        module: "opencode-plugin"
+        functions: ["r5rs:extract-facts", "r5rs:query-facts"]
+  architecture:
+    toolLayer: [automaton, automaton-query, automaton-execute, grok-explorer, canvas-visualizer, pattern-analyzer, report-generator, config-manager]
+    commandLayer: [start-automaton, start-ai-automaton, explore-canvas, visualize-system, full-analysis, analyze-church, monitor-performance, execute-operations, manage-configs, run-experiments]
+    coreIntegration: [continuous-automaton.ts, advanced-automaton.ts, grok_files/, automaton.jsonl]
+---
+
 # OpenCode Plugin for Continuous Automaton
 
 This plugin provides comprehensive tools and commands to interact with the continuous self-referencing automaton system and computational topology canvas built on Church encoding foundations.

@@ -1,3 +1,31 @@
+---
+id: domain-configuration-guide
+title: "Domain Configuration Guide"
+level: practical
+type: guide
+tags: [domain-configuration-guide, domain-setup, dns-configuration, pm2-production]
+keywords: [domain-configuration-guide, domain-setup, pm2-production, r5rs-canvas-engine, blackboard-architecture, automaton-self-building]
+prerequisites: [production-deployment-guide, dns-configuration-guide]
+enables: []
+related: [r5rs-canvas-engine, blackboard-architecture-guide, production-deployment-guide, dns-configuration-guide]
+readingTime: 25
+difficulty: 3
+blackboard:
+  status: active
+  assignedAgent: null
+  lastUpdate: null
+  dependencies: [r5rs-canvas-engine]
+  watchers: []
+  r5rsEngine: "r5rs-canvas-engine.scm"
+  selfBuilding:
+    enabled: true
+    source: "r5rs-canvas-engine.scm"
+    pattern: "blackboard-architecture"
+    regeneration:
+      function: "r5rs:parse-jsonl-canvas"
+      args: ["generate.metaverse.jsonl"]
+---
+
 # DNS Configuration Guide
 
 ## Domain Configuration Summary

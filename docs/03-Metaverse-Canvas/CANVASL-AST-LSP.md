@@ -1,3 +1,34 @@
+---
+id: canvasl-ast-lsp
+title: "CanvasL AST & LSP Support"
+level: practical
+type: implementation
+tags: [canvasl, ast, lsp, language-server, implementation]
+keywords: [canvasl, ast, lsp, language-server-protocol, r5rs-canvas-engine, blackboard-architecture, automaton-self-building]
+prerequisites: [canvasl-language-overview, metaverse-canvas-docs-readme]
+enables: [canvasl-summary, code-mirror-lezer-integration]
+related: [r5rs-canvas-engine, blackboard-architecture-guide, canvasl-rfc2119-spec]
+readingTime: 40
+difficulty: 4
+blackboard:
+  status: active
+  assignedAgent: null
+  lastUpdate: null
+  dependencies: [r5rs-canvas-engine]
+  watchers: []
+  r5rsEngine: "r5rs-canvas-engine.scm"
+  selfBuilding:
+    enabled: true
+    source: "r5rs-canvas-engine.scm"
+    pattern: "blackboard-architecture"
+    regeneration:
+      function: "r5rs:parse-jsonl-canvas"
+      args: ["automaton-kernel.jsonl"]
+      context:
+        module: "MODULE 2: JSONL Parser & Canvas Loader"
+        functions: ["r5rs:parse-jsonl-canvas", "r5rs:extract-facts", "r5rs:invoke-from-jsonl"]
+---
+
 # CanvasL AST & LSP Support
 
 ## Overview

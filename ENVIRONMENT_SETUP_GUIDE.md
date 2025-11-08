@@ -1,3 +1,31 @@
+---
+id: environment-setup-guide
+title: "Environment Variables Setup Guide"
+level: practical
+type: guide
+tags: [environment-setup, env-variables, configuration, deployment]
+keywords: [environment-setup-guide, env-variables, configuration-management, r5rs-canvas-engine, blackboard-architecture, automaton-self-building]
+prerequisites: [readme-main]
+enables: [deployment-guide, docker-setup-guide]
+related: [r5rs-canvas-engine, blackboard-architecture-guide, readme-main]
+readingTime: 20
+difficulty: 2
+blackboard:
+  status: active
+  assignedAgent: null
+  lastUpdate: null
+  dependencies: [r5rs-canvas-engine]
+  watchers: []
+  r5rsEngine: "r5rs-canvas-engine.scm"
+  selfBuilding:
+    enabled: true
+    source: "r5rs-canvas-engine.scm"
+    pattern: "blackboard-architecture"
+    regeneration:
+      function: "r5rs:parse-jsonl-canvas"
+      args: ["generate.metaverse.jsonl"]
+---
+
 # Environment Variables Setup Guide
 
 ## Overview

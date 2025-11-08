@@ -1,3 +1,31 @@
+---
+id: production-deployment-guide
+title: "Production Deployment Guide"
+level: practical
+type: guide
+tags: [production-deployment, deployment, domain-configuration, dns]
+keywords: [production-deployment-guide, deployment, domain-configuration, r5rs-canvas-engine, blackboard-architecture, automaton-self-building]
+prerequisites: [deployment-guide, dns-configuration-guide]
+enables: []
+related: [r5rs-canvas-engine, blackboard-architecture-guide, deployment-guide, dns-configuration-guide]
+readingTime: 50
+difficulty: 4
+blackboard:
+  status: active
+  assignedAgent: null
+  lastUpdate: null
+  dependencies: [r5rs-canvas-engine]
+  watchers: []
+  r5rsEngine: "r5rs-canvas-engine.scm"
+  selfBuilding:
+    enabled: true
+    source: "r5rs-canvas-engine.scm"
+    pattern: "blackboard-architecture"
+    regeneration:
+      function: "r5rs:parse-jsonl-canvas"
+      args: ["generate.metaverse.jsonl"]
+---
+
 # 🚀 Production Deployment Guide
 
 ## Repository & Domain Information

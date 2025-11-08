@@ -11,7 +11,7 @@ import SelfReferenceAnalyzer from '@/components/SelfReferenceAnalyzer/SelfRefere
 import AIPortal from '@/components/AIPortal/AIPortal';
 import MetaverseInterface from '@/components/AdvancedAnimations/MetaverseInterface';
 import Configuration from '@/components/Configuration/Configuration';
-import CodeEditor from './components/CodeEditor/CodeEditor';
+import UnifiedEditor from './components/UnifiedEditor';
 
 const AppContent: React.FC = () => {
   const activeTab = useAutomatonStore((state) => state.activeTab);
@@ -120,14 +120,18 @@ const AppContent: React.FC = () => {
           </motion.div>
         )}
 
-        {/* Code Editor Tab - Merged Scheme REPL & OpenCode */}
+        {/* Code Editor Tab - Unified Editor (Code + Canvas) */}
         {activeTab === 'code-editor' && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="h-[calc(100vh-200px)] rounded-xl overflow-hidden shadow-xl"
           >
-            <CodeEditor />
+            <UnifiedEditor
+              filename="editor.code"
+              initialMode="auto"
+              height="100%"
+            />
           </motion.div>
         )}
 

@@ -7,16 +7,19 @@
 import { DatabaseAdapter } from '../database/interface';
 import { DatabaseFactory } from '../database/factory';
 import express, { Request, Response, Router } from 'express';
+import { BasesApiService } from '../services/bases-api';
 
 export class ModularBackend {
   private db: DatabaseAdapter;
   private app: express.Application;
   private router: Router;
+  private basesService: BasesApiService;
 
   constructor(db?: DatabaseAdapter) {
     this.db = db || DatabaseFactory.fromEnvironment();
     this.app = express();
     this.router = Router();
+    this.basesService = new BasesApiService('./');
     this.setupMiddleware();
     this.setupRoutes();
   }
@@ -160,6 +163,95 @@ export class ModularBackend {
         
         const items = await this.db.query(req.params.collection, filter, options);
         res.json({ success: true, data: items });
+      } catch (error: any) {
+        res.status(500).json({ success: false, error: error.message });
+      }
+    });
+
+    // Bases endpoints
+    this.router.post('/bases/parse', async (req: Request, res: Response) => {
+      try {
+        const { filePath } = req.body;
+        if (!filePath) {
+          return res.status(400).json({ success: false, error: 'filePath is required' });
+        }
+        const base = await this.basesService.parseBase(filePath);
+        res.json({ success: true, data: base });
+      } catch (error: any) {
+        res.status(500).json({ success: false, error: error.message });
+      }
+    });
+
+    this.router.post('/bases/convert', async (req: Request, res: Response) => {
+      try {
+        const { filePath, options } = req.body;
+        if (!filePath) {
+          return res.status(400).json({ success: false, error: 'filePath is required' });
+        }
+        const base = await this.basesService.convertToBase(filePath, options);
+        res.json({ success: true, data: base });
+      } catch (error: any) {
+        res.status(500).json({ success: false, error: error.message });
+      }
+    });
+
+    this.router.post('/bases/convert-back', async (req: Request, res: Response) => {
+      try {
+        const { base, options } = req.body;
+        if (!base) {
+          return res.status(400).json({ success: false, error: 'base is required' });
+        }
+        const converted = await this.basesService.convertBaseToJSONL(base, options || {});
+        res.json({ success: true, data: converted });
+      } catch (error: any) {
+        res.status(500).json({ success: false, error: error.message });
+      }
+    });
+
+    this.router.post('/bases/roundtrip', async (req: Request, res: Response) => {
+      try {
+        const { filePath } = req.body;
+        if (!filePath) {
+          return res.status(400).json({ success: false, error: 'filePath is required' });
+        }
+        const result = await this.basesService.roundTripJSONL(filePath);
+        res.json({ success: true, data: result });
+      } catch (error: any) {
+        res.status(500).json({ success: false, error: error.message });
+      }
+    });
+
+    this.router.get('/bases/list', async (req: Request, res: Response) => {
+      try {
+        const directory = (req.query.directory as string) || '.';
+        const files = await this.basesService.listBaseFiles(directory);
+        res.json({ success: true, data: files });
+      } catch (error: any) {
+        res.status(500).json({ success: false, error: error.message });
+      }
+    });
+
+    this.router.post('/bases/save', async (req: Request, res: Response) => {
+      try {
+        const { base, filePath } = req.body;
+        if (!base || !filePath) {
+          return res.status(400).json({ success: false, error: 'base and filePath are required' });
+        }
+        await this.basesService.saveBase(base, filePath);
+        res.json({ success: true });
+      } catch (error: any) {
+        res.status(500).json({ success: false, error: error.message });
+      }
+    });
+
+    this.router.post('/bases/embed', async (req: Request, res: Response) => {
+      try {
+        const { filePath, options } = req.body;
+        if (!filePath) {
+          return res.status(400).json({ success: false, error: 'filePath is required' });
+        }
+        const html = await this.basesService.createBaseEmbed(filePath, options);
+        res.json({ success: true, data: html });
       } catch (error: any) {
         res.status(500).json({ success: false, error: error.message });
       }

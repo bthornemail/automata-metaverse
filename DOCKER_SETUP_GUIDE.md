@@ -1,3 +1,31 @@
+---
+id: docker-setup-guide
+title: "Docker Development Setup Guide"
+level: practical
+type: guide
+tags: [docker, docker-setup, development, containerization]
+keywords: [docker-setup-guide, docker-development, containerization, r5rs-canvas-engine, blackboard-architecture, automaton-self-building]
+prerequisites: [environment-setup-guide]
+enables: [deployment-guide]
+related: [r5rs-canvas-engine, blackboard-architecture-guide, environment-setup-guide]
+readingTime: 30
+difficulty: 3
+blackboard:
+  status: active
+  assignedAgent: null
+  lastUpdate: null
+  dependencies: [r5rs-canvas-engine]
+  watchers: []
+  r5rsEngine: "r5rs-canvas-engine.scm"
+  selfBuilding:
+    enabled: true
+    source: "r5rs-canvas-engine.scm"
+    pattern: "blackboard-architecture"
+    regeneration:
+      function: "r5rs:parse-jsonl-canvas"
+      args: ["generate.metaverse.jsonl"]
+---
+
 # 🐳 **Docker Development Setup - Fixed**
 
 ## ✅ **Issues Resolved**

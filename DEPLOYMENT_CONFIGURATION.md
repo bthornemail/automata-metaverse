@@ -1,3 +1,31 @@
+---
+id: deployment-configuration
+title: "Deployment Configuration - PM2, Docker & Kubernetes"
+level: practical
+type: configuration
+tags: [deployment-configuration, pm2, docker, kubernetes, port-configuration]
+keywords: [deployment-configuration, pm2-docker-kubernetes, port-configuration, r5rs-canvas-engine, blackboard-architecture, automaton-self-building]
+prerequisites: [deployment-guide, environment-setup-guide]
+enables: []
+related: [r5rs-canvas-engine, blackboard-architecture-guide, deployment-guide, pm2-readme]
+readingTime: 25
+difficulty: 3
+blackboard:
+  status: active
+  assignedAgent: null
+  lastUpdate: null
+  dependencies: [r5rs-canvas-engine]
+  watchers: []
+  r5rsEngine: "r5rs-canvas-engine.scm"
+  selfBuilding:
+    enabled: true
+    source: "r5rs-canvas-engine.scm"
+    pattern: "blackboard-architecture"
+    regeneration:
+      function: "r5rs:parse-jsonl-canvas"
+      args: ["generate.metaverse.jsonl"]
+---
+
 # Deployment Configuration - PM2, Docker & Kubernetes
 
 ## ✅ Configuration Status: COMPLETE

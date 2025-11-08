@@ -1,8 +1,22 @@
 import { tool } from "@opencode-ai/plugin"
 import * as fs from "fs"
+import * as path from "path"
 
+/**
+ * Pattern Analyzer Tool
+ * 
+ * Related Commands:
+ * - /analyze-church - Deep Church encoding pattern analysis
+ * - /full-analysis - Comprehensive system analysis including patterns
+ * - /run-experiments - Pattern discovery as part of experiment suite
+ * 
+ * This tool is used by:
+ * - analyze-church.md - Primary command for Church encoding analysis
+ * - full-analysis.md - Comprehensive pattern analysis
+ * - run-experiments.md - Pattern discovery phase
+ */
 export default tool({
-  description: "🧠 Analyze patterns and extract deep insights from the computational topology. Discover Church encoding patterns, self-reference recursion, dimensional relationships, and topological structures.",
+  description: "I'm your pattern detective - I love finding the hidden patterns in the computational topology. I can analyze Church encoding patterns, self-reference recursion, dimensional relationships, and topological structures. Whether you want to look at patterns, dimensions, evolution, Church encoding specifics, self-reference mechanisms, or topology - I'll dig deep and give you insights. Think of me as your research analyst who sees connections others miss.",
   args: {
     analysis: tool.schema.enum(["patterns", "dimensions", "evolution", "church-encoding", "self-reference", "topology"]).describe("🔬 Analysis type: 'patterns' for recurring motifs, 'dimensions' for level analysis, 'evolution' for progression tracking, 'church-encoding' for lambda calculus patterns, 'self-reference' for recursion analysis, 'topology' for structural analysis"),
     scope: tool.schema.enum(["grok-files", "automaton", "both"]).describe("📊 Data source: 'grok-files' analyzes the 59-file canvas, 'automaton' analyzes JSONL state, 'both' combines both sources (default: both)"),
@@ -31,22 +45,22 @@ export default tool({
       // Perform specific analysis
       switch (args.analysis) {
         case "patterns":
-          return analyzePatterns(grokData, automatonData, detail)
+          return analyzePatterns(grokData, automatonData, detail, agent, sessionID)
           
         case "dimensions":
-          return analyzeDimensions(grokData, automatonData, detail)
+          return analyzeDimensions(grokData, automatonData, detail, agent, sessionID)
           
         case "evolution":
-          return analyzeEvolution(grokData, automatonData, detail)
+          return analyzeEvolution(grokData, automatonData, detail, agent, sessionID)
           
         case "church-encoding":
-          return analyzeChurchEncoding(grokData, automatonData, detail)
+          return analyzeChurchEncoding(grokData, automatonData, detail, agent, sessionID)
           
         case "self-reference":
-          return analyzeSelfReference(grokData, automatonData, detail)
+          return analyzeSelfReference(grokData, automatonData, detail, agent, sessionID)
           
         case "topology":
-          return analyzeTopology(grokData, automatonData, detail)
+          return analyzeTopology(grokData, automatonData, detail, agent, sessionID)
           
         default:
           return "❌ Unknown analysis type"
@@ -75,7 +89,8 @@ async function analyzeGrokFiles(dimensionFilter?: number) {
       continue
     }
     
-    const content = fs.readFileSync(path.join(grokDir, file), "utf8")
+    const filePath = path.join(grokDir, file)
+    const content = fs.readFileSync(filePath, "utf8")
     data.push({
       file,
       number: num,
@@ -108,16 +123,18 @@ async function analyzeAutomaton(dimensionFilter?: number) {
   return { objects, totalLines: lines.length }
 }
 
-function analyzePatterns(grokData: any, automatonData: any, detail: string) {
+function analyzePatterns(grokData: any, automatonData: any, detail: string, agent?: string, sessionID?: string) {
   const patterns = {
     recurring: [],
     structural: [],
     mathematical: []
   }
   
+  let allContent = ""
+  
   if (grokData) {
     // Find recurring patterns in Grok files
-    const allContent = grokData.map((f: any) => f.content).join(" ")
+    allContent = grokData.map((f: any) => f.content).join(" ")
     
     const commonTerms = ["church", "lambda", "successor", "pair", "algebra", "network", "consensus", "intelligence", "quantum"]
     patterns.recurring = commonTerms.map(term => ({
@@ -137,7 +154,7 @@ function analyzePatterns(grokData: any, automatonData: any, detail: string) {
     // Mathematical patterns in automaton
     patterns.mathematical = [
       { type: "JSON objects", count: automatonData.objects.length },
-      { type: "Self-modifications", count: (allContent.match(/self.?modify/gi) || []).length }
+      { type: "Self-modifications", count: allContent ? (allContent.match(/self.?modify/gi) || []).length : 0 }
     ]
   }
   
@@ -145,12 +162,12 @@ function analyzePatterns(grokData: any, automatonData: any, detail: string) {
     analysis: "patterns",
     patterns,
     detail,
-    agent: context.agent,
-    sessionID: context.sessionID
+    agent,
+    sessionID
   }
 }
 
-function analyzeDimensions(grokData: any, automatonData: any, detail: string) {
+function analyzeDimensions(grokData: any, automatonData: any, detail: string, agent?: string, sessionID?: string) {
   const dimensions = []
   
   if (grokData) {
@@ -180,12 +197,12 @@ function analyzeDimensions(grokData: any, automatonData: any, detail: string) {
     dimensions,
     totalDimensions: dimensions.length,
     detail,
-    agent: context.agent,
-    sessionID: context.sessionID
+    agent,
+    sessionID
   }
 }
 
-function analyzeEvolution(grokData: any, automatonData: any, detail: string) {
+function analyzeEvolution(grokData: any, automatonData: any, detail: string, agent?: string, sessionID?: string) {
   const evolution = {
     path: ["0D → 1D → 2D → 3D → 4D → 5D → 6D → 7D"],
     mechanisms: [],
@@ -216,8 +233,8 @@ function analyzeEvolution(grokData: any, automatonData: any, detail: string) {
     analysis: "evolution",
     evolution,
     detail,
-    agent: context.agent,
-    sessionID: context.sessionID
+    agent,
+    sessionID
   }
 }
 
@@ -243,8 +260,8 @@ function analyzeChurchEncoding(grokData: any, automatonData: any, detail: string
     analysis: "church-encoding",
     church,
     detail,
-    agent: context.agent,
-    sessionID: context.sessionID
+    agent,
+    sessionID
   }
 }
 
@@ -279,12 +296,12 @@ function analyzeSelfReference(grokData: any, automatonData: any, detail: string)
     analysis: "self-reference",
     selfRef,
     detail,
-    agent: context.agent,
-    sessionID: context.sessionID
+    agent,
+    sessionID
   }
 }
 
-function analyzeTopology(grokData: any, automatonData: any, detail: string) {
+function analyzeTopology(grokData: any, automatonData: any, detail: string, agent?: string, sessionID?: string) {
   const topology = {
     types: ["point", "line", "surface", "volume", "spacetime"],
     properties: ["connected", "simply-connected", "manifold"],
@@ -306,8 +323,8 @@ function analyzeTopology(grokData: any, automatonData: any, detail: string) {
     analysis: "topology",
     topology,
     detail,
-    agent: context.agent,
-    sessionID: context.sessionID
+    agent,
+    sessionID
   }
 }
 

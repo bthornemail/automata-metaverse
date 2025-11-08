@@ -1,3 +1,35 @@
+---
+id: architecture-zustand-vs-datalog-jsonl
+title: "Architecture: Zustand vs Prolog/Datalog/JSONL"
+level: foundational
+type: architecture
+tags: [architecture, zustand, datalog, jsonl, prolog, layer-separation]
+keywords: [architecture-zustand-datalog, layer-separation, zustand-vs-datalog, r5rs-canvas-engine, blackboard-architecture, automaton-self-building]
+prerequisites: [unified-ui-architecture, meta-log-docs-readme]
+enables: []
+related: [r5rs-canvas-engine, blackboard-architecture-guide, unified-ui-architecture, meta-log-docs-readme]
+readingTime: 30
+difficulty: 3
+blackboard:
+  status: active
+  assignedAgent: null
+  lastUpdate: null
+  dependencies: [r5rs-canvas-engine]
+  watchers: []
+  r5rsEngine: "r5rs-canvas-engine.scm"
+  selfBuilding:
+    enabled: true
+    source: "r5rs-canvas-engine.scm"
+    pattern: "blackboard-architecture"
+    regeneration:
+      function: "r5rs:parse-jsonl-canvas"
+      args: ["generate.metaverse.jsonl"]
+  layers:
+    jsonl: "Persistent Data Storage Layer"
+    prologDatalog: "Logic & Query Layer"
+    zustand: "UI State Management Layer"
+---
+
 # Architecture: Zustand vs Prolog/Datalog/JSONL
 
 ## Question: Why do we need Zustand if we have Prolog Datalog and JSONL?

@@ -1,3 +1,31 @@
+---
+id: canvasl-summary
+title: "CanvasL Language Summary"
+level: practical
+type: guide
+tags: [canvasl, summary, quick-reference, syntax]
+keywords: [canvasl, summary, quick-reference, r5rs-canvas-engine, blackboard-architecture, automaton-self-building]
+prerequisites: [canvasl-language-overview, canvasl-ast-lsp]
+enables: []
+related: [r5rs-canvas-engine, blackboard-architecture-guide, canvasl-rfc2119-spec, canvasl-quick-reference]
+readingTime: 20
+difficulty: 2
+blackboard:
+  status: active
+  assignedAgent: null
+  lastUpdate: null
+  dependencies: [r5rs-canvas-engine]
+  watchers: []
+  r5rsEngine: "r5rs-canvas-engine.scm"
+  selfBuilding:
+    enabled: true
+    source: "r5rs-canvas-engine.scm"
+    pattern: "blackboard-architecture"
+    regeneration:
+      function: "r5rs:parse-jsonl-canvas"
+      args: ["automaton-kernel.jsonl"]
+---
+
 # CanvasL Language Summary
 
 ## Overview

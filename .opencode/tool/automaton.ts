@@ -4,8 +4,21 @@ import { ContinuousAutomatonRunner } from "../../continuous-automaton"
 // Global runner instance to maintain state across tool calls
 let runner: ContinuousAutomatonRunner | null = null
 
+/**
+ * Automaton Control Tool
+ * 
+ * Related Commands:
+ * - /start-automaton - Quick start with optimal defaults
+ * - /start-ai-automaton - Start with Ollama AI integration
+ * - /monitor-performance - Status checking during monitoring
+ * 
+ * This tool is used by:
+ * - start-automaton.md - Primary command for starting automaton
+ * - start-ai-automaton.md - AI-powered automaton startup
+ * - monitor-performance.md - Status checks during performance monitoring
+ */
 export default tool({
-  description: "🤖 Control the continuous self-referencing automaton execution lifecycle. Start, stop, monitor, and analyze the Church encoding-based computational topology system in real-time.",
+  description: "I'm your automaton controller - I handle starting, stopping, and monitoring the continuous self-referencing automaton. Think of me as your system operator who manages the Church encoding-based computational topology in real-time. I can start it up, check its status, stop it when needed, and trigger deep analysis. I'm your go-to for lifecycle management.",
   args: {
     action: tool.schema.enum(["start", "stop", "status", "analyze"]).describe("🎯 Action to perform: 'start' begins continuous execution, 'stop' halts the runner, 'status' shows current state, 'analyze' triggers deep analysis"),
     interval: tool.schema.number().optional().describe("⏱️ Time interval between automaton iterations in milliseconds (default: 2000ms). Lower values = faster evolution but higher CPU usage"),

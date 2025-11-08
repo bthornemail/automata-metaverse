@@ -1,3 +1,31 @@
+---
+id: metaverse-canvas-docs-readme
+title: "Metaverse Canvas Documentation"
+level: foundational
+type: navigation
+tags: [metaverse-canvas, jsonl, canvasl, documentation, canvas-editing]
+keywords: [metaverse-canvas, jsonl-canvas-editing, canvasl, r5rs-canvas-engine, blackboard-architecture, automaton-self-building]
+prerequisites: []
+enables: [jsonl-canvas-editing, canvasl-language, canvasl-ast-lsp, metaverse-canvas-complete]
+related: [r5rs-canvas-engine, blackboard-architecture-guide, canvasl-rfc2119-spec]
+readingTime: 15
+difficulty: 2
+blackboard:
+  status: active
+  assignedAgent: null
+  lastUpdate: null
+  dependencies: []
+  watchers: []
+  r5rsEngine: "r5rs-canvas-engine.scm"
+  selfBuilding:
+    enabled: true
+    source: "r5rs-canvas-engine.scm"
+    pattern: "blackboard-architecture"
+    regeneration:
+      function: "r5rs:parse-jsonl-canvas"
+      args: ["automaton-kernel.jsonl"]
+---
+
 # Metaverse Canvas Documentation
 
 This directory contains documentation for the Metaverse Canvas system, including JSONL canvas editing, markdown front matter integration, and relationship management.
@@ -8,9 +36,11 @@ This directory contains documentation for the Metaverse Canvas system, including
 - **[BACKWARD-COMPATIBILITY.md](./BACKWARD-COMPATIBILITY.md)** - Backward compatibility verification with 00-Inbox design
 - **[LEZER-GRAMMAR-COMPATIBILITY.md](./LEZER-GRAMMAR-COMPATIBILITY.md)** - Lezer grammar compatibility and CodeMirror 6 integration
 - **[CODE-MIRROR-LEZER-INTEGRATION.md](./CODE-MIRROR-LEZER-INTEGRATION.md)** - Detailed CodeMirror 6 and Lezer integration guide
-- **[CANVASL-LANGUAGE.md](./CANVASL-LANGUAGE.md)** - CanvasL language specification (.canvasl extension)
+- **[CANVASL-LANGUAGE.md](./CANVASL-LANGUAGE.md)** - CanvasL language overview and features
 - **[CANVASL-AST-LSP.md](./CANVASL-AST-LSP.md)** - AST and LSP support for CanvasL
 - **[CANVASL-SUMMARY.md](./CANVASL-SUMMARY.md)** - CanvasL language summary and quick reference
+
+**For complete RFC 2119 specification**: See `docs/04-CanvasL/CANVASL-RFC2119-SPEC.md`
 - **[GRAMMAR-REFERENCE.md](./GRAMMAR-REFERENCE.md)** - Complete grammar reference guide
 - **[IMPLEMENTATION-SUMMARY.md](./IMPLEMENTATION-SUMMARY.md)** - Implementation summary and status
 - **[IMPLEMENTATION-COMPLETE.md](./IMPLEMENTATION-COMPLETE.md)** - Complete implementation checklist
@@ -71,7 +101,16 @@ This directory contains documentation for the Metaverse Canvas system, including
 
 ## Related Documentation
 
-- `docs/00-Inbox/` - Foundational design documents
-- `README-R5RS-ENGINE.md` - R5RS engine documentation
-- `AGENTS.md` - Multi-agent system architecture
-- `ui/IMPLEMENTATION_NOTES.md` - Implementation details
+### CanvasL Specification
+
+- **`docs/04-CanvasL/CANVASL-RFC2119-SPEC.md`**: Complete RFC 2119 specification for CanvasL
+- **`docs/04-CanvasL/README.md`**: CanvasL documentation overview
+- **`docs/04-CanvasL/QUICK_REFERENCE.md`**: CanvasL quick reference
+
+### Foundational Documents
+
+- **`docs/00-Inbox/`**: Foundational design documents
+- **`docs/05-Meta-Log/MULTIVERSE-CANVAS-RFC2119-SPEC.md`**: Multiverse canvas specification
+- **`README-R5RS-ENGINE.md`**: R5RS engine documentation
+- **`AGENTS.md`**: Multi-agent system architecture
+- **`ui/IMPLEMENTATION_NOTES.md`**: Implementation details

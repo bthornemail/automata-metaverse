@@ -2,8 +2,21 @@ import { tool } from "@opencode-ai/plugin"
 import * as fs from "fs"
 import * as path from "path"
 
+/**
+ * Report Generator Tool
+ * 
+ * Related Commands:
+ * - /monitor-performance - Performance report generation
+ * - /full-analysis - Comprehensive analysis report
+ * - /run-experiments - Report generation for experiment results
+ * 
+ * This tool is used by:
+ * - monitor-performance.md - Performance monitoring and reporting
+ * - full-analysis.md - Complete system analysis report
+ * - run-experiments.md - Experiment results documentation
+ */
 export default tool({
-  description: "📊 Generate comprehensive reports about the automaton system. Create state snapshots, performance analyses, evolution timelines, and full system documentation in multiple formats.",
+  description: "I'm your report writer - I create comprehensive documentation about the automaton system. Need a state snapshot? Performance analysis? Evolution timeline? Full system documentation? I can generate reports in text, JSON, or markdown formats. Think of me as your technical writer who turns system data into clear, useful reports. Perfect for understanding what's happening, tracking progress, or documenting the system.",
   args: {
     reportType: tool.schema.enum(["state", "performance", "evolution", "analysis", "full"]).describe("📋 Report type: 'state' for current snapshot, 'performance' for metrics, 'evolution' for progression analysis, 'analysis' for insights, 'full' for complete documentation"),
     format: tool.schema.enum(["text", "json", "markdown"]).describe("📄 Output format: 'text' for plain text, 'json' for structured data, 'markdown' for documentation (default: markdown)"),
@@ -17,7 +30,7 @@ export default tool({
     
     try {
       const reportData = await collectReportData(args.reportType, args.timeRange)
-      const report = generateReport(args.reportType, reportData, format, args.include)
+      const report = generateReport(args.reportType, reportData, format, args.include, agent, sessionID)
       
       if (args.outputFile) {
         fs.writeFileSync(args.outputFile, report)
@@ -94,7 +107,7 @@ async function collectReportData(reportType: string, timeRange?: string) {
   return data
 }
 
-function generateReport(reportType: string, data: any, format: string, include?: string[]) {
+function generateReport(reportType: string, data: any, format: string, include?: string[], agent?: string, sessionID?: string) {
   switch (reportType) {
     case "state":
       return generateStateReport(data, format, include)
@@ -105,7 +118,7 @@ function generateReport(reportType: string, data: any, format: string, include?:
     case "analysis":
       return generateAnalysisReport(data, format, include)
     case "full":
-      return generateFullReport(data, format, include)
+      return generateFullReport(data, format, include, agent, sessionID)
     default:
       return "Unknown report type"
   }
@@ -284,7 +297,7 @@ ${analysis.recommendations.map((r: string) => `- ${r}`).join('\n')}
 `
 }
 
-function generateFullReport(data: any, format: string, include?: string[]) {
+function generateFullReport(data: any, format: string, include?: string[], agent?: string, sessionID?: string) {
   const sections = []
   
   if (!include || include.includes('state')) {
@@ -306,8 +319,8 @@ function generateFullReport(data: any, format: string, include?: string[]) {
   return `# Full Automaton System Report
 
 **Generated:** ${data.timestamp}
-**Agent:** ${context.agent}
-**Session:** ${context.sessionID}
+${agent ? `**Agent:** ${agent}` : ''}
+${sessionID ? `**Session:** ${sessionID}` : ''}
 
 ---
 

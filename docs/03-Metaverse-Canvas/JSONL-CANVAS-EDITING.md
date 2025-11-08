@@ -1,3 +1,34 @@
+---
+id: jsonl-canvas-editing
+title: "JSONL Canvas Editing & Markdown Front Matter Integration"
+level: practical
+type: implementation
+tags: [jsonl, canvas-editing, markdown, front-matter, implementation]
+keywords: [jsonl-canvas-editing, markdown-front-matter, r5rs-canvas-engine, blackboard-architecture, automaton-self-building, canvas-editor]
+prerequisites: [metaverse-canvas-docs-readme]
+enables: [backward-compatibility, implementation-complete]
+related: [r5rs-canvas-engine, blackboard-architecture-guide, metaverse-canvas-complete]
+readingTime: 45
+difficulty: 3
+blackboard:
+  status: active
+  assignedAgent: null
+  lastUpdate: null
+  dependencies: [r5rs-canvas-engine]
+  watchers: []
+  r5rsEngine: "r5rs-canvas-engine.scm"
+  selfBuilding:
+    enabled: true
+    source: "r5rs-canvas-engine.scm"
+    pattern: "blackboard-architecture"
+    regeneration:
+      function: "r5rs:parse-jsonl-canvas"
+      args: ["automaton-kernel.jsonl"]
+      context:
+        module: "MODULE 2: JSONL Parser & Canvas Loader"
+        functions: ["r5rs:parse-jsonl-canvas", "r5rs:extract-facts", "r5rs:update-canvas-node"]
+---
+
 # JSONL Canvas Editing & Markdown Front Matter Integration
 
 ## Overview

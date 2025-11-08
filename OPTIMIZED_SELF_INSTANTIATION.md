@@ -1,3 +1,39 @@
+---
+id: optimized-self-instantiation
+title: "Optimized Self-Instantiation Strategy Analysis"
+level: practical
+type: analysis
+tags: [self-instantiation, optimization, strategy-analysis, automaton-kernel]
+keywords: [optimized-self-instantiation, self-instantiation-strategy, automaton-kernel, r5rs-canvas-engine, blackboard-architecture, automaton-self-building]
+prerequisites: [seed-regeneration-guide, agents-multi-agent-system]
+enables: []
+related: [r5rs-canvas-engine, blackboard-architecture-guide, seed-regeneration-guide, agents-multi-agent-system]
+readingTime: 50
+difficulty: 4
+blackboard:
+  status: active
+  assignedAgent: null
+  lastUpdate: null
+  dependencies: [r5rs-canvas-engine]
+  watchers: []
+  r5rsEngine: "r5rs-canvas-engine.scm"
+  selfBuilding:
+    enabled: true
+    source: "r5rs-canvas-engine.scm"
+    pattern: "blackboard-architecture"
+    regeneration:
+      function: "r5rs:parse-jsonl-canvas"
+      args: ["automaton-kernel.jsonl"]
+      context:
+        module: "MODULE 2: JSONL Parser & Canvas Loader"
+        functions: ["r5rs:parse-jsonl-canvas", "r5rs:extract-facts", "r5rs:invoke-from-jsonl"]
+  analysis:
+    kernelStructure: "automaton-kernel.jsonl (74 lines - Minimal Bootstrap)"
+    automatonStructure: "automaton.jsonl (95+ lines - Evolved State)"
+    integrationArchitecture: "OpenCode Bridge, Command Router, Integration Manager"
+    optimizationStrategy: "Most optimized self-instantiation approach"
+---
+
 # Optimized Self-Instantiation Strategy Analysis
 
 ## Executive Summary

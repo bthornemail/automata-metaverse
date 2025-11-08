@@ -2,8 +2,19 @@ import { tool } from "@opencode-ai/plugin"
 import * as fs from "fs"
 import * as path from "path"
 
+/**
+ * Config Manager Tool
+ * 
+ * Related Commands:
+ * - /manage-configs - Configuration management demonstration
+ * - /run-experiments - Configuration testing as part of experiment suite
+ * 
+ * This tool is used by:
+ * - manage-configs.md - Primary command for configuration management
+ * - run-experiments.md - Configuration testing phase
+ */
 export default tool({
-  description: "⚙️ Manage and experiment with different automaton configurations. Save, load, compare, and reset experimental setups for the Church encoding system with different parameters and behaviors.",
+  description: "I'm your configuration manager - I help you experiment with different automaton setups. Want to try different parameters? Save a working configuration? Compare two setups? I can create, load, save, list, compare, and reset configurations for the Church encoding system. Think of me as your lab assistant who keeps track of all your experimental setups.",
   args: {
     action: tool.schema.enum(["create", "load", "save", "list", "compare", "reset"]).describe("🎯 Configuration action: 'create' new config, 'load' existing, 'save' current state, 'list' all configs, 'compare' two configs, 'reset' to defaults"),
     name: tool.schema.string().optional().describe("🏷️ Configuration name for identification. Used in file system and for loading/saving specific setups"),
