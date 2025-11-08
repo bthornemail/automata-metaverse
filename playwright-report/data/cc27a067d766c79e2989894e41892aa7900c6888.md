@@ -1,0 +1,87 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e6]:
+      - heading "Self-Referencing Automaton Interface" [level=1] [ref=e7]: Self-Referencing Automaton Interface
+      - generic [ref=e10]: "Phase 3: Quantum Visualization"
+  - generic [ref=e14]:
+    - button "Switch to Overview tab" [ref=e15] [cursor=pointer]:
+      - img [ref=e16]
+      - text: Overview
+    - button "Switch to Self-Reference tab" [ref=e18] [cursor=pointer]:
+      - img [ref=e19]
+      - text: Self-Reference
+    - button "Switch to AI Portal tab" [ref=e22] [cursor=pointer]:
+      - img [ref=e23]
+      - text: AI Portal
+    - button "Switch to Code Editor tab" [ref=e26] [cursor=pointer]:
+      - img [ref=e27]
+      - text: Code Editor
+    - button "Switch to Config tab" [active] [ref=e30] [cursor=pointer]:
+      - img [ref=e31]
+      - text: Config
+  - main [ref=e46]:
+    - generic [ref=e48]:
+      - generic [ref=e49]:
+        - heading "Configuration Management" [level=3] [ref=e50]:
+          - img [ref=e51]
+          - text: Configuration Management
+        - generic [ref=e54]:
+          - button "Save" [disabled] [ref=e55]:
+            - img [ref=e56]
+            - text: Save
+          - button "Reset configuration to defaults" [ref=e60] [cursor=pointer]:
+            - img [ref=e61]
+          - button "Export configuration" [ref=e64] [cursor=pointer]:
+            - img [ref=e65]
+          - generic "Import configuration" [ref=e69] [cursor=pointer]:
+            - img [ref=e70]
+      - generic [ref=e74]:
+        - button "General" [ref=e75] [cursor=pointer]:
+          - img [ref=e76]
+          - text: General
+        - button "Automaton" [ref=e79] [cursor=pointer]:
+          - img [ref=e80]
+          - text: Automaton
+        - button "Visualization" [ref=e82] [cursor=pointer]:
+          - img [ref=e83]
+          - text: Visualization
+        - button "Advanced" [ref=e87] [cursor=pointer]:
+          - img [ref=e88]
+          - text: Advanced
+      - generic [ref=e92]:
+        - generic [ref=e94]:
+          - generic [ref=e95]:
+            - generic [ref=e96]: Theme
+            - paragraph [ref=e97]: Choose the application theme
+          - combobox "Theme" [ref=e99]:
+            - option "light"
+            - option "dark" [selected]
+            - option "auto"
+        - generic [ref=e101]:
+          - generic [ref=e102]:
+            - generic [ref=e103]: Language
+            - paragraph [ref=e104]: Interface language
+          - combobox "Language" [ref=e106]:
+            - option "en" [selected]
+            - option "es"
+            - option "fr"
+            - option "de"
+            - option "zh"
+        - generic [ref=e108]:
+          - generic [ref=e109]:
+            - generic [ref=e110]: Auto Save
+            - paragraph [ref=e111]: Automatically save configuration changes
+          - generic [ref=e113]:
+            - checkbox "Auto Save" [checked] [ref=e114]
+            - generic [ref=e115]: Enabled
+      - generic [ref=e117]:
+        - generic [ref=e118]: Configuration loaded successfully
+        - generic [ref=e119]: 16 options available
+  - contentinfo [ref=e120]:
+    - generic [ref=e122]:
+      - generic [ref=e123]: Self-Referencing JSONL Automaton • 8-Dimensional Church Encoding
+      - generic [ref=e124]: Meta-Circular Evaluator • Quantum Visualization & Advanced Analytics
+```
