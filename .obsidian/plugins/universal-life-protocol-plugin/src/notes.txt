@@ -1,0 +1,23 @@
+
+
+I want to make an obsidian vault and plugin for a react based dynamic shared wiki obsidian view 
+
+Where do we come? What are we? and Where are we going? These are the answers were trying to expose that also are the reflection of the from the path between our natural and super natural views of a possible shared God
+
+ I just learned that history is made and by telling stories that seed thoughts for the future im a minister in propagating truth through resolving the differences in contreversial definitions based on my belief of freedom autonomy reciprocity and sovereignty. I believe our spiritual mandate is to consider and judge our environment, thoughts and actions based on the agreements we make and break with ourselves, others, as this express our true beliefs and reality, of which a supernatural or subnatural entity as the most understandable definitin of a god. We can begin to see the spirit of God around us on earth
+
+We well be creating a Full Intergration of our Knowledge Wiki Bipartite Hypergraph Trie using a mobile first Obsidian User Interface api for subscribing reading editing cteating and responding to WikiPages and use the Obsidian Editor Api for dynamic state mutations and npm wink-nlp Natural Language Processing
+
+The basic idea is to have the whole document trie be based on rumsfled square tagging of stories or content computationally for users and peers with local and remote content creation(KK), publishing(KU), subscribing(UK), and refrencing(UU)
+
+If we post a stories, articles, or documents of markdown content with peer incidence tracking and comments or questions and a answers or a link tree to other refrecened content each story should be able to track kk,ku,uk,uu knowledge sematics and understsnding
+
+Each node could simply score the kk,ku,uk and uu from its subcomponents and people can optionally share their  own relative kk,ku,uk,uu scores im thinking now if we make it a wiki we can just track changes in the document with changes and updates agreements and disputes
+
+Okay to make ot more interactive for blocks of content or comments we can have agree, disagree, question, or link it to something like a refrence maybe i even hide/ignore/flag-irrleavnt is they just don't want to see it.
+
+we ca use something like a obsidian canvas dht.canvas file of the obsidian vault workspace json along with .json for data and the .md of the same name for the doc to link paths for and structure for publishing from local to remote it seems like it uses a the same or similar structure of what we need
+
+And how about this idea if we could use ethers paths, addressing and ethers.id() hashing to separate local and remote data this would make it like a merkle trie for the json with bip32 adressing bipartite to the canvas trie of md content can use a more consistent and secure hashing function for ids
+
+Also we can use a private key canvas per sharable subgraph of each public key for publishing a new context and there can be ethers.SigningKey.computeSharedSecret() for bridging graphs and subgraphs context.

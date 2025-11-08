@@ -38,9 +38,12 @@ export interface QueryOptions {
 
 class DatabaseServiceImpl implements DatabaseService {
   /**
-   * Read JSONL file - tries local browser first, then falls back to API
+   * Read JSONL or CanvasL file - tries local browser first, then falls back to API
+   * Supports both .jsonl and .canvasl extensions
    */
   async readJSONL(file: string): Promise<any[]> {
+    // Normalize file extension - support both .jsonl and .canvasl
+    const normalizedFile = file.endsWith('.canvasl') ? file : file;
     // Try local file first (from public/jsonl/ directory)
     try {
       const data = await localFileService.loadFromPublic(file);
@@ -159,10 +162,12 @@ class DatabaseServiceImpl implements DatabaseService {
   }
 
   async writeJSONL(file: string, data: any[]): Promise<void> {
+    // Support both .jsonl and .canvasl files
     await apiService.appendToJsonlFile(file, { data });
   }
 
   async appendJSONL(file: string, data: any): Promise<void> {
+    // Support both .jsonl and .canvasl files
     await apiService.appendToJsonlFile(file, data);
   }
 

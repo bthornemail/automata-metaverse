@@ -1,0 +1,76 @@
+{
+  "name": "@universal-life-protocol/universal-life-vault",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "MCP server for Obsidian URI integration",
+  "main": "obsidian-mcp.js",
+  "bin": {
+    "axiom-canvas-mcp": "./services/axiom-canvas-mcp.js",
+    "obsidian-mcp": "./services/obsidian-mcp.js",
+    "merkle-trie-mcp": "./services/merkle-trie-mcp.js",
+    "manifest-generator": "./services/manifest-generator-cli.js",
+    "manifest-server": "./services/manifest-server.js"
+  },
+  "scripts": {
+    "start:obsidian-mcp": "node services/obsidian-mcp.js",
+    "start:canvas-mcp": "node services/axiom-canvas-mcp.js",
+    "start:merkle-trie-mcp": "node services/merkle-trie-mcp.js",
+    "start:manifest-server": "node services/manifest-server.js",
+    "start": "concurrently -c \"auto\" -p \"{name}-{pid}\" -n \"Server,Client\" \"npm run start:obsidian-mcp\" \"npm run start:canvas-mcp\"",
+    "dev:obsidian-mcp": "tsx src/axiom-canvas-mcp.ts",
+    "dev:canvas-mcp": "tsx src/axiom-canvas-mcp.ts",
+    "dev:manifest-server": "tsx services/manifest-server.js",
+    "dev": "concurrently -c \"auto\" -p \"{name}-{pid}\" -n \"Server,Client\" \"npm run dev:obsidian-mcp\" \"npm run dev:canvas-mcp\"",
+    "build": "tsc --project tsconfig.json",
+    "test": "node tests/test-axiom-canvas.js",
+    "generate-manifest": "node services/manifest-generator-cli.js",
+    "test-manifest": "npm run generate-manifest ./Vault \"test mnemonic\" && npm run start:manifest-server"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.6.0",
+    "ethers": "^6.15.0",
+    "express": "^4.21.0",
+    "cors": "^2.8.5"
+  },
+  "keywords": [
+    "mcp",
+    "obsidian",
+    "model-context-protocol",
+    "canvas",
+    "axiom",
+    "ethereum",
+    "harmonic-vectors",
+    "visual-programming",
+    "s-expressions"
+  ],
+  "author": "Universal Life Vault",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "@types/express": "^4.17.21",
+    "@types/cors": "^2.8.17",
+    "concurrently": "^9.2.1",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2"
+  },
+  "references": [
+    {
+      "path": "../autonomous-universe"
+    },
+    {
+      "path": "../universal-communication-protocol"
+    },
+    {
+      "path": "../universal-context-protocol"
+    },
+    {
+      "path": "../universal-life-broker"
+    },
+    {
+      "path": "../universal-life-vault"
+    },
+    {
+      "path": "../universal-life-schema"
+    }
+  ]
+}

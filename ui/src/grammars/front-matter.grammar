@@ -1,0 +1,52 @@
+@top { Document }
+
+@tokens {
+  frontMatterDelimiter { "---" }
+  newline { "\n" | "\r\n" }
+  yamlKey { [a-zA-Z_][a-zA-Z0-9_-]* }
+  yamlValue { [^\n\r]+ }
+  yamlColon { ":" }
+  yamlDash { "-" }
+  whitespace { " " | "\t" }
+  yamlString { "\"" [^"]* "\"" | "'" [^']* "'" }
+  yamlNumber { [0-9]+ ("." [0-9]+)? }
+  yamlBoolean { "true" | "false" }
+  yamlArrayStart { "[" }
+  yamlArrayEnd { "]" }
+  yamlComma { "," }
+  markdownContent { [^] }
+}
+
+@skip {
+  whitespace
+}
+
+Document {
+  FrontMatter? MarkdownContent
+}
+
+FrontMatter {
+  frontMatterDelimiter newline
+  YAMLContent
+  frontMatterDelimiter newline
+}
+
+YAMLContent {
+  YAMLEntry*
+}
+
+YAMLEntry {
+  yamlKey yamlColon YAMLValue newline
+}
+
+YAMLValue {
+  yamlString | yamlNumber | yamlBoolean | YAMLArray | yamlValue
+}
+
+YAMLArray {
+  yamlDash whitespace? YAMLValue (newline yamlDash whitespace? YAMLValue)*
+}
+
+MarkdownContent {
+  markdownContent*
+}
