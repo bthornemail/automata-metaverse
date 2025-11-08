@@ -98,16 +98,11 @@
           - generic [ref=e155]:
             - generic [ref=e156]: Abstract Stats
             - generic [ref=e157]: "Dimension: 2D"
-            - generic [ref=e158]: "Evolution Events: 3"
+            - generic [ref=e158]: "Evolution Events: 5"
             - generic [ref=e159]: "Qubits: 3"
             - generic [ref=e160]: "Particles: 30"
   - contentinfo [ref=e161]:
     - generic [ref=e163]:
       - generic [ref=e164]: Self-Referencing JSONL Automaton • 8-Dimensional Church Encoding
       - generic [ref=e165]: Meta-Circular Evaluator • Quantum Visualization & Advanced Analytics
-  - generic [ref=e167]:
-    - img [ref=e168]
-    - generic [ref=e171]: Connected to automaton server
-    - button [ref=e172] [cursor=pointer]:
-      - img [ref=e173]
 ```

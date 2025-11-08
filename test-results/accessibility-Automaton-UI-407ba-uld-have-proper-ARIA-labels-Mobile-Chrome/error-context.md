@@ -31,7 +31,7 @@
             - text: Automaton Dashboard
           - generic [ref=e51]:
             - generic [ref=e54]: Connected
-            - generic [ref=e57]: idle
+            - generic [ref=e57]: running
         - generic [ref=e58]:
           - generic [ref=e59]:
             - generic [ref=e60]: Current Dimension
@@ -39,144 +39,144 @@
             - generic [ref=e64]: Intelligence
           - generic [ref=e65]:
             - generic [ref=e66]: Iterations
-            - generic [ref=e67]: "101"
+            - generic [ref=e67]: "70"
             - generic [ref=e68]: Total executed
           - generic [ref=e69]:
             - generic [ref=e70]: Self-Modifications
-            - generic [ref=e71]: "18"
+            - generic [ref=e71]: "9"
             - generic [ref=e72]: Dynamic changes
           - generic [ref=e73]:
             - generic [ref=e74]: Total Objects
-            - generic [ref=e75]: "270"
+            - generic [ref=e75]: "401"
             - generic [ref=e76]: In JSONL file
         - generic [ref=e78]:
           - generic [ref=e79]: Dimensional Progression
           - generic [ref=e80]: 0D → 7D
         - generic [ref=e90]:
-          - button "Start" [ref=e91] [cursor=pointer]:
+          - button "Stop" [ref=e91] [cursor=pointer]:
             - img [ref=e93]
-            - text: Start
-          - button "Reset" [ref=e95] [cursor=pointer]:
-            - img [ref=e97]
+            - text: Stop
+          - button "Reset" [disabled] [ref=e96]:
+            - img [ref=e98]
             - text: Reset
-          - button "Configure" [ref=e100] [cursor=pointer]:
-            - img [ref=e102]
+          - button "Configure" [ref=e101] [cursor=pointer]:
+            - img [ref=e103]
             - text: Configure
-        - generic [ref=e105]:
-          - generic [ref=e106]: "Mode:"
-          - generic [ref=e107]:
-            - button "Built-in" [ref=e108] [cursor=pointer]
-            - button "AI (Ollama)" [ref=e109] [cursor=pointer]
-      - generic [ref=e111]:
-        - heading "Control Panel" [level=3] [ref=e113]
-        - generic [ref=e114]:
-          - generic [ref=e115]:
-            - heading "Quick Actions" [level=4] [ref=e116]
-            - generic [ref=e117]:
-              - button "Start Automaton" [ref=e118] [cursor=pointer]:
-                - img [ref=e120]
-                - text: Start Automaton
-              - button "Reset" [ref=e122] [cursor=pointer]:
-                - img [ref=e124]
+        - generic [ref=e106]:
+          - generic [ref=e107]: "Mode:"
+          - generic [ref=e108]:
+            - button "Built-in" [ref=e109] [cursor=pointer]
+            - button "AI (Ollama)" [ref=e110] [cursor=pointer]
+      - generic [ref=e112]:
+        - heading "Control Panel" [level=3] [ref=e114]
+        - generic [ref=e115]:
+          - generic [ref=e116]:
+            - heading "Quick Actions" [level=4] [ref=e117]
+            - generic [ref=e118]:
+              - button "Stop Automaton" [ref=e119] [cursor=pointer]:
+                - img [ref=e121]
+                - text: Stop Automaton
+              - button "Reset" [disabled] [ref=e123]:
+                - img [ref=e125]
                 - text: Reset
-          - generic [ref=e127]:
-            - heading "Manual Action Execution" [level=4] [ref=e128]
-            - generic [ref=e129]:
-              - 'button "Evolve: Progress to next dimension" [pressed] [ref=e130] [cursor=pointer]':
-                - generic [ref=e131]:
-                  - img [ref=e132]
-                  - generic [ref=e134]:
-                    - generic [ref=e135]: Evolve
-                    - generic [ref=e136]: Progress to next dimension
-              - 'button "Self-Reference: Execute self-reference pattern" [ref=e137] [cursor=pointer]':
-                - generic [ref=e138]:
-                  - img [ref=e139]
-                  - generic [ref=e142]:
-                    - generic [ref=e143]: Self-Reference
-                    - generic [ref=e144]: Execute self-reference pattern
-              - 'button "Self-Modify: Add new self-referential object" [ref=e145] [cursor=pointer]':
-                - generic [ref=e146]:
-                  - img [ref=e147]
-                  - generic [ref=e149]:
-                    - generic [ref=e150]: Self-Modify
-                    - generic [ref=e151]: Add new self-referential object
-              - 'button "Self-I/O: Read/write own JSONL file" [ref=e152] [cursor=pointer]':
-                - generic [ref=e153]:
-                  - img [ref=e154]
-                  - generic [ref=e157]:
-                    - generic [ref=e158]: Self-I/O
-                    - generic [ref=e159]: Read/write own JSONL file
-              - 'button "Validate Self: Check SHACL compliance" [ref=e160] [cursor=pointer]':
-                - generic [ref=e161]:
-                  - img [ref=e162]
-                  - generic [ref=e165]:
-                    - generic [ref=e166]: Validate Self
-                    - generic [ref=e167]: Check SHACL compliance
-              - 'button "Self-Train: Learn from execution history" [ref=e168] [cursor=pointer]':
-                - generic [ref=e169]:
-                  - img [ref=e170]
-                  - generic [ref=e173]:
-                    - generic [ref=e174]: Self-Train
-                    - generic [ref=e175]: Learn from execution history
-              - 'button "Self-Observe: Quantum observation and collapse" [ref=e176] [cursor=pointer]':
-                - generic [ref=e177]:
-                  - img [ref=e178]
-                  - generic [ref=e181]:
-                    - generic [ref=e182]: Self-Observe
-                    - generic [ref=e183]: Quantum observation and collapse
-              - 'button "Compose: Compose multiple states" [ref=e184] [cursor=pointer]':
-                - generic [ref=e185]:
-                  - img [ref=e186]
-                  - generic [ref=e190]:
-                    - generic [ref=e191]: Compose
-                    - generic [ref=e192]: Compose multiple states
-            - 'button "Execute: Evolve" [ref=e193] [cursor=pointer]':
-              - img [ref=e195]
+          - generic [ref=e128]:
+            - heading "Manual Action Execution" [level=4] [ref=e129]
+            - generic [ref=e130]:
+              - 'button "Evolve: Progress to next dimension" [pressed] [ref=e131] [cursor=pointer]':
+                - generic [ref=e132]:
+                  - img [ref=e133]
+                  - generic [ref=e135]:
+                    - generic [ref=e136]: Evolve
+                    - generic [ref=e137]: Progress to next dimension
+              - 'button "Self-Reference: Execute self-reference pattern" [ref=e138] [cursor=pointer]':
+                - generic [ref=e139]:
+                  - img [ref=e140]
+                  - generic [ref=e143]:
+                    - generic [ref=e144]: Self-Reference
+                    - generic [ref=e145]: Execute self-reference pattern
+              - 'button "Self-Modify: Add new self-referential object" [ref=e146] [cursor=pointer]':
+                - generic [ref=e147]:
+                  - img [ref=e148]
+                  - generic [ref=e150]:
+                    - generic [ref=e151]: Self-Modify
+                    - generic [ref=e152]: Add new self-referential object
+              - 'button "Self-I/O: Read/write own JSONL file" [ref=e153] [cursor=pointer]':
+                - generic [ref=e154]:
+                  - img [ref=e155]
+                  - generic [ref=e158]:
+                    - generic [ref=e159]: Self-I/O
+                    - generic [ref=e160]: Read/write own JSONL file
+              - 'button "Validate Self: Check SHACL compliance" [ref=e161] [cursor=pointer]':
+                - generic [ref=e162]:
+                  - img [ref=e163]
+                  - generic [ref=e166]:
+                    - generic [ref=e167]: Validate Self
+                    - generic [ref=e168]: Check SHACL compliance
+              - 'button "Self-Train: Learn from execution history" [ref=e169] [cursor=pointer]':
+                - generic [ref=e170]:
+                  - img [ref=e171]
+                  - generic [ref=e174]:
+                    - generic [ref=e175]: Self-Train
+                    - generic [ref=e176]: Learn from execution history
+              - 'button "Self-Observe: Quantum observation and collapse" [ref=e177] [cursor=pointer]':
+                - generic [ref=e178]:
+                  - img [ref=e179]
+                  - generic [ref=e182]:
+                    - generic [ref=e183]: Self-Observe
+                    - generic [ref=e184]: Quantum observation and collapse
+              - 'button "Compose: Compose multiple states" [ref=e185] [cursor=pointer]':
+                - generic [ref=e186]:
+                  - img [ref=e187]
+                  - generic [ref=e191]:
+                    - generic [ref=e192]: Compose
+                    - generic [ref=e193]: Compose multiple states
+            - 'button "Execute: Evolve" [disabled] [ref=e194]':
+              - img [ref=e196]
               - text: "Execute: Evolve"
-          - generic [ref=e197]:
-            - heading "Execution Parameters" [level=4] [ref=e198]
-            - generic [ref=e199]:
-              - generic [ref=e200]:
-                - generic [ref=e201]: "Execution Interval: 2000ms"
-                - slider "Execution interval in milliseconds" [ref=e202] [cursor=pointer]: "2000"
-                - generic [ref=e203]:
-                  - generic [ref=e204]: 100ms
-                  - generic [ref=e205]: 10s
-              - generic [ref=e206]:
-                - generic [ref=e207]: "Max Iterations: 100"
-                - slider "Maximum number of iterations" [ref=e208] [cursor=pointer]: "100"
-                - generic [ref=e209]:
-                  - generic [ref=e210]: "10"
-                  - generic [ref=e211]: "1000"
-          - generic [ref=e212]:
-            - heading "Dimension Control" [level=4] [ref=e213]
-            - generic [ref=e214]:
-              - generic [ref=e215]: "Jump to Dimension:"
-              - generic [ref=e216]:
-                - button "Jump to dimension 0D" [ref=e217] [cursor=pointer]: 0D
-                - button "Jump to dimension 1D" [ref=e218] [cursor=pointer]: 1D
-                - button "Jump to dimension 2D" [ref=e219] [cursor=pointer]: 2D
-                - button "Jump to dimension 3D" [ref=e220] [cursor=pointer]: 3D
-                - button "Jump to dimension 4D" [ref=e221] [cursor=pointer]: 4D
-                - button "Jump to dimension 5D" [ref=e222] [cursor=pointer]: 5D
-                - button "Jump to dimension 6D" [ref=e223] [cursor=pointer]: 6D
-                - button "Jump to dimension 7D" [ref=e224] [cursor=pointer]: 7D
-          - generic [ref=e225]:
-            - heading "Current Status" [level=4] [ref=e226]
-            - generic [ref=e227]:
-              - generic [ref=e228]: Mode:builtin
-              - generic [ref=e229]: Status:idle
-              - generic [ref=e230]:
+          - generic [ref=e198]:
+            - heading "Execution Parameters" [level=4] [ref=e199]
+            - generic [ref=e200]:
+              - generic [ref=e201]:
+                - generic [ref=e202]: "Execution Interval: 2000ms"
+                - slider "Execution interval in milliseconds" [disabled] [ref=e203] [cursor=pointer]: "2000"
+                - generic [ref=e204]:
+                  - generic [ref=e205]: 100ms
+                  - generic [ref=e206]: 10s
+              - generic [ref=e207]:
+                - generic [ref=e208]: "Max Iterations: 100"
+                - slider "Maximum number of iterations" [disabled] [ref=e209] [cursor=pointer]: "100"
+                - generic [ref=e210]:
+                  - generic [ref=e211]: "10"
+                  - generic [ref=e212]: "1000"
+          - generic [ref=e213]:
+            - heading "Dimension Control" [level=4] [ref=e214]
+            - generic [ref=e215]:
+              - generic [ref=e216]: "Jump to Dimension:"
+              - generic [ref=e217]:
+                - button "Jump to dimension 0D" [ref=e218] [cursor=pointer]: 0D
+                - button "Jump to dimension 1D" [ref=e219] [cursor=pointer]: 1D
+                - button "Jump to dimension 2D" [ref=e220] [cursor=pointer]: 2D
+                - button "Jump to dimension 3D" [ref=e221] [cursor=pointer]: 3D
+                - button "Jump to dimension 4D" [ref=e222] [cursor=pointer]: 4D
+                - button "Jump to dimension 5D" [ref=e223] [cursor=pointer]: 5D
+                - button "Jump to dimension 6D" [ref=e224] [cursor=pointer]: 6D
+                - button "Jump to dimension 7D" [ref=e225] [cursor=pointer]: 7D
+          - generic [ref=e226]:
+            - heading "Current Status" [level=4] [ref=e227]
+            - generic [ref=e228]:
+              - generic [ref=e229]: Mode:builtin
+              - generic [ref=e230]: Status:running
+              - generic [ref=e231]:
                 - text: "Dimension:"
-                - generic [ref=e231]: 6D
-              - generic [ref=e232]: Iterations:101
-  - contentinfo [ref=e233]:
-    - generic [ref=e235]:
-      - generic [ref=e236]: Self-Referencing JSONL Automaton • 8-Dimensional Church Encoding
-      - generic [ref=e237]: Meta-Circular Evaluator • Quantum Visualization & Advanced Analytics
-  - generic [ref=e239]:
-    - img [ref=e240]
-    - generic [ref=e243]: Connected to automaton server
-    - button [ref=e244] [cursor=pointer]:
-      - img [ref=e245]
+                - generic [ref=e232]: 6D
+              - generic [ref=e233]: Iterations:70
+  - contentinfo [ref=e234]:
+    - generic [ref=e236]:
+      - generic [ref=e237]: Self-Referencing JSONL Automaton • 8-Dimensional Church Encoding
+      - generic [ref=e238]: Meta-Circular Evaluator • Quantum Visualization & Advanced Analytics
+  - generic [ref=e240]:
+    - img [ref=e241]
+    - generic [ref=e244]: Connected to automaton server
+    - button [ref=e245] [cursor=pointer]:
+      - img [ref=e246]
 ```

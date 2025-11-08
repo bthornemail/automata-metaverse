@@ -75,7 +75,7 @@
               - heading "3D Metaverse Portal" [level=3] [ref=e118]
               - paragraph [ref=e119]: Bridging Human NLP ↔ Automaton Metaverse ↔ WebLLM ↔ TinyML
             - generic [ref=e120]:
-              - generic [ref=e121]: 0 events
+              - generic [ref=e121]: 5 events
               - generic [ref=e122]: 3 qubits
               - generic [ref=e123]: 30 particles
               - generic [ref=e124]: 2 users
@@ -97,8 +97,8 @@
               - text: Both
           - generic [ref=e155]:
             - generic [ref=e156]: Abstract Stats
-            - generic [ref=e157]: "Dimension: 0D"
-            - generic [ref=e158]: "Evolution Events: 0"
+            - generic [ref=e157]: "Dimension: 2D"
+            - generic [ref=e158]: "Evolution Events: 5"
             - generic [ref=e159]: "Qubits: 3"
             - generic [ref=e160]: "Particles: 30"
   - contentinfo [ref=e161]:

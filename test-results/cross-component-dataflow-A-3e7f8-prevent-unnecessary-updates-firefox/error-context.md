@@ -43,15 +43,15 @@
             - generic [ref=e71]: Intelligence
           - generic [ref=e72]:
             - generic [ref=e73]: Iterations
-            - generic [ref=e74]: "7"
+            - generic [ref=e74]: "172"
             - generic [ref=e75]: Total executed
           - generic [ref=e76]:
             - generic [ref=e77]: Self-Modifications
-            - generic [ref=e78]: "2"
+            - generic [ref=e78]: "24"
             - generic [ref=e79]: Dynamic changes
           - generic [ref=e80]:
             - generic [ref=e81]: Total Objects
-            - generic [ref=e82]: "212"
+            - generic [ref=e82]: "313"
             - generic [ref=e83]: In JSONL file
         - generic [ref=e85]:
           - generic [ref=e86]: Dimensional Progression
@@ -68,7 +68,7 @@
             - text: Configure
         - generic [ref=e113]:
           - generic [ref=e114]: Last Action
-          - generic [ref=e115]: self-train
+          - generic [ref=e115]: evolve
         - generic [ref=e116]:
           - generic [ref=e117]: "Mode:"
           - generic [ref=e118]:
@@ -176,14 +176,20 @@
               - generic [ref=e243]:
                 - text: "Dimension:"
                 - generic [ref=e244]: 6D
-              - generic [ref=e245]: Iterations:7
+              - generic [ref=e245]: Iterations:172
   - contentinfo [ref=e246]:
     - generic [ref=e248]:
       - generic [ref=e249]: Self-Referencing JSONL Automaton • 8-Dimensional Church Encoding
       - generic [ref=e250]: Meta-Circular Evaluator • Quantum Visualization & Advanced Analytics
-  - generic [ref=e252]:
-    - img [ref=e253]
-    - generic [ref=e257]: Automaton is already running
-    - button [ref=e258] [cursor=pointer]:
-      - img [ref=e259]
+  - generic:
+    - generic [ref=e252]:
+      - img [ref=e253]
+      - generic [ref=e257]: Automaton is already running
+      - button [ref=e258] [cursor=pointer]:
+        - img [ref=e259]
+    - generic [ref=e263]:
+      - img [ref=e264]
+      - generic [ref=e268]: Automaton is already running
+      - button [ref=e269] [cursor=pointer]:
+        - img [ref=e270]
 ```

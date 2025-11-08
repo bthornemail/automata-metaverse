@@ -43,11 +43,11 @@
             - generic [ref=e68]: Total executed
           - generic [ref=e69]:
             - generic [ref=e70]: Self-Modifications
-            - generic [ref=e71]: "5"
+            - generic [ref=e71]: "2"
             - generic [ref=e72]: Dynamic changes
           - generic [ref=e73]:
             - generic [ref=e74]: Total Objects
-            - generic [ref=e75]: "151"
+            - generic [ref=e75]: "284"
             - generic [ref=e76]: In JSONL file
         - generic [ref=e78]:
           - generic [ref=e79]: Dimensional Progression
@@ -159,10 +159,10 @@
                 - button "Jump to dimension 0D" [ref=e221] [cursor=pointer]: 0D
                 - button "Jump to dimension 1D" [ref=e222] [cursor=pointer]: 1D
                 - button "Jump to dimension 2D" [ref=e223] [cursor=pointer]: 2D
-                - button "Jump to dimension 3D" [active] [ref=e224] [cursor=pointer]: 3D
+                - button "Jump to dimension 3D" [ref=e224] [cursor=pointer]: 3D
                 - button "Jump to dimension 4D" [ref=e225] [cursor=pointer]: 4D
                 - button "Jump to dimension 5D" [ref=e226] [cursor=pointer]: 5D
-                - button "Jump to dimension 6D" [ref=e227] [cursor=pointer]: 6D
+                - button "Jump to dimension 6D" [active] [ref=e227] [cursor=pointer]: 6D
                 - button "Jump to dimension 7D" [ref=e228] [cursor=pointer]: 7D
           - generic [ref=e229]:
             - heading "Current Status" [level=4] [ref=e230]

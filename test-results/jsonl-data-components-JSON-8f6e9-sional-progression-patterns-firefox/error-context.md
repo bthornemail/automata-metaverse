@@ -39,7 +39,7 @@
             - generic [ref=e68]: Intelligence
           - generic [ref=e69]:
             - generic [ref=e70]: Iterations
-            - generic [ref=e71]: "60"
+            - generic [ref=e71]: "58"
             - generic [ref=e72]: Total executed
           - generic [ref=e73]:
             - generic [ref=e74]: Self-Modifications
@@ -47,7 +47,7 @@
             - generic [ref=e76]: Dynamic changes
           - generic [ref=e77]:
             - generic [ref=e78]: Total Objects
-            - generic [ref=e79]: "239"
+            - generic [ref=e79]: "343"
             - generic [ref=e80]: In JSONL file
         - generic [ref=e82]:
           - generic [ref=e83]: Dimensional Progression
@@ -172,7 +172,7 @@
               - generic [ref=e240]:
                 - text: "Dimension:"
                 - generic [ref=e241]: 6D
-              - generic [ref=e242]: Iterations:60
+              - generic [ref=e242]: Iterations:58
   - contentinfo [ref=e243]:
     - generic [ref=e245]:
       - generic [ref=e246]: Self-Referencing JSONL Automaton • 8-Dimensional Church Encoding

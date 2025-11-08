@@ -43,11 +43,6 @@ export default defineConfig({
     
     /* Run headless by default for CI environments */
     headless: process.env.CI ? true : false,
-    
-    /* Capture console logs for debugging */
-    launchOptions: {
-      args: ['--disable-web-security'], // Allow CORS for local testing
-    },
   },
 
   /* Configure projects for major browsers */
@@ -57,6 +52,10 @@ export default defineConfig({
       use: { 
         ...devices['Desktop Chrome'],
         headless: true,
+        /* Allow CORS for local testing - Chromium supports this flag */
+        launchOptions: {
+          args: ['--disable-web-security'],
+        },
       },
     },
 
@@ -65,6 +64,10 @@ export default defineConfig({
       use: { 
         ...devices['Desktop Firefox'],
         headless: true,
+        /* Allow CORS for local testing - Firefox supports this flag */
+        launchOptions: {
+          args: ['--disable-web-security'],
+        },
       },
     },
 
@@ -82,6 +85,10 @@ export default defineConfig({
       use: { 
         ...devices['Pixel 5'],
         headless: true,
+        /* Allow CORS for local testing - Chromium-based mobile browser supports this flag */
+        launchOptions: {
+          args: ['--disable-web-security'],
+        },
       },
     },
     {

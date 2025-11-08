@@ -30,7 +30,7 @@
             - img [ref=e53]
             - text: Automaton Dashboard
           - generic [ref=e55]:
-            - generic [ref=e58]: Connected
+            - generic [ref=e58]: Disconnected
             - generic [ref=e61]: running
         - generic [ref=e62]:
           - generic [ref=e63]:
@@ -39,15 +39,15 @@
             - generic [ref=e68]: Pair
           - generic [ref=e69]:
             - generic [ref=e70]: Iterations
-            - generic [ref=e71]: "19"
+            - generic [ref=e71]: "20"
             - generic [ref=e72]: Total executed
           - generic [ref=e73]:
             - generic [ref=e74]: Self-Modifications
-            - generic [ref=e75]: "3"
+            - generic [ref=e75]: "1"
             - generic [ref=e76]: Dynamic changes
           - generic [ref=e77]:
             - generic [ref=e78]: Total Objects
-            - generic [ref=e79]: "247"
+            - generic [ref=e79]: "357"
             - generic [ref=e80]: In JSONL file
         - generic [ref=e82]:
           - generic [ref=e83]: Dimensional Progression
@@ -169,14 +169,9 @@
               - generic [ref=e237]:
                 - text: "Dimension:"
                 - generic [ref=e238]: 2D
-              - generic [ref=e239]: Iterations:19
+              - generic [ref=e239]: Iterations:20
   - contentinfo [ref=e240]:
     - generic [ref=e242]:
       - generic [ref=e243]: Self-Referencing JSONL Automaton • 8-Dimensional Church Encoding
       - generic [ref=e244]: Meta-Circular Evaluator • Quantum Visualization & Advanced Analytics
-  - generic [ref=e246]:
-    - img [ref=e247]
-    - generic [ref=e250]: Connected to automaton server
-    - button [ref=e251] [cursor=pointer]:
-      - img [ref=e252]
 ```

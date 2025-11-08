@@ -51,7 +51,7 @@
             - generic [ref=e75]: Dynamic changes
           - generic [ref=e76]:
             - generic [ref=e77]: Total Objects
-            - generic [ref=e78]: "119"
+            - generic [ref=e78]: "267"
             - generic [ref=e79]: In JSONL file
         - generic [ref=e81]:
           - generic [ref=e82]: Dimensional Progression
@@ -68,7 +68,7 @@
             - text: Configure
         - generic [ref=e109]:
           - generic [ref=e110]: Last Action
-          - generic [ref=e111]: evolve
+          - generic [ref=e111]: self-io
         - generic [ref=e112]:
           - generic [ref=e113]: "Mode:"
           - generic [ref=e114]:

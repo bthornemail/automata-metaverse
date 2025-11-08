@@ -69,7 +69,7 @@
         - generic [ref=e106]:
           - generic [ref=e108]:
             - generic [ref=e109]: Self-Refs
-            - generic [ref=e110]: "7"
+            - generic [ref=e110]: "10"
           - generic [ref=e112]:
             - generic [ref=e113]: Automata
             - generic [ref=e114]: "8"
@@ -78,7 +78,7 @@
             - generic [ref=e118]: "0"
           - generic [ref=e120]:
             - generic [ref=e121]: Executions
-            - generic [ref=e122]: "68"
+            - generic [ref=e122]: "64"
         - generic [ref=e124]:
           - img [ref=e125]
           - textbox "Search self-references and activities..." [ref=e128]
@@ -94,8 +94,8 @@
                   - generic [ref=e142]:
                     - img [ref=e144]
                     - generic [ref=e146]:
-                      - generic [ref=e147]: self train
-                      - generic [ref=e148]: 6D → 6D
+                      - generic [ref=e147]: evolve
+                      - generic [ref=e148]: 6D → 0D
                   - button "Close and convert to self-reference" [ref=e149] [cursor=pointer]:
                     - img [ref=e150]
                 - generic [ref=e154]:
@@ -118,7 +118,7 @@
                   - generic [ref=e181]:
                     - img [ref=e183]
                     - generic [ref=e185]:
-                      - generic [ref=e186]: self train
+                      - generic [ref=e186]: self modify
                       - generic [ref=e187]: 2D → 2D
                   - button "Close and convert to self-reference" [ref=e188] [cursor=pointer]:
                     - img [ref=e189]
@@ -126,8 +126,8 @@
                   - generic [ref=e194]:
                     - img [ref=e196]
                     - generic [ref=e198]:
-                      - generic [ref=e199]: self modify
-                      - generic [ref=e200]: 2D → 2D
+                      - generic [ref=e199]: evolve
+                      - generic [ref=e200]: 0D → 2D
                   - button "Close and convert to self-reference" [ref=e201] [cursor=pointer]:
                     - img [ref=e202]
                 - generic [ref=e206]:
@@ -135,22 +135,22 @@
                     - img [ref=e209]
                     - generic [ref=e211]:
                       - generic [ref=e212]: evolve
-                      - generic [ref=e213]: 0D → 2D
+                      - generic [ref=e213]: 6D → 0D
                   - button "Close and convert to self-reference" [ref=e214] [cursor=pointer]:
                     - img [ref=e215]
                 - generic [ref=e219]:
                   - generic [ref=e220]:
                     - img [ref=e222]
                     - generic [ref=e224]:
-                      - generic [ref=e225]: evolve
-                      - generic [ref=e226]: 6D → 0D
+                      - generic [ref=e225]: self train
+                      - generic [ref=e226]: 6D → 6D
                   - button "Close and convert to self-reference" [ref=e227] [cursor=pointer]:
                     - img [ref=e228]
                 - generic [ref=e232]:
                   - generic [ref=e233]:
                     - img [ref=e235]
                     - generic [ref=e237]:
-                      - generic [ref=e238]: self modify
+                      - generic [ref=e238]: self train
                       - generic [ref=e239]: 6D → 6D
                   - button "Close and convert to self-reference" [ref=e240] [cursor=pointer]:
                     - img [ref=e241]
@@ -174,80 +174,80 @@
                   - generic [ref=e272]:
                     - img [ref=e274]
                     - generic [ref=e276]:
-                      - generic [ref=e277]: evolve
-                      - generic [ref=e278]: 2D → 4D
+                      - generic [ref=e277]: self io
+                      - generic [ref=e278]: 4D → 4D
                   - button "Close and convert to self-reference" [ref=e279] [cursor=pointer]:
                     - img [ref=e280]
                 - generic [ref=e284]:
                   - generic [ref=e285]:
                     - img [ref=e287]
                     - generic [ref=e289]:
-                      - generic [ref=e290]: self train
-                      - generic [ref=e291]: 2D → 2D
+                      - generic [ref=e290]: evolve
+                      - generic [ref=e291]: 2D → 4D
                   - button "Close and convert to self-reference" [ref=e292] [cursor=pointer]:
                     - img [ref=e293]
                 - generic [ref=e297]:
                   - generic [ref=e298]:
                     - img [ref=e300]
                     - generic [ref=e302]:
-                      - generic [ref=e303]: evolve
-                      - generic [ref=e304]: 0D → 2D
+                      - generic [ref=e303]: self modify
+                      - generic [ref=e304]: 2D → 2D
                   - button "Close and convert to self-reference" [ref=e305] [cursor=pointer]:
                     - img [ref=e306]
                 - generic [ref=e310]:
                   - generic [ref=e311]:
                     - img [ref=e313]
                     - generic [ref=e315]:
-                      - generic [ref=e316]: evolve
-                      - generic [ref=e317]: 6D → 0D
+                      - generic [ref=e316]: validate self
+                      - generic [ref=e317]: 2D → 2D
                   - button "Close and convert to self-reference" [ref=e318] [cursor=pointer]:
                     - img [ref=e319]
                 - generic [ref=e323]:
                   - generic [ref=e324]:
                     - img [ref=e326]
                     - generic [ref=e328]:
-                      - generic [ref=e329]: self train
-                      - generic [ref=e330]: 6D → 6D
+                      - generic [ref=e329]: evolve
+                      - generic [ref=e330]: 0D → 2D
                   - button "Close and convert to self-reference" [ref=e331] [cursor=pointer]:
                     - img [ref=e332]
                 - generic [ref=e336]:
                   - generic [ref=e337]:
                     - img [ref=e339]
                     - generic [ref=e341]:
-                      - generic [ref=e342]: evolve
-                      - generic [ref=e343]: 4D → 6D
+                      - generic [ref=e342]: self train
+                      - generic [ref=e343]: 0D → 0D
                   - button "Close and convert to self-reference" [ref=e344] [cursor=pointer]:
                     - img [ref=e345]
                 - generic [ref=e349]:
                   - generic [ref=e350]:
                     - img [ref=e352]
                     - generic [ref=e354]:
-                      - generic [ref=e355]: self io
-                      - generic [ref=e356]: 4D → 4D
+                      - generic [ref=e355]: evolve
+                      - generic [ref=e356]: 6D → 0D
                   - button "Close and convert to self-reference" [ref=e357] [cursor=pointer]:
                     - img [ref=e358]
                 - generic [ref=e362]:
                   - generic [ref=e363]:
                     - img [ref=e365]
                     - generic [ref=e367]:
-                      - generic [ref=e368]: validate self
-                      - generic [ref=e369]: 4D → 4D
+                      - generic [ref=e368]: self train
+                      - generic [ref=e369]: 6D → 6D
                   - button "Close and convert to self-reference" [ref=e370] [cursor=pointer]:
                     - img [ref=e371]
                 - generic [ref=e375]:
                   - generic [ref=e376]:
                     - img [ref=e378]
                     - generic [ref=e380]:
-                      - generic [ref=e381]: evolve
-                      - generic [ref=e382]: 2D → 4D
+                      - generic [ref=e381]: self io
+                      - generic [ref=e382]: 6D → 6D
                   - button "Close and convert to self-reference" [ref=e383] [cursor=pointer]:
                     - img [ref=e384]
                 - generic [ref=e388]:
                   - generic [ref=e389]:
                     - img [ref=e391]
                     - generic [ref=e393]:
-                      - generic [ref=e394]: self train
-                      - generic [ref=e395]: 2D → 2D
+                      - generic [ref=e394]: evolve
+                      - generic [ref=e395]: 4D → 6D
                   - button "Close and convert to self-reference" [ref=e396] [cursor=pointer]:
                     - img [ref=e397]
             - generic [ref=e400]:
@@ -262,7 +262,7 @@
                       - generic [ref=e413]:
                         - generic [ref=e414]: self-ref
                         - generic [ref=e415]: Line 0
-                    - generic [ref=e416]: 6:23:41 PM
+                    - generic [ref=e416]: 7:43:53 PM
                   - generic [ref=e417]: self-reference
                 - generic [ref=e418] [cursor=pointer]:
                   - generic [ref=e419]:
@@ -271,7 +271,7 @@
                       - generic [ref=e422]:
                         - generic [ref=e423]: modification-1762624542182
                         - generic [ref=e424]: Line 1
-                    - generic [ref=e425]: 6:23:41 PM
+                    - generic [ref=e425]: 7:43:53 PM
                   - generic [ref=e426]: ";; 0D Self-Modification: Identity Evolution (define self-evolve (lambda (identity) (lambda (x) (i..."
                 - generic [ref=e427] [cursor=pointer]:
                   - generic [ref=e428]:
@@ -280,7 +280,7 @@
                       - generic [ref=e431]:
                         - generic [ref=e432]: modification-1762624615931
                         - generic [ref=e433]: Line 2
-                    - generic [ref=e434]: 6:23:41 PM
+                    - generic [ref=e434]: 7:43:53 PM
                   - generic [ref=e435]: ";; 0D Self-Modification: Identity Evolution (define self-evolve (lambda (identity) (lambda (x) (i..."
                 - generic [ref=e436] [cursor=pointer]:
                   - generic [ref=e437]:
@@ -289,7 +289,7 @@
                       - generic [ref=e440]:
                         - generic [ref=e441]: modification-1762625096727
                         - generic [ref=e442]: Line 3
-                    - generic [ref=e443]: 6:23:41 PM
+                    - generic [ref=e443]: 7:43:53 PM
                   - generic [ref=e444]: ";; 0D Self-Modification: Identity Evolution (define self-evolve (lambda (identity) (lambda (x) (i..."
                 - generic [ref=e445] [cursor=pointer]:
                   - generic [ref=e446]:
@@ -298,7 +298,7 @@
                       - generic [ref=e449]:
                         - generic [ref=e450]: modification-1762625417245
                         - generic [ref=e451]: Line 4
-                    - generic [ref=e452]: 6:23:41 PM
+                    - generic [ref=e452]: 7:43:53 PM
                   - generic [ref=e453]: ";; 0D Self-Modification: Identity Evolution (define self-evolve (lambda (identity) (lambda (x) (i..."
                 - generic [ref=e454] [cursor=pointer]:
                   - generic [ref=e455]:
@@ -307,7 +307,7 @@
                       - generic [ref=e458]:
                         - generic [ref=e459]: modification-1762625440703
                         - generic [ref=e460]: Line 5
-                    - generic [ref=e461]: 6:23:41 PM
+                    - generic [ref=e461]: 7:43:53 PM
                   - generic [ref=e462]: ";; 0D Self-Modification: Identity Evolution (define self-evolve (lambda (identity) (lambda (x) (i..."
                 - generic [ref=e463] [cursor=pointer]:
                   - generic [ref=e464]:
@@ -316,15 +316,42 @@
                       - generic [ref=e467]:
                         - generic [ref=e468]: modification-1762626058255
                         - generic [ref=e469]: Line 6
-                    - generic [ref=e470]: 6:23:41 PM
+                    - generic [ref=e470]: 7:43:53 PM
                   - generic [ref=e471]: ";; 0D Self-Modification: Identity Evolution (define self-evolve (lambda (identity) (lambda (x) (i..."
-  - contentinfo [ref=e472]:
-    - generic [ref=e474]:
-      - generic [ref=e475]: Self-Referencing JSONL Automaton • 8-Dimensional Church Encoding
-      - generic [ref=e476]: Meta-Circular Evaluator • Quantum Visualization & Advanced Analytics
-  - generic [ref=e478]:
-    - img [ref=e479]
-    - generic [ref=e482]: Connected to automaton server
-    - button [ref=e483] [cursor=pointer]:
-      - img [ref=e484]
+                - generic [ref=e472] [cursor=pointer]:
+                  - generic [ref=e473]:
+                    - generic [ref=e474]:
+                      - generic [ref=e475]: "7"
+                      - generic [ref=e476]:
+                        - generic [ref=e477]: modification-1762626218518
+                        - generic [ref=e478]: Line 7
+                    - generic [ref=e479]: 7:43:53 PM
+                  - generic [ref=e480]: ";; 0D Self-Modification: Identity Evolution (define self-evolve (lambda (identity) (lambda (x) (i..."
+                - generic [ref=e481] [cursor=pointer]:
+                  - generic [ref=e482]:
+                    - generic [ref=e483]:
+                      - generic [ref=e484]: "8"
+                      - generic [ref=e485]:
+                        - generic [ref=e486]: modification-1762626748656
+                        - generic [ref=e487]: Line 8
+                    - generic [ref=e488]: 7:43:53 PM
+                  - generic [ref=e489]: ";; 0D Self-Modification: Identity Evolution (define self-evolve (lambda (identity) (lambda (x) (i..."
+                - generic [ref=e490] [cursor=pointer]:
+                  - generic [ref=e491]:
+                    - generic [ref=e492]:
+                      - generic [ref=e493]: "9"
+                      - generic [ref=e494]:
+                        - generic [ref=e495]: modification-1762631008302
+                        - generic [ref=e496]: Line 9
+                    - generic [ref=e497]: 7:43:53 PM
+                  - generic [ref=e498]: ";; 0D Self-Modification: Identity Evolution (define self-evolve (lambda (identity) (lambda (x) (i..."
+  - contentinfo [ref=e499]:
+    - generic [ref=e501]:
+      - generic [ref=e502]: Self-Referencing JSONL Automaton • 8-Dimensional Church Encoding
+      - generic [ref=e503]: Meta-Circular Evaluator • Quantum Visualization & Advanced Analytics
+  - generic [ref=e505]:
+    - img [ref=e506]
+    - generic [ref=e509]: Connected to automaton server
+    - button [ref=e510] [cursor=pointer]:
+      - img [ref=e511]
 ```

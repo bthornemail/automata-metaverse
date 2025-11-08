@@ -35,19 +35,19 @@
         - generic [ref=e58]:
           - generic [ref=e59]:
             - generic [ref=e60]: Current Dimension
-            - generic [ref=e63]: 4D
-            - generic [ref=e64]: Network
+            - generic [ref=e63]: 6D
+            - generic [ref=e64]: Intelligence
           - generic [ref=e65]:
             - generic [ref=e66]: Iterations
             - generic [ref=e67]: "25"
             - generic [ref=e68]: Total executed
           - generic [ref=e69]:
             - generic [ref=e70]: Self-Modifications
-            - generic [ref=e71]: "3"
+            - generic [ref=e71]: "4"
             - generic [ref=e72]: Dynamic changes
           - generic [ref=e73]:
             - generic [ref=e74]: Total Objects
-            - generic [ref=e75]: "138"
+            - generic [ref=e75]: "278"
             - generic [ref=e76]: In JSONL file
         - generic [ref=e78]:
           - generic [ref=e79]: Dimensional Progression
@@ -171,7 +171,7 @@
               - generic [ref=e232]: Status:idle
               - generic [ref=e233]:
                 - text: "Dimension:"
-                - generic [ref=e234]: 4D
+                - generic [ref=e234]: 6D
               - generic [ref=e235]: Iterations:25
   - contentinfo [ref=e236]:
     - generic [ref=e238]:

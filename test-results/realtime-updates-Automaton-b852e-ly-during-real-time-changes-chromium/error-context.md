@@ -35,19 +35,19 @@
         - generic [ref=e58]:
           - generic [ref=e59]:
             - generic [ref=e60]: Current Dimension
-            - generic [ref=e63]: 2D
-            - generic [ref=e64]: Pair
+            - generic [ref=e63]: 0D
+            - generic [ref=e64]: Identity
           - generic [ref=e65]:
             - generic [ref=e66]: Iterations
             - generic [ref=e67]: "9"
             - generic [ref=e68]: Total executed
           - generic [ref=e69]:
             - generic [ref=e70]: Self-Modifications
-            - generic [ref=e71]: "2"
+            - generic [ref=e71]: "3"
             - generic [ref=e72]: Dynamic changes
           - generic [ref=e73]:
             - generic [ref=e74]: Total Objects
-            - generic [ref=e75]: "137"
+            - generic [ref=e75]: "282"
             - generic [ref=e76]: In JSONL file
         - generic [ref=e78]:
           - generic [ref=e79]: Dimensional Progression
@@ -171,7 +171,7 @@
               - generic [ref=e233]: Status:running
               - generic [ref=e234]:
                 - text: "Dimension:"
-                - generic [ref=e235]: 2D
+                - generic [ref=e235]: 0D
               - generic [ref=e236]: Iterations:9
   - contentinfo [ref=e237]:
     - generic [ref=e239]:

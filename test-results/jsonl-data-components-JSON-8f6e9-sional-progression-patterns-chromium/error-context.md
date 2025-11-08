@@ -35,19 +35,19 @@
         - generic [ref=e58]:
           - generic [ref=e59]:
             - generic [ref=e60]: Current Dimension
-            - generic [ref=e63]: 6D
-            - generic [ref=e64]: Intelligence
+            - generic [ref=e63]: 4D
+            - generic [ref=e64]: Network
           - generic [ref=e65]:
             - generic [ref=e66]: Iterations
-            - generic [ref=e67]: "51"
+            - generic [ref=e67]: "50"
             - generic [ref=e68]: Total executed
           - generic [ref=e69]:
             - generic [ref=e70]: Self-Modifications
-            - generic [ref=e71]: "5"
+            - generic [ref=e71]: "7"
             - generic [ref=e72]: Dynamic changes
           - generic [ref=e73]:
             - generic [ref=e74]: Total Objects
-            - generic [ref=e75]: "126"
+            - generic [ref=e75]: "277"
             - generic [ref=e76]: In JSONL file
         - generic [ref=e78]:
           - generic [ref=e79]: Dimensional Progression
@@ -64,7 +64,7 @@
             - text: Configure
         - generic [ref=e106]:
           - generic [ref=e107]: Last Action
-          - generic [ref=e108]: validate-self
+          - generic [ref=e108]: evolve
         - generic [ref=e109]:
           - generic [ref=e110]: "Mode:"
           - generic [ref=e111]:
@@ -171,8 +171,8 @@
               - generic [ref=e233]: Status:running
               - generic [ref=e234]:
                 - text: "Dimension:"
-                - generic [ref=e235]: 6D
-              - generic [ref=e236]: Iterations:51
+                - generic [ref=e235]: 4D
+              - generic [ref=e236]: Iterations:50
   - contentinfo [ref=e237]:
     - generic [ref=e239]:
       - generic [ref=e240]: Self-Referencing JSONL Automaton • 8-Dimensional Church Encoding
