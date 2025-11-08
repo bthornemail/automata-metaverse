@@ -1,0 +1,12 @@
+{"id":"h:0D-system→0D-system-r5rs","fromNode":"0D-system","fromSide":"right","toNode":"0D-system-r5rs","toSide":"left","label":"Church encoding → R5RS implementation","function":"r5rs:church-zero","args":[]}
+{"id":"h:1D-system→1D-system-r5rs","fromNode":"1D-system","fromSide":"right","toNode":"1D-system-r5rs","toSide":"left","label":"Successor → JSONL parser","function":"r5rs:church-succ","args":[]}
+{"id":"h:2D-system→2D-topology-r5rs","fromNode":"2D-system","fromSide":"right","toNode":"2D-topology-r5rs","toSide":"left","label":"Pairs → RDF triples","function":"r5rs:jsonl-to-rdf","args":["facts"]}
+{"id":"h:2D-system→2D-topology-system","fromNode":"2D-system","fromSide":"bottom","toNode":"2D-topology-system","toSide":"top","label":"Pairs → M/S expressions","function":"r5rs:m->s","args":["expr","mappings"]}
+{"id":"h:3D-algebra→3D-topology-r5rs","fromNode":"3D-algebra","fromSide":"right","toNode":"3D-topology-r5rs","toSide":"left","label":"Algebra → OWL reasoning","function":"r5rs:owl-entail","args":["triples"]}
+{"id":"h:3D-analysis→3D-topology-r5rs","fromNode":"3D-analysis","fromSide":"right","toNode":"3D-topology-r5rs","toSide":"left","label":"Fixed-point → SHACL validation","function":"r5rs:shacl-validate","args":["shapes","triples"]}
+{"id":"h:4D-network→4D-system-r5rs","fromNode":"4D-network","fromSide":"right","toNode":"4D-system-r5rs","toSide":"left","label":"Network → Logic programming","function":"r5rs:prolog-query","args":["db","goal"]}
+{"id":"h:5D-consensus→5D-system-r5rs","fromNode":"5D-consensus","fromSide":"right","toNode":"5D-system-r5rs","toSide":"left","label":"Consensus → REPL interface","function":"r5rs:handle-query-command","args":["query-str","facts","triples"]}
+{"id":"h:6D-intelligence→6D-system-r5rs","fromNode":"6D-intelligence","fromSide":"right","toNode":"6D-system-r5rs","toSide":"left","label":"AI → Attention mechanism","function":"r5rs:attention","args":["Q","K","V"]}
+{"id":"h:7D-quantum→6D-system-r5rs","fromNode":"7D-quantum","fromSide":"right","toNode":"6D-system-r5rs","toSide":"left","label":"Quantum → Qubit operations","function":"r5rs:qubit","args":["alpha","beta"]}
+{"id":"h:7D-quantum→7D-topology-system","fromNode":"7D-quantum","fromSide":"bottom","toNode":"7D-topology-system","toSide":"top","label":"Quantum → Function registry","function":"r5rs:invoke-from-jsonl","args":["func-name","args","context"]}
+{"id":"v:0D-system→0D-system-r5rs","fromNode":"0D-system","fromSide":"bottom","toNode":"0D-system-r5rs","toSide":"top","label":"implementation layer"}

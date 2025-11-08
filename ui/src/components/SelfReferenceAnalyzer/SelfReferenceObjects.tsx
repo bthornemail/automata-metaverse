@@ -69,10 +69,16 @@ export const SelfReferenceObjects: React.FC<SelfReferenceObjectsProps> = ({
     return null;
   }).filter(Boolean) as Array<SelfReferenceObject & { source: 'modification' | 'execution'; timestamp: number }>;
 
-  // Combine active activities
+  // Combine active activities with deduplication
+  const seenActivityIds = new Set<string>();
   const activeActivities = [
     ...modifications
-      .filter(mod => !closedActivities.has(`${mod.type}-${mod.timestamp}`))
+      .filter(mod => {
+        const id = `${mod.type}-${mod.timestamp}`;
+        if (closedActivities.has(id) || seenActivityIds.has(id)) return false;
+        seenActivityIds.add(id);
+        return true;
+      })
       .map(mod => ({
         type: 'modification' as const,
         title: mod.type,
@@ -84,7 +90,12 @@ export const SelfReferenceObjects: React.FC<SelfReferenceObjectsProps> = ({
         id: `${mod.type}-${mod.timestamp}`
       })),
     ...executionHistory
-      .filter(exec => !closedActivities.has(`${exec.action}-${exec.timestamp}`))
+      .filter(exec => {
+        const id = `${exec.action}-${exec.timestamp}`;
+        if (closedActivities.has(id) || seenActivityIds.has(id)) return false;
+        seenActivityIds.add(id);
+        return true;
+      })
       .map(exec => ({
         type: 'execution' as const,
         title: exec.actionDisplay,
@@ -97,14 +108,25 @@ export const SelfReferenceObjects: React.FC<SelfReferenceObjectsProps> = ({
       }))
   ].sort((a, b) => b.timestamp - a.timestamp);
 
-  // Combine all self-reference objects (original + closed activities)
+  // Combine all self-reference objects (original + closed activities) with deduplication
+  const seenIds = new Set<string>();
   const allSelfRefs = [
-    ...selfRefObjects,
-    ...closedActivityRefs.map(ref => ({
-      id: ref.id,
-      text: ref.text,
-      line: ref.line
-    }))
+    ...selfRefObjects.filter(ref => {
+      if (seenIds.has(ref.id)) return false;
+      seenIds.add(ref.id);
+      return true;
+    }),
+    ...closedActivityRefs
+      .map(ref => ({
+        id: ref.id,
+        text: ref.text,
+        line: ref.line
+      }))
+      .filter(ref => {
+        if (seenIds.has(ref.id)) return false;
+        seenIds.add(ref.id);
+        return true;
+      })
   ];
 
   const handleCloseActivity = (activityId: string) => {

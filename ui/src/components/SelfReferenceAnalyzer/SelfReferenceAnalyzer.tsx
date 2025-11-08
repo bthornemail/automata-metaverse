@@ -5,6 +5,7 @@ import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip
 import { SelfReferenceData } from '@/types';
 import { apiService } from '@/services/api';
 import { useExecutionHistory } from '@/hooks/useExecutionHistory';
+import { integrityService, IntegrityResult } from '@/services/integrity-service';
 import { Card } from '@/components/shared/Card';
 import { SelfReferenceObjects } from './SelfReferenceObjects';
 import { DimensionalOverview } from './DimensionalOverview';
@@ -25,6 +26,8 @@ const SelfReferenceAnalyzer: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState<AnalyzerTab>('self-reference');
+  const [integrityResult, setIntegrityResult] = useState<IntegrityResult | null>(null);
+  const [integrityLoading, setIntegrityLoading] = useState(false);
 
   const loadAnalysis = async () => {
     try {
@@ -45,9 +48,38 @@ const SelfReferenceAnalyzer: React.FC = () => {
     }
   };
 
+  const validateIntegrity = async () => {
+    try {
+      setIntegrityLoading(true);
+      const result = await integrityService.validateIntegrity();
+      setIntegrityResult(result);
+      
+      // Update data with integrity result
+      setData(prev => ({
+        ...prev,
+        integrity: {
+          valid: result.valid,
+          issues: result.issues,
+        },
+      }));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to validate integrity');
+    } finally {
+      setIntegrityLoading(false);
+    }
+  };
+
   useEffect(() => {
     loadAnalysis();
     historyActions.loadHistory();
+    validateIntegrity();
+    
+    // Re-validate integrity every 30 seconds
+    const interval = setInterval(() => {
+      validateIntegrity();
+    }, 30000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   const filteredSelfRefs = data.selfRefObjects.filter(ref =>
@@ -108,12 +140,15 @@ const SelfReferenceAnalyzer: React.FC = () => {
         
         <div className="flex gap-2">
           <button
-            onClick={loadAnalysis}
-            disabled={loading}
+            onClick={() => {
+              loadAnalysis();
+              validateIntegrity();
+            }}
+            disabled={loading || integrityLoading}
             className="control-button bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
           >
             <Zap className="w-4 h-4" />
-            {loading ? 'Analyzing...' : 'Refresh'}
+            {loading || integrityLoading ? 'Analyzing...' : 'Refresh'}
           </button>
           
           {activeTab === 'execution-history' && (
@@ -175,7 +210,12 @@ const SelfReferenceAnalyzer: React.FC = () => {
             <Card title="Integrity Status">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  {data.integrity.valid ? (
+                  {integrityLoading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#6366f1]"></div>
+                      <span className="text-gray-400 font-medium">Validating...</span>
+                    </>
+                  ) : (integrityResult?.valid ?? data.integrity.valid) ? (
                     <>
                       <CheckCircle className="w-5 h-5 text-green-500" />
                       <span className="text-green-400 font-medium">Valid</span>
@@ -187,16 +227,68 @@ const SelfReferenceAnalyzer: React.FC = () => {
                     </>
                   )}
                 </div>
+                <button
+                  onClick={validateIntegrity}
+                  disabled={integrityLoading}
+                  className="text-xs px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-gray-300 disabled:opacity-50"
+                >
+                  {integrityLoading ? 'Validating...' : 'Re-validate'}
+                </button>
               </div>
+
+              {/* Validation Checks */}
+              {integrityResult && (
+                <div className="mb-3 grid grid-cols-2 md:grid-cols-4 gap-2">
+                  <div className={`text-xs px-2 py-1 rounded ${integrityResult.checks.structure ? 'bg-green-900/50 text-green-400' : 'bg-red-900/50 text-red-400'}`}>
+                    Structure: {integrityResult.checks.structure ? '✓' : '✗'}
+                  </div>
+                  <div className={`text-xs px-2 py-1 rounded ${integrityResult.checks.selfReference ? 'bg-green-900/50 text-green-400' : 'bg-red-900/50 text-red-400'}`}>
+                    Self-Ref: {integrityResult.checks.selfReference ? '✓' : '✗'}
+                  </div>
+                  <div className={`text-xs px-2 py-1 rounded ${integrityResult.checks.rdf ? 'bg-green-900/50 text-green-400' : 'bg-red-900/50 text-red-400'}`}>
+                    RDF: {integrityResult.checks.rdf ? '✓' : '✗'}
+                  </div>
+                  <div className={`text-xs px-2 py-1 rounded ${integrityResult.checks.shacl ? 'bg-green-900/50 text-green-400' : 'bg-red-900/50 text-red-400'}`}>
+                    SHACL: {integrityResult.checks.shacl ? '✓' : '✗'}
+                  </div>
+                </div>
+              )}
               
-              {!data.integrity.valid && data.integrity.issues.length > 0 && (
-                <div className="space-y-2">
-                  {data.integrity.issues.map((issue, index) => (
-                    <div key={index} className="text-sm text-red-300 flex items-start gap-2">
-                      <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                      {issue}
+              {/* Issues List */}
+              {(integrityResult?.details.length ?? data.integrity.issues.length) > 0 && (
+                <div className="space-y-2 max-h-48 overflow-y-auto">
+                  {(integrityResult?.details || data.integrity.issues.map((msg, i) => ({ severity: 'error' as const, message: msg }))).map((issue, index) => (
+                    <div 
+                      key={index} 
+                      className={`text-sm flex items-start gap-2 ${
+                        issue.severity === 'error' ? 'text-red-300' : 
+                        issue.severity === 'warning' ? 'text-yellow-300' : 
+                        'text-blue-300'
+                      }`}
+                    >
+                      <AlertCircle className={`w-4 h-4 mt-0.5 flex-shrink-0 ${
+                        issue.severity === 'error' ? 'text-red-500' : 
+                        issue.severity === 'warning' ? 'text-yellow-500' : 
+                        'text-blue-500'
+                      }`} />
+                      <div className="flex-1">
+                        <div>{issue.message}</div>
+                        {issue.component && (
+                          <div className="text-xs opacity-75 mt-0.5">
+                            Component: {issue.component}
+                            {issue.line && ` • Line ${issue.line}`}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   ))}
+                </div>
+              )}
+              
+              {(!integrityResult || integrityResult.details.length === 0) && data.integrity.valid && (
+                <div className="text-sm text-green-400 flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4" />
+                  All integrity checks passed
                 </div>
               )}
             </Card>

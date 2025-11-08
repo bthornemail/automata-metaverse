@@ -12,6 +12,8 @@ export const useAutomatonActions = () => {
   const setLoading = useStore((state) => state.setLoading);
   const setError = useStore((state) => state.setError);
   const addNotification = useStore((state) => state.addNotification);
+  const addExecutionEntry = useStore((state) => state.addExecutionEntry);
+  const getStatus = useStore((state) => state.status);
 
   const startAutomaton = useCallback(async (params?: { intervalMs?: number; maxIterations?: number }) => {
     setLoading('start', true);
@@ -20,6 +22,15 @@ export const useAutomatonActions = () => {
     try {
       const response = await unifiedApi.startAutomaton(params);
       if (response.success) {
+        // Track execution
+        addExecutionEntry({
+          action: 'start-automaton',
+          timestamp: Date.now(),
+          from: getStatus.status || 'idle',
+          to: 'running',
+          iteration: getStatus.iterationCount || 0,
+        });
+        
         addNotification({
           type: 'success',
           message: 'Automaton started',
@@ -44,7 +55,7 @@ export const useAutomatonActions = () => {
     } finally {
       setLoading('start', false);
     }
-  }, [setLoading, setError, addNotification]);
+  }, [setLoading, setError, addNotification, addExecutionEntry, getStatus]);
 
   const stopAutomaton = useCallback(async () => {
     setLoading('stop', true);
@@ -53,6 +64,15 @@ export const useAutomatonActions = () => {
     try {
       const response = await unifiedApi.stopAutomaton();
       if (response.success) {
+        // Track execution
+        addExecutionEntry({
+          action: 'stop-automaton',
+          timestamp: Date.now(),
+          from: getStatus.status || 'running',
+          to: 'idle',
+          iteration: getStatus.iterationCount || 0,
+        });
+        
         addNotification({
           type: 'success',
           message: 'Automaton stopped',
@@ -67,7 +87,7 @@ export const useAutomatonActions = () => {
     } finally {
       setLoading('stop', false);
     }
-  }, [setLoading, setError, addNotification]);
+  }, [setLoading, setError, addNotification, addExecutionEntry, getStatus]);
 
   const resetAutomaton = useCallback(async () => {
     setLoading('reset', true);
@@ -104,6 +124,20 @@ export const useAutomatonActions = () => {
     try {
       const response = await unifiedApi.executeAction(action, params);
       if (response.success) {
+        // Track execution with validated entry
+        const executionEntry = {
+          action: `execute-${action}`,
+          timestamp: Date.now(),
+          from: getStatus.status || 'idle',
+          to: 'executed',
+          iteration: getStatus.iterationCount || 0,
+        };
+        
+        // Ensure entry is a valid object before adding
+        if (executionEntry && typeof executionEntry === 'object' && !Array.isArray(executionEntry)) {
+          addExecutionEntry(executionEntry);
+        }
+        
         addNotification({
           type: 'success',
           message: `Action "${action}" executed`,
@@ -118,7 +152,7 @@ export const useAutomatonActions = () => {
     } finally {
       setLoading(`action-${action}`, false);
     }
-  }, [setLoading, setError, addNotification]);
+  }, [setLoading, setError, addNotification, addExecutionEntry, getStatus]);
 
   const setDimension = useCallback(async (dimension: number) => {
     setLoading('dimension', true);
@@ -127,6 +161,15 @@ export const useAutomatonActions = () => {
     try {
       const response = await unifiedApi.setDimension(dimension);
       if (response.success) {
+        // Track execution
+        addExecutionEntry({
+          action: 'set-dimension',
+          timestamp: Date.now(),
+          from: getStatus.currentDimension?.toString() || '0',
+          to: dimension.toString(),
+          iteration: getStatus.iterationCount || 0,
+        });
+        
         addNotification({
           type: 'success',
           message: `Dimension set to ${dimension}D`,
@@ -141,7 +184,7 @@ export const useAutomatonActions = () => {
     } finally {
       setLoading('dimension', false);
     }
-  }, [setLoading, setError, addNotification]);
+  }, [setLoading, setError, addNotification, addExecutionEntry, getStatus]);
 
   return {
     startAutomaton,

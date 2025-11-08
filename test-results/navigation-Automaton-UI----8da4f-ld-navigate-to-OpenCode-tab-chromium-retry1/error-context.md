@@ -1,0 +1,84 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e6]:
+      - heading "Self-Referencing Automaton Interface" [level=1] [ref=e7]: Self-Referencing Automaton Interface
+      - generic [ref=e10]: "Phase 3: Quantum Visualization"
+  - generic [ref=e14]:
+    - button "Overview" [ref=e15] [cursor=pointer]:
+      - img [ref=e16]
+      - text: Overview
+    - button "Self-Reference" [ref=e18] [cursor=pointer]:
+      - img [ref=e19]
+      - text: Self-Reference
+    - button "History" [ref=e22] [cursor=pointer]:
+      - img [ref=e23]
+      - text: History
+    - button "Agents" [ref=e27] [cursor=pointer]:
+      - img [ref=e28]
+      - text: Agents
+    - button "Quantum" [ref=e30] [cursor=pointer]:
+      - img [ref=e31]
+      - text: Quantum
+    - button "Animations" [ref=e33] [cursor=pointer]:
+      - img [ref=e34]
+      - text: Animations
+    - button "WebGL 3D" [ref=e36] [cursor=pointer]:
+      - img [ref=e37]
+      - text: WebGL 3D
+    - button "Multiplayer" [ref=e40] [cursor=pointer]:
+      - img [ref=e41]
+      - text: Multiplayer
+    - button "AI Evolution" [ref=e44] [cursor=pointer]:
+      - img [ref=e45]
+      - text: AI Evolution
+    - button "Metaverse" [ref=e48] [cursor=pointer]:
+      - img [ref=e49]
+      - text: Metaverse
+    - button "OpenCode" [active] [ref=e52] [cursor=pointer]:
+      - img [ref=e53]
+      - text: OpenCode
+    - button "Config" [ref=e56] [cursor=pointer]:
+      - img [ref=e57]
+      - text: Config
+  - main [ref=e68]:
+    - generic [ref=e70]:
+      - generic [ref=e71]:
+        - generic [ref=e72]:
+          - img [ref=e73]
+          - heading "OpenCode Editor" [level=2] [ref=e76]
+          - generic [ref=e77]:
+            - img [ref=e78]
+            - generic [ref=e80]: Disconnected
+        - generic [ref=e81]:
+          - button "Analyze" [ref=e82] [cursor=pointer]:
+            - img [ref=e83]
+            - generic [ref=e86]: Analyze
+          - button "Run" [ref=e87] [cursor=pointer]:
+            - img [ref=e88]
+            - generic [ref=e90]: Run
+      - generic [ref=e91]:
+        - generic [ref=e92]:
+          - generic [ref=e93]:
+            - generic [ref=e94]: JavaScript Editor
+            - generic [ref=e95]: CodeMirror 6
+          - textbox [ref=e99]:
+            - generic [ref=e100]: // Welcome to OpenCode Editor with AI Agents
+            - generic [ref=e101]: // Start typing your code here...
+            - generic [ref=e103]: "function fibonacci(n) {"
+            - generic [ref=e104]: if (n <= 1) return n;
+            - generic [ref=e105]: return fibonacci(n - 1) + fibonacci(n - 2);
+            - generic [ref=e106]: "}"
+            - generic [ref=e108]: console.log(fibonacci(10));
+        - generic [ref=e110]:
+          - button "Analysis" [ref=e111] [cursor=pointer]
+          - button "AI Agents" [ref=e112] [cursor=pointer]
+          - button [ref=e113] [cursor=pointer]:
+            - img [ref=e114]
+  - contentinfo [ref=e117]:
+    - generic [ref=e119]:
+      - generic [ref=e120]: Self-Referencing JSONL Automaton • 8-Dimensional Church Encoding
+      - generic [ref=e121]: Meta-Circular Evaluator • Quantum Visualization & Advanced Analytics
+```

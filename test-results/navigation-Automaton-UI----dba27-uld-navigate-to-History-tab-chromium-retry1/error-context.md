@@ -1,0 +1,219 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e6]:
+      - heading "Self-Referencing Automaton Interface" [level=1] [ref=e7]: Self-Referencing Automaton Interface
+      - generic [ref=e10]: "Phase 3: Quantum Visualization"
+  - generic [ref=e14]:
+    - button "Overview" [ref=e15] [cursor=pointer]:
+      - img [ref=e16]
+      - text: Overview
+    - button "Self-Reference" [ref=e18] [cursor=pointer]:
+      - img [ref=e19]
+      - text: Self-Reference
+    - button "History" [active] [ref=e22] [cursor=pointer]:
+      - img [ref=e23]
+      - text: History
+    - button "Agents" [ref=e27] [cursor=pointer]:
+      - img [ref=e28]
+      - text: Agents
+    - button "Quantum" [ref=e30] [cursor=pointer]:
+      - img [ref=e31]
+      - text: Quantum
+    - button "Animations" [ref=e33] [cursor=pointer]:
+      - img [ref=e34]
+      - text: Animations
+    - button "WebGL 3D" [ref=e36] [cursor=pointer]:
+      - img [ref=e37]
+      - text: WebGL 3D
+    - button "Multiplayer" [ref=e40] [cursor=pointer]:
+      - img [ref=e41]
+      - text: Multiplayer
+    - button "AI Evolution" [ref=e44] [cursor=pointer]:
+      - img [ref=e45]
+      - text: AI Evolution
+    - button "Metaverse" [ref=e48] [cursor=pointer]:
+      - img [ref=e49]
+      - text: Metaverse
+    - button "OpenCode" [ref=e52] [cursor=pointer]:
+      - img [ref=e53]
+      - text: OpenCode
+    - button "Config" [ref=e56] [cursor=pointer]:
+      - img [ref=e57]
+      - text: Config
+  - main [ref=e68]:
+    - generic [ref=e70]:
+      - generic [ref=e71]:
+        - heading "Execution History & Analysis" [level=3] [ref=e72]:
+          - img [ref=e73]
+          - text: Execution History & Analysis
+        - generic [ref=e77]:
+          - button "Refresh" [ref=e78] [cursor=pointer]:
+            - img [ref=e79]
+            - text: Refresh
+          - button "Clear" [ref=e81] [cursor=pointer]:
+            - img [ref=e82]
+            - text: Clear
+      - generic [ref=e85]:
+        - button "Timeline" [ref=e86] [cursor=pointer]:
+          - img [ref=e87]
+          - text: Timeline
+        - button "Action Frequency" [ref=e90] [cursor=pointer]:
+          - img [ref=e91]
+          - text: Action Frequency
+        - button "Dimensional Progression" [ref=e93] [cursor=pointer]:
+          - img [ref=e94]
+          - text: Dimensional Progression
+        - button "Performance" [ref=e97] [cursor=pointer]:
+          - img [ref=e98]
+          - text: Performance
+      - generic [ref=e101]:
+        - heading "Recent Execution Timeline" [level=4] [ref=e102]
+        - generic [ref=e103]:
+          - generic [ref=e105]:
+            - generic [ref=e106]:
+              - generic [ref=e107]: self io
+              - generic [ref=e108]: 4D → 4D
+            - generic [ref=e109]:
+              - generic [ref=e110]: Iteration 67
+              - generic [ref=e111]: 3:23:29 AM
+          - generic [ref=e113]:
+            - generic [ref=e114]:
+              - generic [ref=e115]: evolve
+              - generic [ref=e116]: 4D → 6D
+            - generic [ref=e117]:
+              - generic [ref=e118]: Iteration 68
+              - generic [ref=e119]: 3:23:31 AM
+          - generic [ref=e121]:
+            - generic [ref=e122]:
+              - generic [ref=e123]: evolve
+              - generic [ref=e124]: 6D → 0D
+            - generic [ref=e125]:
+              - generic [ref=e126]: Iteration 69
+              - generic [ref=e127]: 3:23:33 AM
+          - generic [ref=e129]:
+            - generic [ref=e130]:
+              - generic [ref=e131]: evolve
+              - generic [ref=e132]: 0D → 2D
+            - generic [ref=e133]:
+              - generic [ref=e134]: Iteration 70
+              - generic [ref=e135]: 3:23:35 AM
+          - generic [ref=e137]:
+            - generic [ref=e138]:
+              - generic [ref=e139]: self modify
+              - generic [ref=e140]: 2D → 2D
+            - generic [ref=e141]:
+              - generic [ref=e142]: Iteration 71
+              - generic [ref=e143]: 3:23:37 AM
+          - generic [ref=e145]:
+            - generic [ref=e146]:
+              - generic [ref=e147]: self modify
+              - generic [ref=e148]: 2D → 2D
+            - generic [ref=e149]:
+              - generic [ref=e150]: Iteration 72
+              - generic [ref=e151]: 3:23:39 AM
+          - generic [ref=e153]:
+            - generic [ref=e154]:
+              - generic [ref=e155]: self modify
+              - generic [ref=e156]: 2D → 2D
+            - generic [ref=e157]:
+              - generic [ref=e158]: Iteration 73
+              - generic [ref=e159]: 3:23:41 AM
+          - generic [ref=e161]:
+            - generic [ref=e162]:
+              - generic [ref=e163]: self modify
+              - generic [ref=e164]: 2D → 2D
+            - generic [ref=e165]:
+              - generic [ref=e166]: Iteration 74
+              - generic [ref=e167]: 3:23:43 AM
+          - generic [ref=e169]:
+            - generic [ref=e170]:
+              - generic [ref=e171]: evolve
+              - generic [ref=e172]: 2D → 4D
+            - generic [ref=e173]:
+              - generic [ref=e174]: Iteration 75
+              - generic [ref=e175]: 3:23:45 AM
+          - generic [ref=e177]:
+            - generic [ref=e178]:
+              - generic [ref=e179]: evolve
+              - generic [ref=e180]: 4D → 6D
+            - generic [ref=e181]:
+              - generic [ref=e182]: Iteration 76
+              - generic [ref=e183]: 3:23:47 AM
+          - generic [ref=e185]:
+            - generic [ref=e186]:
+              - generic [ref=e187]: evolve
+              - generic [ref=e188]: 6D → 0D
+            - generic [ref=e189]:
+              - generic [ref=e190]: Iteration 77
+              - generic [ref=e191]: 3:23:55 AM
+          - generic [ref=e193]:
+            - generic [ref=e194]:
+              - generic [ref=e195]: self io
+              - generic [ref=e196]: 0D → 0D
+            - generic [ref=e197]:
+              - generic [ref=e198]: Iteration 78
+              - generic [ref=e199]: 3:23:57 AM
+          - generic [ref=e201]:
+            - generic [ref=e202]:
+              - generic [ref=e203]: self reference
+              - generic [ref=e204]: 0D → 0D
+            - generic [ref=e205]:
+              - generic [ref=e206]: Iteration 79
+              - generic [ref=e207]: 3:23:59 AM
+          - generic [ref=e209]:
+            - generic [ref=e210]:
+              - generic [ref=e211]: evolve
+              - generic [ref=e212]: 0D → 2D
+            - generic [ref=e213]:
+              - generic [ref=e214]: Iteration 80
+              - generic [ref=e215]: 3:24:01 AM
+          - generic [ref=e217]:
+            - generic [ref=e218]:
+              - generic [ref=e219]: self modify
+              - generic [ref=e220]: 2D → 2D
+            - generic [ref=e221]:
+              - generic [ref=e222]: Iteration 81
+              - generic [ref=e223]: 3:24:03 AM
+          - generic [ref=e225]:
+            - generic [ref=e226]:
+              - generic [ref=e227]: evolve
+              - generic [ref=e228]: 2D → 4D
+            - generic [ref=e229]:
+              - generic [ref=e230]: Iteration 82
+              - generic [ref=e231]: 3:24:05 AM
+          - generic [ref=e233]:
+            - generic [ref=e234]:
+              - generic [ref=e235]: evolve
+              - generic [ref=e236]: 4D → 6D
+            - generic [ref=e237]:
+              - generic [ref=e238]: Iteration 83
+              - generic [ref=e239]: 3:24:07 AM
+          - generic [ref=e241]:
+            - generic [ref=e242]:
+              - generic [ref=e243]: evolve
+              - generic [ref=e244]: 6D → 0D
+            - generic [ref=e245]:
+              - generic [ref=e246]: Iteration 84
+              - generic [ref=e247]: 3:24:11 AM
+          - generic [ref=e249]:
+            - generic [ref=e250]:
+              - generic [ref=e251]: evolve
+              - generic [ref=e252]: 0D → 2D
+            - generic [ref=e253]:
+              - generic [ref=e254]: Iteration 85
+              - generic [ref=e255]: 3:24:13 AM
+          - generic [ref=e257]:
+            - generic [ref=e258]:
+              - generic [ref=e259]: self modify
+              - generic [ref=e260]: 2D → 2D
+            - generic [ref=e261]:
+              - generic [ref=e262]: Iteration 86
+              - generic [ref=e263]: 3:24:15 AM
+  - contentinfo [ref=e264]:
+    - generic [ref=e266]:
+      - generic [ref=e267]: Self-Referencing JSONL Automaton • 8-Dimensional Church Encoding
+      - generic [ref=e268]: Meta-Circular Evaluator • Quantum Visualization & Advanced Analytics
+```

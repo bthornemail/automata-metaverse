@@ -76,15 +76,35 @@ export async function loadJSONLFromBrowser(
         };
       }
       
-      const lines = text.trim().split('\n').filter(line => line.trim());
-      const data = lines.map((line, index) => {
+      // Ensure text is a string before splitting
+      if (typeof text !== 'string') {
+        console.warn(`[JSONL Loader] Expected string, got ${typeof text}`);
+        return {
+          data: [],
+          source: 'error',
+          filename,
+          itemCount: 0
+        };
+      }
+      
+      const lines = text.trim().split('\n').filter((line: string) => line && line.trim());
+      const data = lines.map((line: string, index: number) => {
         try {
-          return JSON.parse(line);
+          if (!line || typeof line !== 'string' || !line.trim()) {
+            return null;
+          }
+          const parsed = JSON.parse(line.trim());
+          // Ensure parsed result is an object
+          if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
+            return parsed;
+          }
+          console.warn(`[JSONL Loader] Line ${index + 1} parsed to non-object:`, typeof parsed);
+          return null;
         } catch (e) {
           console.warn(`[JSONL Loader] Failed to parse line ${index + 1}:`, e);
           return null;
         }
-      }).filter(Boolean);
+      }).filter((item): item is any => item !== null && typeof item === 'object');
 
       console.log(`[JSONL Loader] ✓ Loaded ${data.length} items from local file: ${filename}`);
       return {

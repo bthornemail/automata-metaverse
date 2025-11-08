@@ -1,0 +1,128 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e6]:
+      - heading "Self-Referencing Automaton Interface" [level=1] [ref=e7]: Self-Referencing Automaton Interface
+      - generic [ref=e10]: "Phase 3: Quantum Visualization"
+  - generic [ref=e14]:
+    - button "Overview" [ref=e15] [cursor=pointer]:
+      - img [ref=e16]
+      - text: Overview
+    - button "Self-Reference" [ref=e18] [cursor=pointer]:
+      - img [ref=e19]
+      - text: Self-Reference
+    - button "History" [ref=e22] [cursor=pointer]:
+      - img [ref=e23]
+      - text: History
+    - button "Agents" [ref=e27] [cursor=pointer]:
+      - img [ref=e28]
+      - text: Agents
+    - button "Quantum" [ref=e30] [cursor=pointer]:
+      - img [ref=e31]
+      - text: Quantum
+    - button "Animations" [ref=e33] [cursor=pointer]:
+      - img [ref=e34]
+      - text: Animations
+    - button "WebGL 3D" [ref=e36] [cursor=pointer]:
+      - img [ref=e37]
+      - text: WebGL 3D
+    - button "Multiplayer" [ref=e40] [cursor=pointer]:
+      - img [ref=e41]
+      - text: Multiplayer
+    - button "AI Evolution" [active] [ref=e44] [cursor=pointer]:
+      - img [ref=e45]
+      - text: AI Evolution
+    - button "Metaverse" [ref=e48] [cursor=pointer]:
+      - img [ref=e49]
+      - text: Metaverse
+    - button "OpenCode" [ref=e52] [cursor=pointer]:
+      - img [ref=e53]
+      - text: OpenCode
+    - button "Config" [ref=e56] [cursor=pointer]:
+      - img [ref=e57]
+      - text: Config
+  - main [ref=e68]:
+    - generic [ref=e70]:
+      - generic [ref=e72]:
+        - generic [ref=e73]:
+          - img [ref=e74]
+          - heading "WebLLM Evolution Engine" [level=3] [ref=e77]
+        - generic [ref=e79]:
+          - button [ref=e80] [cursor=pointer]:
+            - img [ref=e81]
+          - button [ref=e84] [cursor=pointer]:
+            - img [ref=e85]
+          - img [ref=e89] [cursor=pointer]
+      - generic [ref=e92]:
+        - generic [ref=e93]:
+          - generic [ref=e94]:
+            - generic [ref=e95]:
+              - heading "Evolution Controls" [level=4] [ref=e96]
+              - generic [ref=e97]:
+                - button "Start Evolution" [ref=e98] [cursor=pointer]:
+                  - img [ref=e99]
+                  - text: Start Evolution
+                - button [ref=e101] [cursor=pointer]:
+                  - img [ref=e102]
+            - generic [ref=e105]:
+              - button "Church Encoding" [ref=e106] [cursor=pointer]
+              - button "Dimensional" [ref=e107] [cursor=pointer]
+              - button "Topological" [ref=e108] [cursor=pointer]
+              - button "Self-Reference" [ref=e109] [cursor=pointer]
+          - generic [ref=e110]:
+            - heading "Evolution Metrics" [level=4] [ref=e111]
+            - generic [ref=e112]:
+              - generic [ref=e113]:
+                - generic [ref=e114]: "0"
+                - generic [ref=e115]: Total Mutations
+              - generic [ref=e116]:
+                - generic [ref=e117]: "0"
+                - generic [ref=e118]: Successful
+              - generic [ref=e119]:
+                - generic [ref=e120]: 0.0%
+                - generic [ref=e121]: Avg Confidence
+              - generic [ref=e122]:
+                - generic [ref=e123]: "0"
+                - generic [ref=e124]: Complexity
+              - generic [ref=e125]:
+                - generic [ref=e126]: "0"
+                - generic [ref=e127]: Novelty
+              - generic [ref=e128]:
+                - generic [ref=e129]: 0.0%
+                - generic [ref=e130]: Church Accuracy
+          - generic [ref=e131]:
+            - heading "Generated Mutations" [level=4] [ref=e132]
+            - generic [ref=e134]:
+              - img [ref=e135]
+              - paragraph [ref=e137]: No mutations generated yet
+              - paragraph [ref=e138]: Start evolution or generate mutations manually
+        - generic [ref=e139]:
+          - generic [ref=e140]:
+            - heading "Evolution Log" [level=4] [ref=e141]
+            - button [ref=e142] [cursor=pointer]:
+              - img [ref=e143]
+          - generic [ref=e146]:
+            - generic [ref=e147]: "[3:27:33 AM] Fallback to mock WebLLM implementation"
+            - generic [ref=e148]: "[3:27:32 AM] Failed to initialize WebLLM: ModelNotFoundError: Cannot find model record in appConfig for llama-2-7b-chat. Please check if the model ID is correct and included in the model_list configuration."
+          - generic [ref=e149]:
+            - heading "WebLLM Status" [level=5] [ref=e150]
+            - generic [ref=e151]:
+              - generic [ref=e152]:
+                - generic [ref=e153]: "Status:"
+                - generic [ref=e154]: Loaded
+              - generic [ref=e155]:
+                - generic [ref=e156]: "Model:"
+                - generic [ref=e157]: llama-2-7b-chat
+              - generic [ref=e158]:
+                - generic [ref=e159]: "Temperature:"
+                - generic [ref=e160]: "0.7"
+              - generic [ref=e161]:
+                - generic [ref=e162]: "Evolution:"
+                - generic [ref=e163]: Inactive
+  - contentinfo [ref=e164]:
+    - generic [ref=e166]:
+      - generic [ref=e167]: Self-Referencing JSONL Automaton • 8-Dimensional Church Encoding
+      - generic [ref=e168]: Meta-Circular Evaluator • Quantum Visualization & Advanced Analytics
+```

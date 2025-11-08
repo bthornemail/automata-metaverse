@@ -1,0 +1,107 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e6]:
+      - heading "Self-Referencing Automaton Interface" [level=1] [ref=e7]: Self-Referencing Automaton Interface
+      - generic [ref=e10]: "Phase 3: Quantum Visualization"
+  - generic [ref=e14]:
+    - button "Overview" [ref=e15] [cursor=pointer]:
+      - img [ref=e16]
+      - text: Overview
+    - button "Self-Reference" [ref=e18] [cursor=pointer]:
+      - img [ref=e19]
+      - text: Self-Reference
+    - button "History" [ref=e22] [cursor=pointer]:
+      - img [ref=e23]
+      - text: History
+    - button "Agents" [ref=e27] [cursor=pointer]:
+      - img [ref=e28]
+      - text: Agents
+    - button "Quantum" [ref=e30] [cursor=pointer]:
+      - img [ref=e31]
+      - text: Quantum
+    - button "Animations" [ref=e33] [cursor=pointer]:
+      - img [ref=e34]
+      - text: Animations
+    - button "WebGL 3D" [ref=e36] [cursor=pointer]:
+      - img [ref=e37]
+      - text: WebGL 3D
+    - button "Multiplayer" [ref=e40] [cursor=pointer]:
+      - img [ref=e41]
+      - text: Multiplayer
+    - button "AI Evolution" [ref=e44] [cursor=pointer]:
+      - img [ref=e45]
+      - text: AI Evolution
+    - button "Metaverse" [active] [ref=e48] [cursor=pointer]:
+      - img [ref=e49]
+      - text: Metaverse
+    - button "OpenCode" [ref=e52] [cursor=pointer]:
+      - img [ref=e53]
+      - text: OpenCode
+    - button "Config" [ref=e56] [cursor=pointer]:
+      - img [ref=e57]
+      - text: Config
+  - main [ref=e68]:
+    - generic [ref=e70]:
+      - generic [ref=e72]:
+        - heading "Church Encoding Metaverse" [level=3] [ref=e75]
+        - generic [ref=e77]:
+          - combobox [ref=e78]:
+            - option "Orbit Camera" [selected]
+            - option "Fly Camera"
+            - option "First Person"
+          - button "Hide Info" [ref=e79] [cursor=pointer]
+      - generic [ref=e80]:
+        - generic [ref=e85]:
+          - heading "Controls" [level=5] [ref=e86]
+          - generic [ref=e87]:
+            - generic [ref=e88]: "• Left Click + Drag: Rotate view"
+            - generic [ref=e89]: "• Right Click + Drag: Pan view"
+            - generic [ref=e90]: "• Scroll: Zoom in/out"
+            - generic [ref=e91]: "• Click nodes: Select and view details"
+        - generic [ref=e92]:
+          - heading "Dimensional Progression" [level=4] [ref=e93]
+          - generic [ref=e94]:
+            - generic [ref=e95]:
+              - generic [ref=e97]: "0D: Identity"
+              - generic [ref=e98]: λx.x
+            - generic [ref=e99]:
+              - generic [ref=e101]: "1D: Successor"
+              - generic [ref=e102]: λn.λf.λx.f(nfx)
+            - generic [ref=e103]:
+              - generic [ref=e105]: "2D: Pair"
+              - generic [ref=e107]: λx.λy.λf.fxy
+            - generic [ref=e108]:
+              - generic [ref=e110]: "3D: Addition"
+              - generic [ref=e111]: λm.λn.λf.λx.mf(nfx)
+            - generic [ref=e112]:
+              - generic [ref=e114]: "4D: Multiplication"
+              - generic [ref=e115]: λm.λn.λf.m(nf)
+            - generic [ref=e116]:
+              - generic [ref=e118]: "5D: Exponentiation"
+              - generic [ref=e119]: λm.λn.nm
+            - generic [ref=e120]:
+              - generic [ref=e122]: "6D: Y-Combinator"
+              - generic [ref=e123]: λf.(λx.f(xx))(λx.f(xx))
+          - generic [ref=e124]:
+            - heading "Current State" [level=5] [ref=e125]
+            - generic [ref=e126]:
+              - generic [ref=e127]:
+                - generic [ref=e128]: "Dimension:"
+                - generic [ref=e129]: 2D
+              - generic [ref=e130]:
+                - generic [ref=e131]: "Status:"
+                - generic [ref=e132]: idle
+              - generic [ref=e133]:
+                - generic [ref=e134]: "Objects:"
+                - generic [ref=e135]: "111"
+              - generic [ref=e136]:
+                - generic [ref=e137]: "Iterations:"
+                - generic [ref=e138]: "87"
+  - contentinfo [ref=e139]:
+    - generic [ref=e141]:
+      - generic [ref=e142]: Self-Referencing JSONL Automaton • 8-Dimensional Church Encoding
+      - generic [ref=e143]: Meta-Circular Evaluator • Quantum Visualization & Advanced Analytics
+```

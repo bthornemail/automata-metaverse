@@ -41,13 +41,66 @@ class LocalFileServiceImpl implements LocalFileService {
         if (contentType.includes('application/json')) {
           const data = await response.json();
           if (Array.isArray(data)) {
-            console.log(`✓ Loaded ${data.length} items from browser-side JSON: /jsonl/${file}`);
-            return data;
+            // Validate all entries are objects, not strings
+            const validated = data.filter((item): item is any => {
+              if (item === null || item === undefined) return false;
+              if (typeof item === 'string') {
+                // If it's a string, try to parse it
+                try {
+                  const parsed = JSON.parse(item);
+                  return typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed);
+                } catch {
+                  return false;
+                }
+              }
+              return typeof item === 'object' && !Array.isArray(item);
+            }).map(item => {
+              // Parse string entries
+              if (typeof item === 'string') {
+                try {
+                  return JSON.parse(item);
+                } catch {
+                  return null;
+                }
+              }
+              return item;
+            }).filter((item): item is any => item !== null);
+            console.log(`✓ Loaded ${validated.length} items from browser-side JSON: /jsonl/${file}`);
+            return validated;
           }
           // API response wrapper
-          if (data && typeof data === 'object' && 'success' in data && 'data' in data && Array.isArray(data.data)) {
-            console.log(`✓ Loaded ${data.data.length} items from browser-side API response: /jsonl/${file}`);
-            return data.data;
+          if (data && typeof data === 'object' && 'success' in data && 'data' in data) {
+            if (Array.isArray(data.data)) {
+              // Validate array entries
+              const validated = data.data.filter((item): item is any => {
+                if (item === null || item === undefined) return false;
+                if (typeof item === 'string') {
+                  try {
+                    const parsed = JSON.parse(item);
+                    return typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed);
+                  } catch {
+                    return false;
+                  }
+                }
+                return typeof item === 'object' && !Array.isArray(item);
+              }).map(item => {
+                if (typeof item === 'string') {
+                  try {
+                    return JSON.parse(item);
+                  } catch {
+                    return null;
+                  }
+                }
+                return item;
+              }).filter((item): item is any => item !== null);
+              console.log(`✓ Loaded ${validated.length} items from browser-side API response: /jsonl/${file}`);
+              return validated;
+            } else if (typeof data.data === 'string') {
+              // If data.data is a string (JSONL), parse it
+              const parsed = this.parseJSONL(data.data);
+              console.log(`✓ Parsed ${parsed.length} items from API JSONL string: /jsonl/${file}`);
+              return parsed;
+            }
           }
           console.warn(`Unexpected JSON response format for ${file}`);
           return [];
@@ -114,23 +167,81 @@ class LocalFileServiceImpl implements LocalFileService {
     });
   }
 
-  parseJSONL(text: string): any[] {
-    // Guard against non-string input
-    if (typeof text !== 'string') {
-      console.warn('parseJSONL received non-string input:', typeof text);
-      return Array.isArray(text) ? text : [];
+  parseJSONL(text: string | any[]): any[] {
+    // If already an array, validate and return it
+    if (Array.isArray(text)) {
+      // Validate array entries are objects (not strings that need parsing)
+      return text.filter((item): item is any => {
+        if (item === null || item === undefined) {
+          return false;
+        }
+        // If it's a string, try to parse it as JSON
+        if (typeof item === 'string') {
+          try {
+            const parsed = JSON.parse(item);
+            return typeof parsed === 'object' && parsed !== null;
+          } catch {
+            return false;
+          }
+        }
+        // Otherwise, ensure it's an object
+        return typeof item === 'object';
+      }).map(item => {
+        // If item is a string, parse it
+        if (typeof item === 'string') {
+          try {
+            return JSON.parse(item);
+          } catch {
+            return null;
+          }
+        }
+        return item;
+      }).filter((item): item is any => item !== null);
     }
     
-    const lines = text.trim().split('\n').filter(line => line.trim());
-    const data = lines.map((line, index) => {
-      try {
-        return JSON.parse(line);
-      } catch (e) {
-        console.warn(`Failed to parse JSONL line ${index + 1}:`, line.substring(0, 100));
-        return null;
+    // Guard against non-string input
+    if (typeof text !== 'string') {
+      console.warn('parseJSONL received non-string, non-array input:', typeof text, text);
+      return [];
+    }
+    
+    // Handle empty or whitespace-only strings
+    if (!text || !text.trim()) {
+      return [];
+    }
+    
+    try {
+      // Ensure text is a string before splitting
+      if (typeof text !== 'string') {
+        console.error('parseJSONL: Cannot split non-string:', typeof text);
+        return [];
       }
-    }).filter(Boolean);
-    return data;
+      
+      // Split by newlines and filter empty lines
+      const lines = text.trim().split('\n').filter((line: string) => line && line.trim());
+      const data = lines.map((line: string, index: number) => {
+        try {
+          // Skip empty lines
+          if (!line || typeof line !== 'string' || !line.trim()) {
+            return null;
+          }
+          const parsed = JSON.parse(line.trim());
+          // Ensure parsed result is an object
+          if (typeof parsed === 'object' && parsed !== null) {
+            return parsed;
+          }
+          console.warn(`Line ${index + 1} parsed to non-object:`, typeof parsed);
+          return null;
+        } catch (e) {
+          console.warn(`Failed to parse JSONL line ${index + 1}:`, line.substring(0, 100), e);
+          return null;
+        }
+      }).filter((item): item is any => item !== null && typeof item === 'object');
+      return data;
+    } catch (error) {
+      console.error('Error parsing JSONL:', error);
+      return [];
+    }
   }
 }
 

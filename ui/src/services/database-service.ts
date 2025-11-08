@@ -44,9 +44,39 @@ class DatabaseServiceImpl implements DatabaseService {
     // Try local file first (from public/jsonl/ directory)
     try {
       const data = await localFileService.loadFromPublic(file);
-      if (data.length > 0) {
-        console.log(`✓ Loaded ${data.length} items from local file: ${file}`);
-        return data;
+      // Ensure we always return an array of objects
+      if (Array.isArray(data)) {
+        // Validate all entries are objects
+        const validated = data.filter((item): item is any => {
+          if (item === null || item === undefined) return false;
+          // If it's a string, it needs parsing (shouldn't happen, but handle it)
+          if (typeof item === 'string') {
+            try {
+              const parsed = JSON.parse(item);
+              return typeof parsed === 'object' && parsed !== null;
+            } catch {
+              return false;
+            }
+          }
+          return typeof item === 'object';
+        }).map(item => {
+          // Parse string entries
+          if (typeof item === 'string') {
+            try {
+              return JSON.parse(item);
+            } catch {
+              return null;
+            }
+          }
+          return item;
+        }).filter((item): item is any => item !== null);
+        
+        if (validated.length > 0) {
+          console.log(`✓ Loaded ${validated.length} items from local file: ${file}`);
+          return validated;
+        }
+        console.log(`✓ Loaded empty array from local file: ${file}`);
+        return [];
       }
     } catch (localError) {
       console.log(`Local file not found (${file}), trying API...`);
@@ -55,9 +85,69 @@ class DatabaseServiceImpl implements DatabaseService {
     // Fallback to API (only if local fails)
     try {
       const response = await apiService.getJsonlFile(file);
-      if (response.success && response.data && Array.isArray(response.data)) {
-        console.log(`✓ Loaded ${response.data.length} items from API: ${file}`);
-        return response.data;
+      if (response.success && response.data) {
+        // Handle case where API returns a string (JSONL content)
+        if (typeof response.data === 'string') {
+          const parsed = localFileService.parseJSONL(response.data);
+          console.log(`✓ Parsed ${parsed.length} items from API JSONL string: ${file}`);
+          return parsed;
+        }
+        // Handle case where API returns an array
+        if (Array.isArray(response.data)) {
+          // Validate array entries
+          const validated = response.data.filter((item): item is any => {
+            if (item === null || item === undefined) return false;
+            if (typeof item === 'string') {
+              try {
+                const parsed = JSON.parse(item);
+                return typeof parsed === 'object' && parsed !== null;
+              } catch {
+                return false;
+              }
+            }
+            return typeof item === 'object';
+          }).map(item => {
+            if (typeof item === 'string') {
+              try {
+                return JSON.parse(item);
+              } catch {
+                return null;
+              }
+            }
+            return item;
+          }).filter((item): item is any => item !== null);
+          console.log(`✓ Loaded ${validated.length} items from API array: ${file}`);
+          return validated;
+        }
+        // Handle case where API returns wrapped data
+        if (response.data && typeof response.data === 'object' && 'data' in response.data) {
+          const wrappedData = response.data.data;
+          if (Array.isArray(wrappedData)) {
+            const validated = wrappedData.filter((item): item is any => {
+              if (item === null || item === undefined) return false;
+              if (typeof item === 'string') {
+                try {
+                  const parsed = JSON.parse(item);
+                  return typeof parsed === 'object' && parsed !== null;
+                } catch {
+                  return false;
+                }
+              }
+              return typeof item === 'object';
+            }).map(item => {
+              if (typeof item === 'string') {
+                try {
+                  return JSON.parse(item);
+                } catch {
+                  return null;
+                }
+              }
+              return item;
+            }).filter((item): item is any => item !== null);
+            console.log(`✓ Loaded ${validated.length} items from API wrapped response: ${file}`);
+            return validated;
+          }
+        }
       }
     } catch (apiError) {
       console.warn(`Failed to load from API: ${file}`, apiError);

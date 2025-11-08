@@ -31,13 +31,21 @@ export const useRealtimeUpdates = () => {
       to?: string;
       iteration?: number;
     }) => {
-      addExecutionEntry({
-        iteration: data.iteration || 0,
-        action: data.action,
-        from: data.from || '',
-        to: data.to || '',
-        timestamp: data.timestamp,
-      });
+      // Validate data before creating entry
+      if (data && typeof data === 'object' && !Array.isArray(data)) {
+        const validatedEntry = {
+          iteration: typeof data.iteration === 'number' ? data.iteration : 0,
+          action: typeof data.action === 'string' ? data.action : 'unknown',
+          from: typeof data.from === 'string' ? data.from : '',
+          to: typeof data.to === 'string' ? data.to : '',
+          timestamp: typeof data.timestamp === 'number' ? data.timestamp : Date.now(),
+        };
+        
+        // Ensure all fields are valid before adding
+        if (validatedEntry.action && validatedEntry.timestamp) {
+          addExecutionEntry(validatedEntry);
+        }
+      }
     });
 
     // Subscribe to self-modifications
@@ -50,10 +58,24 @@ export const useRealtimeUpdates = () => {
     });
 
     // Subscribe to errors
-    const unsubscribeError = componentBus.on('error', (error: string) => {
+    const unsubscribeError = componentBus.on('error', (error: string | Error | any) => {
+      // Safely convert error to string
+      let errorMessage: string;
+      if (typeof error === 'string') {
+        errorMessage = error;
+      } else if (error instanceof Error) {
+        errorMessage = error.message || String(error);
+      } else {
+        try {
+          errorMessage = String(error);
+        } catch (e) {
+          errorMessage = 'An error occurred';
+        }
+      }
+      
       addNotification({
         type: 'error',
-        message: error,
+        message: errorMessage,
         duration: 5000,
       });
     });

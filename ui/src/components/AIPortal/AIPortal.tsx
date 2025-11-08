@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Brain, MessageSquare, Send, Bot, User, Zap, Play, Pause, RotateCcw, 
   Settings, Download, Upload, Lightbulb, TrendingUp, Cpu, Code, Sparkles, X,
-  Sliders, FileText, BarChart3, Network, Cpu as CpuIcon, Maximize2, Minimize2
+  FileText, BarChart3, Network, Cpu as CpuIcon, Maximize2, Minimize2
 } from 'lucide-react';
 import { AgentChat } from '@/types';
 import { apiService } from '@/services/api';
@@ -12,6 +12,8 @@ import { Modal } from '@/components/shared/Modal';
 import { Card } from '@/components/shared/Card';
 import { nlpService } from '@/services/nlp-service';
 import { tinyMLService } from '@/services/tinyml-service';
+import { databaseService } from '@/services/database-service';
+import { llmService, LLMProviderConfig } from '@/services/llm-service';
 import WebGLMetaverseEvolution from '@/components/AdvancedAnimations/WebGLMetaverseEvolution';
 
 interface AIMutation {
@@ -32,6 +34,18 @@ interface WebLLMConfig {
   topP: number;
   frequencyPenalty: number;
   presencePenalty: number;
+}
+
+interface LLMProviderConfig {
+  provider: 'webllm' | 'ollama' | 'openai' | 'opencode';
+  model: string;
+  temperature: number;
+  maxTokens: number;
+  topP: number;
+  // Provider-specific
+  ollamaUrl?: string;
+  openaiApiKey?: string;
+  opencodeEndpoint?: string;
 }
 
 interface EvolutionMetrics {
@@ -102,6 +116,18 @@ const AIPortal: React.FC = () => {
     frequencyPenalty: 0.1,
     presencePenalty: 0.1
   });
+  
+  // LLM Provider Configuration
+  const [llmProviderConfig, setLlmProviderConfig] = useState<LLMProviderConfig>({
+    provider: 'webllm',
+    model: 'Llama-2-7b-chat-hf-q4f32_1',
+    temperature: 0.7,
+    maxTokens: 2048,
+    topP: 0.9,
+    ollamaUrl: 'http://localhost:11434',
+    opencodeEndpoint: 'http://localhost:3000/api/opencode'
+  });
+  
   const [evolutionLog, setEvolutionLog] = useState<string[]>([]);
   const webLLMRef = useRef<any>(null);
 
@@ -119,10 +145,10 @@ const AIPortal: React.FC = () => {
 
   // Modal States
   const [showSettingsModal, setShowSettingsModal] = useState(false);
-  const [showConfigModal, setShowConfigModal] = useState(false);
   const [showMutationModal, setShowMutationModal] = useState(false);
   const [showAgentSelectModal, setShowAgentSelectModal] = useState(false);
   const [showBridgeModal, setShowBridgeModal] = useState(false);
+  const [showAIEvolutionModal, setShowAIEvolutionModal] = useState(false);
   
   // Chat Panel State
   const [showChatPanel, setShowChatPanel] = useState(false);
@@ -132,7 +158,13 @@ const AIPortal: React.FC = () => {
     initializeBridges();
     loadAvailableAgents();
     scrollToBottom();
+    initializeLLMProvider();
   }, []);
+
+  // Initialize LLM Provider when config changes
+  useEffect(() => {
+    initializeLLMProvider();
+  }, [llmProviderConfig.provider, llmProviderConfig.model]);
 
   useEffect(() => {
     scrollToBottom();
@@ -145,6 +177,94 @@ const AIPortal: React.FC = () => {
       metaverse: automatonState.isRunning || automatonState.currentDimension > 0
     }));
   }, [automatonState]);
+
+  const addEvolutionLog = (message: string) => {
+    const timestamp = new Date().toLocaleTimeString();
+    setEvolutionLog(prev => [`[${timestamp}] ${message}`, ...prev.slice(0, 99)]);
+  };
+
+  const initializeLLMProvider = async () => {
+    try {
+      addEvolutionLog(`Initializing LLM provider: ${llmProviderConfig.provider}...`);
+      
+      if (llmProviderConfig.provider === 'webllm') {
+        addEvolutionLog(`Loading WebLLM model: ${llmProviderConfig.model}...`);
+        addEvolutionLog(`⚠ Note: First-time model download may take 5-10 minutes`);
+        addEvolutionLog(`   Models are downloaded to browser cache on first use`);
+        addEvolutionLog(`   You can switch to Ollama/OpenAI in Settings while waiting`);
+      }
+      
+      // For WebLLM, set a timeout to prevent hanging
+      let initPromise = llmService.initialize(llmProviderConfig);
+      
+      if (llmProviderConfig.provider === 'webllm') {
+        // Add a timeout for WebLLM initialization (10 minutes for model download)
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('WebLLM initialization timeout (10 minutes). Model download may still be in progress.')), 600000);
+        });
+        
+        await Promise.race([initPromise, timeoutPromise]);
+      } else {
+        await initPromise;
+      }
+      
+      // Verify initialization
+      if (llmService.isAvailable()) {
+        setBridgeStatus(prev => ({ ...prev, webllm: true }));
+        setIsWebLLMLoaded(true);
+        addEvolutionLog(`✓ LLM provider ${llmProviderConfig.provider} initialized successfully`);
+        
+        // Test the provider with a simple query if WebLLM
+        if (llmProviderConfig.provider === 'webllm') {
+          try {
+            const testResponse = await llmService.generateResponse(
+              [
+                { role: 'system', content: 'You are a helpful assistant.' },
+                { role: 'user', content: 'Say "ready" if you can respond.' }
+              ],
+              llmProviderConfig
+            );
+            addEvolutionLog(`✓ WebLLM test successful: ${testResponse.content.substring(0, 50)}`);
+          } catch (testError) {
+            console.warn('WebLLM test failed:', testError);
+            addEvolutionLog(`⚠ WebLLM initialized but test query failed: ${testError instanceof Error ? testError.message : 'Unknown'}`);
+          }
+        }
+      } else {
+        // For non-webllm providers, mark as available even if not "initialized" in the traditional sense
+        if (llmProviderConfig.provider !== 'webllm') {
+          setBridgeStatus(prev => ({ ...prev, webllm: true }));
+          setIsWebLLMLoaded(true);
+          addEvolutionLog(`✓ ${llmProviderConfig.provider.toUpperCase()} ready (no pre-initialization needed)`);
+        } else {
+          throw new Error('LLM service reports as unavailable after initialization');
+        }
+      }
+    } catch (error) {
+      console.error('Failed to initialize LLM provider:', error);
+      
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      
+      // For non-webllm providers, don't mark as failed - they might work on first use
+      if (llmProviderConfig.provider === 'webllm') {
+        setBridgeStatus(prev => ({ ...prev, webllm: false }));
+        setIsWebLLMLoaded(false);
+        addEvolutionLog(`✗ Failed to initialize WebLLM: ${errorMessage}`);
+        addEvolutionLog(`💡 Suggestions:`);
+        addEvolutionLog(`   - Check browser console (F12) for detailed errors`);
+        addEvolutionLog(`   - Try a smaller model: Settings → Configuration → Model → TinyLlama`);
+        addEvolutionLog(`   - Ensure stable internet (models download on first use, ~2-4GB)`);
+        addEvolutionLog(`   - Switch to Ollama: Settings → Configuration → Provider → Ollama`);
+        addEvolutionLog(`   - Or use OpenAI: Settings → Configuration → Provider → OpenAI`);
+      } else {
+        // For other providers, mark as ready but log the warning
+        addEvolutionLog(`⚠ ${llmProviderConfig.provider.toUpperCase()} initialization note: ${errorMessage}`);
+        addEvolutionLog(`   Will attempt to use on first message`);
+        setBridgeStatus(prev => ({ ...prev, webllm: true }));
+        setIsWebLLMLoaded(true);
+      }
+    }
+  };
 
   const initializeBridges = async () => {
     // Initialize NLP Service
@@ -159,8 +279,8 @@ const AIPortal: React.FC = () => {
       console.error('Failed to initialize TinyML:', error);
     }
 
-    // Initialize WebLLM
-    await initializeWebLLM();
+    // Initialize LLM Provider (will initialize WebLLM if selected)
+    await initializeLLMProvider();
   };
 
   const scrollToBottom = () => {
@@ -179,48 +299,77 @@ const AIPortal: React.FC = () => {
   };
 
   const initializeWebLLM = async () => {
+    // Don't initialize if already loaded or initializing
+    if (isWebLLMLoaded || webLLMRef.current) {
+      return;
+    }
+
     try {
+      addEvolutionLog('Initializing WebLLM engine...');
       const { CreateMLCEngine } = await import('@mlc-ai/web-llm');
       
       const initProgressCallback = (progress: any) => {
-        addEvolutionLog(`Loading WebLLM: ${Math.round(progress.progress * 100)}%`);
+        const percent = Math.round(progress.progress * 100);
+        addEvolutionLog(`Loading WebLLM: ${percent}%`);
       };
       
-      const engine = await CreateMLCEngine(config.model, { initProgressCallback });
+      addEvolutionLog(`Loading model: ${config.model}`);
+      const engine = await CreateMLCEngine(config.model, { 
+        initProgressCallback,
+        // Use a smaller model if the default fails
+        model: config.model,
+        // Enable verbose logging for debugging
+        verbose: true
+      });
+      
       webLLMRef.current = engine;
       setIsWebLLMLoaded(true);
       setBridgeStatus(prev => ({ ...prev, webllm: true }));
-      addEvolutionLog('WebLLM initialized successfully');
+      addEvolutionLog('✓ WebLLM initialized successfully - Real engine ready');
+      
+      // Test the engine with a simple prompt
+      try {
+        const testResponse = await engine.chat.completions.create({
+          messages: [
+            { role: 'system', content: 'You are a helpful assistant.' },
+            { role: 'user', content: 'Say "ready" if you can respond.' }
+          ],
+          temperature: 0.1,
+          max_tokens: 10
+        });
+        addEvolutionLog(`✓ WebLLM test successful: ${testResponse.choices[0]?.message?.content || 'no response'}`);
+      } catch (testError) {
+        console.warn('WebLLM test failed, but engine is loaded:', testError);
+      }
     } catch (error) {
       console.error('Failed to initialize WebLLM:', error);
-      await initializeMockWebLLM();
+      addEvolutionLog(`✗ WebLLM initialization failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      
+      // Don't use mock - instead, mark as not loaded and let sendMessage handle it
+      setIsWebLLMLoaded(false);
+      setBridgeStatus(prev => ({ ...prev, webllm: false }));
+      
+      // Try alternative model if current one fails
+      if (config.model !== 'Llama-2-7b-chat-hf-q4f32_1') {
+        addEvolutionLog('Trying alternative model: Llama-2-7b-chat-hf-q4f32_1');
+        try {
+          const { CreateMLCEngine } = await import('@mlc-ai/web-llm');
+          const engine = await CreateMLCEngine('Llama-2-7b-chat-hf-q4f32_1', { 
+            initProgressCallback: (p: any) => addEvolutionLog(`Loading alt model: ${Math.round(p.progress * 100)}%`)
+          });
+          webLLMRef.current = engine;
+          setIsWebLLMLoaded(true);
+          setBridgeStatus(prev => ({ ...prev, webllm: true }));
+          addEvolutionLog('✓ Alternative WebLLM model loaded successfully');
+        } catch (altError) {
+          console.error('Alternative model also failed:', altError);
+          addEvolutionLog('✗ All WebLLM models failed to load');
+        }
+      }
     }
   };
 
-  const initializeMockWebLLM = async () => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    webLLMRef.current = {
-      chat: {
-        completions: {
-          create: async () => ({
-            choices: [{
-              message: { content: JSON.stringify({ description: 'Mock mutation', code: '', confidence: 0.7, impact: 'medium' }) }
-            }]
-          })
-        }
-      }
-    };
-    setIsWebLLMLoaded(true);
-    setBridgeStatus(prev => ({ ...prev, webllm: true }));
-    addEvolutionLog('Using mock WebLLM implementation');
-  };
-
-  const addEvolutionLog = (message: string) => {
-    const timestamp = new Date().toLocaleTimeString();
-    setEvolutionLog(prev => [`[${timestamp}] ${message}`, ...prev.slice(0, 99)]);
-  };
-
-  // Enhanced sendMessage with NLP processing and bridge integration
+  // Enhanced sendMessage with NLP processing, WebLLM, and JSONL automaton integration
   const sendMessage = async (message: string) => {
     if (!message.trim() || isTyping) return;
 
@@ -244,7 +393,95 @@ const AIPortal: React.FC = () => {
       const nlpAnalysis = await nlpService.parseInput(message);
       addEvolutionLog(`NLP Analysis: ${nlpAnalysis.intent} (${(nlpAnalysis.confidence * 100).toFixed(0)}% confidence)`);
 
-      // Step 2: TinyML Pattern Recognition & Prediction
+      // Step 2: Load JSONL Automaton Data using Scheme REPL (better than JS parsing)
+      let jsonlContext = '';
+      try {
+        // Use Scheme REPL to process JSONL line-by-line (no split errors!)
+        const { schemeREPLService } = await import('../../services/scheme-repl-service');
+        
+        const kernelResult = await schemeREPLService.loadAndProcessJSONL('automaton-kernel.jsonl');
+        const metaverseResult = await schemeREPLService.loadAndProcessJSONL('generate.metaverse.jsonl');
+        
+        // Fallback to database service if Scheme REPL fails
+        let automatonKernel: any[] = [];
+        let metaverseData: any[] = [];
+        
+        if (kernelResult.success && kernelResult.result) {
+          automatonKernel = kernelResult.result.facts || [];
+          addEvolutionLog(`✓ Loaded ${automatonKernel.length} kernel facts via Scheme REPL`);
+        } else {
+          // Fallback to database service
+          automatonKernel = await databaseService.readJSONL('automaton-kernel.jsonl');
+          addEvolutionLog(`⚠ Using database service fallback for kernel`);
+        }
+        
+        if (metaverseResult.success && metaverseResult.result) {
+          metaverseData = metaverseResult.result.facts || [];
+          addEvolutionLog(`✓ Loaded ${metaverseData.length} metaverse facts via Scheme REPL`);
+        } else {
+          // Fallback to database service
+          metaverseData = await databaseService.readJSONL('generate.metaverse.jsonl');
+          addEvolutionLog(`⚠ Using database service fallback for metaverse`);
+        }
+        
+        // Ensure we have arrays and validate entries
+        const kernelArray = Array.isArray(automatonKernel) 
+          ? automatonKernel.filter((item): item is any => 
+              item !== null && 
+              item !== undefined && 
+              typeof item === 'object' &&
+              !Array.isArray(item) // Exclude arrays, only objects
+            )
+          : [];
+        const metaverseArray = Array.isArray(metaverseData)
+          ? metaverseData.filter((item): item is any => 
+              item !== null && 
+              item !== undefined && 
+              typeof item === 'object' &&
+              !Array.isArray(item) // Exclude arrays, only objects
+            )
+          : [];
+        
+        // Extract relevant automaton data for context
+        const kernelSummary = kernelArray.slice(0, 10).map((item: any) => {
+          // Double-check item is an object
+          if (!item || typeof item !== 'object' || Array.isArray(item)) {
+            return { id: 'unknown', type: 'unknown', text: 'invalid item' };
+          }
+          return {
+            id: (typeof item.id === 'string' || typeof item.id === 'number') ? String(item.id) : 'no-id',
+            type: typeof item.type === 'string' ? item.type : 'no-type',
+            text: typeof item.text === 'string' ? item.text.substring(0, 100) : (typeof item.text === 'object' ? JSON.stringify(item.text).substring(0, 100) : 'no text')
+          };
+        });
+        
+        const metaverseSummary = metaverseArray.slice(0, 10).map((item: any) => {
+          // Double-check item is an object
+          if (!item || typeof item !== 'object' || Array.isArray(item)) {
+            return { id: 'unknown', type: 'unknown', text: 'invalid item' };
+          }
+          return {
+            id: (typeof item.id === 'string' || typeof item.id === 'number') ? String(item.id) : 'no-id',
+            type: typeof item.type === 'string' ? item.type : 'no-type',
+            text: typeof item.text === 'string' ? item.text.substring(0, 100) : (typeof item.text === 'object' ? JSON.stringify(item.text).substring(0, 100) : 'no text')
+          };
+        });
+
+        jsonlContext = `
+JSONL Automaton Data:
+- Automaton Kernel: ${JSON.stringify(kernelSummary, null, 2)}
+- Metaverse Structure: ${JSON.stringify(metaverseSummary, null, 2)}
+- Total Kernel Nodes: ${kernelArray.length}
+- Total Metaverse Nodes: ${metaverseArray.length}
+`;
+        addEvolutionLog(`Loaded ${kernelArray.length} kernel nodes and ${metaverseArray.length} metaverse nodes`);
+      } catch (jsonlError) {
+        console.error('Failed to load JSONL data:', jsonlError);
+        addEvolutionLog(`✗ JSONL Error: ${jsonlError instanceof Error ? jsonlError.message : 'Unknown error'}`);
+        jsonlContext = 'JSONL Automaton Data: Unable to load (using cached state)';
+      }
+
+      // Step 3: TinyML Pattern Recognition & Prediction
       const tinyMLPrediction = tinyMLService.predictNextDimension(
         automatonState.currentDimension,
         [] // Would use actual history in production
@@ -252,7 +489,7 @@ const AIPortal: React.FC = () => {
       addEvolutionLog(`TinyML Prediction: Next dimension ${tinyMLPrediction.nextDimension}D (${(tinyMLPrediction.confidence * 100).toFixed(0)}% confidence)`);
       setPatternPrediction(tinyMLPrediction);
 
-      // Step 3: Execute automaton command if detected
+      // Step 4: Execute automaton command if detected
       if (nlpAnalysis.automatonCommand) {
         if (nlpAnalysis.intent === 'start') {
           await automatonActions.startAutomaton(nlpAnalysis.parameters);
@@ -266,46 +503,158 @@ const AIPortal: React.FC = () => {
         }
       }
 
-      // Step 4: Generate WebLLM response with context
+      // Step 5: Generate WebLLM response with comprehensive context including JSONL
       const contextPrompt = `
-Context:
+You are an AI assistant for a Self-Referencing Automaton system that uses Church encoding and dimensional topology (0D-7D).
+
+Current Automaton State:
 - Current Dimension: ${automatonState.currentDimension}D
 - Automaton Status: ${automatonState.isRunning ? 'Running' : 'Idle'}
-- NLP Intent: ${nlpAnalysis.intent}
-- TinyML Prediction: ${tinyMLPrediction.nextDimension}D (${(tinyMLPrediction.confidence * 100).toFixed(0)}% confidence)
+- Iteration Count: ${automatonState.iterationCount || 0}
+- Self-Modification Count: ${automatonState.selfModificationCount || 0}
 
-User Message: ${message}
+NLP Analysis:
+- Intent: ${nlpAnalysis.intent}
+- Confidence: ${(nlpAnalysis.confidence * 100).toFixed(0)}%
+- Detected Entities: ${JSON.stringify(nlpAnalysis.entities || {})}
 
-Generate a helpful response that bridges human NLP understanding, automaton metaverse state, and AI evolution capabilities.
+TinyML Prediction:
+- Next Dimension: ${tinyMLPrediction.nextDimension}D
+- Confidence: ${(tinyMLPrediction.confidence * 100).toFixed(0)}%
+- Reasoning: ${tinyMLPrediction.reasoning || 'Pattern-based prediction'}
+
+${jsonlContext}
+
+User Message: "${message}"
+
+Instructions:
+1. Use the JSONL automaton data to provide accurate information about the system structure
+2. Reference specific nodes, dimensions, or Church encodings when relevant
+3. If the user asks about automaton operations, use the current state and JSONL data
+4. Be helpful, technical but accessible, and bridge human understanding with automaton concepts
+5. If asked to modify or query the automaton, suggest specific JSONL operations
+
+Generate a helpful, informative response:
 `;
 
       let agentResponse: string;
       
-      if (isWebLLMLoaded && webLLMRef.current) {
+      // Use unified LLM service with selected provider
+      // For non-webllm providers, try even if not marked as available (they don't need pre-initialization)
+      const shouldTryLLM = llmService.isAvailable() || llmProviderConfig.provider !== 'webllm';
+      
+      if (shouldTryLLM) {
         try {
-          const webllmResponse = await webLLMRef.current.chat.completions.create({
-            messages: [
-              { role: 'system', content: 'You are an AI assistant bridging human communication, automaton metaverse, and AI evolution.' },
+          addEvolutionLog(`${llmProviderConfig.provider.toUpperCase()}: Generating response with JSONL context...`);
+          
+          const llmResponse = await llmService.generateResponse(
+            [
+              { 
+                role: 'system', 
+                content: `You are an expert AI assistant for a Self-Referencing Automaton system. You have access to JSONL automaton data, dimensional topology (0D-7D), Church encoding, and real-time automaton state. Provide accurate, helpful responses based on the provided context.`
+              },
               { role: 'user', content: contextPrompt }
             ],
-            temperature: config.temperature,
-            max_tokens: config.maxTokens
-          });
-          agentResponse = webllmResponse.choices[0].message.content;
-          addEvolutionLog(`WebLLM: Generated response`);
-        } catch (error) {
-          // Fallback to API agent
-          const response = await apiService.sendAgentMessage(chat.activeAgent, message);
-          agentResponse = response.success && response.data 
-            ? response.data 
-            : `I understand you want to ${nlpAnalysis.intent}. ${nlpService.formatStateToNL(automatonState)}`;
+            llmProviderConfig
+          );
+          
+          agentResponse = llmResponse.content || 'I apologize, but I did not receive a valid response.';
+          
+          // Check if response looks like mock JSON
+          if (agentResponse.trim().startsWith('{') && agentResponse.includes('description')) {
+            throw new Error('Received mock JSON response instead of chat response');
+          }
+          
+          addEvolutionLog(`✓ ${llmProviderConfig.provider.toUpperCase()}: Generated response (${agentResponse.length} chars)${llmResponse.model ? ` using ${llmResponse.model}` : ''}`);
+          
+          if (llmResponse.usage) {
+            addEvolutionLog(`  Tokens: ${llmResponse.usage.totalTokens || 'N/A'} (prompt: ${llmResponse.usage.promptTokens || 'N/A'}, completion: ${llmResponse.usage.completionTokens || 'N/A'})`);
+          }
+        } catch (llmError) {
+          console.error(`${llmProviderConfig.provider} error:`, llmError);
+          addEvolutionLog(`✗ ${llmProviderConfig.provider.toUpperCase()} Error: ${llmError instanceof Error ? llmError.message : 'Unknown error'}`);
+          
+          // Try to reinitialize if WebLLM
+          if (llmProviderConfig.provider === 'webllm') {
+            addEvolutionLog('Attempting to reinitialize WebLLM...');
+            try {
+              await initializeLLMProvider();
+              
+              // Retry once if reinitialization succeeded
+              if (llmService.isAvailable()) {
+                try {
+                  const retryResponse = await llmService.generateResponse(
+                    [
+                      { role: 'system', content: 'You are a helpful AI assistant.' },
+                      { role: 'user', content: contextPrompt }
+                    ],
+                    llmProviderConfig
+                  );
+                  agentResponse = retryResponse.content || 'Response received but empty.';
+                  addEvolutionLog(`✓ Retry successful`);
+                } catch (retryError) {
+                  addEvolutionLog(`✗ Retry also failed: ${retryError instanceof Error ? retryError.message : 'Unknown'}`);
+                }
+              }
+            } catch (reinitError) {
+              addEvolutionLog(`✗ Reinitialization failed: ${reinitError instanceof Error ? reinitError.message : 'Unknown'}`);
+            }
+          }
+          
+          // Fallback: Use API agent with JSONL context if LLM still fails
+          if (!agentResponse) {
+            try {
+              const response = await apiService.sendAgentMessage(chat.activeAgent, `${message}\n\nContext: ${jsonlContext.substring(0, 500)}`);
+              agentResponse = response.success && response.data 
+                ? response.data 
+                : `I understand you want to ${nlpAnalysis.intent}. Current automaton state: ${automatonState.currentDimension}D, ${automatonState.isRunning ? 'Running' : 'Idle'}. ${nlpService.formatStateToNL(automatonState)}`;
+              addEvolutionLog(`Fallback: Used API agent`);
+            } catch (apiError) {
+              agentResponse = `I understand you want to ${nlpAnalysis.intent}. Current automaton state: ${automatonState.currentDimension}D, ${automatonState.isRunning ? 'Running' : 'Idle'}. ${nlpService.formatStateToNL(automatonState)}`;
+              addEvolutionLog(`Fallback: Used basic response`);
+            }
+          }
         }
       } else {
-        // Fallback to API agent
-        const response = await apiService.sendAgentMessage(chat.activeAgent, message);
-        agentResponse = response.success && response.data 
-          ? response.data 
-          : `I understand you want to ${nlpAnalysis.intent}. ${nlpService.formatStateToNL(automatonState)}`;
+        // LLM not available - try to initialize (mainly for WebLLM)
+        addEvolutionLog(`${llmProviderConfig.provider.toUpperCase()} not loaded, initializing...`);
+        
+        try {
+          await initializeLLMProvider();
+          
+          if (llmService.isAvailable()) {
+            try {
+              const llmResponse = await llmService.generateResponse(
+                [
+                  { role: 'system', content: 'You are a helpful AI assistant.' },
+                  { role: 'user', content: contextPrompt }
+                ],
+                llmProviderConfig
+              );
+              agentResponse = llmResponse.content || 'Response received but empty.';
+              addEvolutionLog(`✓ ${llmProviderConfig.provider.toUpperCase()}: Initialized and responded`);
+            } catch (error) {
+              agentResponse = `${llmProviderConfig.provider.toUpperCase()} initialized but failed to generate response. Current automaton state: ${automatonState.currentDimension}D, ${automatonState.isRunning ? 'Running' : 'Idle'}.`;
+              addEvolutionLog(`${llmProviderConfig.provider.toUpperCase()} initialized but response failed`);
+            }
+          } else {
+            // WebLLM failed - provide helpful message
+            if (llmProviderConfig.provider === 'webllm') {
+              agentResponse = `WebLLM is not available. This could be due to:\n- Model download in progress (check Evolution Log)\n- Network connectivity issues\n- Browser compatibility\n\nCurrent automaton state: ${automatonState.currentDimension}D, ${automatonState.isRunning ? 'Running' : 'Idle'}.\n\n💡 Try switching to Ollama or OpenAI in Settings, or check the Evolution Log for details.`;
+            } else {
+              agentResponse = `${llmProviderConfig.provider.toUpperCase()} is not available. Current automaton state: ${automatonState.currentDimension}D, ${automatonState.isRunning ? 'Running' : 'Idle'}. Please check configuration (Settings → Configuration).`;
+            }
+            addEvolutionLog(`✗ ${llmProviderConfig.provider.toUpperCase()} initialization failed`);
+          }
+        } catch (initError) {
+          const errorMsg = initError instanceof Error ? initError.message : 'Unknown error';
+          if (llmProviderConfig.provider === 'webllm') {
+            agentResponse = `Unable to initialize WebLLM: ${errorMsg}.\n\nCurrent automaton state: ${automatonState.currentDimension}D, ${automatonState.isRunning ? 'Running' : 'Idle'}.\n\n💡 Suggestions:\n- Check browser console for detailed errors\n- Try a smaller model (TinyLlama) in Settings\n- Ensure stable internet (models download on first use)\n- Switch to Ollama (local) or OpenAI in Settings`;
+          } else {
+            agentResponse = `Unable to initialize ${llmProviderConfig.provider.toUpperCase()}: ${errorMsg}. Current automaton state: ${automatonState.currentDimension}D, ${automatonState.isRunning ? 'Running' : 'Idle'}.`;
+          }
+          addEvolutionLog(`✗ ${llmProviderConfig.provider.toUpperCase()} initialization error: ${errorMsg}`);
+        }
       }
 
       const agentMessage = {
@@ -320,9 +669,10 @@ Generate a helpful response that bridges human NLP understanding, automaton meta
       }));
 
     } catch (error) {
+      console.error('Error in sendMessage:', error);
       const errorMessage = {
         role: 'agent' as const,
-        content: 'Sorry, I encountered an error processing your request. Please try again.',
+        content: `Sorry, I encountered an error: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`,
         timestamp: Date.now()
       };
 
@@ -330,6 +680,7 @@ Generate a helpful response that bridges human NLP understanding, automaton meta
         ...prev,
         messages: [...prev.messages, errorMessage]
       }));
+      addEvolutionLog(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsTyping(false);
     }
@@ -490,7 +841,7 @@ Generate a helpful response that bridges human NLP understanding, automaton meta
       <div className="flex-1 overflow-hidden relative">
         {/* 3D Metaverse Portal - Main Interface */}
         <div className="w-full h-full">
-          <WebGLMetaverseEvolution />
+          <WebGLMetaverseEvolution onOpenAIModal={() => setShowAIEvolutionModal(true)} />
         </div>
 
         {/* Chat Panel Overlay - Toggleable */}
@@ -658,11 +1009,11 @@ Generate a helpful response that bridges human NLP understanding, automaton meta
           <div className="flex items-center justify-between mb-3">
             <h4 className="text-sm font-bold text-white">AI Evolution Engine</h4>
             <button
-              onClick={() => setShowConfigModal(true)}
+              onClick={() => setShowSettingsModal(true)}
               className="p-1 rounded hover:bg-gray-800 transition-colors"
-              title="Configuration"
+              title="Settings"
             >
-              <Sliders className="w-4 h-4 text-gray-400" />
+              <Settings className="w-4 h-4 text-gray-400" />
             </button>
           </div>
 
@@ -686,7 +1037,7 @@ Generate a helpful response that bridges human NLP understanding, automaton meta
               <button
                 key={type}
                 onClick={() => generateMutation(type)}
-                disabled={isGenerating || !isWebLLMLoaded}
+                disabled={isGenerating || !llmService.isAvailable()}
                 className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs disabled:opacity-50"
               >
                 {type.replace('-', ' ')}
@@ -937,11 +1288,11 @@ Generate a helpful response that bridges human NLP understanding, automaton meta
               {isEvolutionActive ? <><Pause className="w-4 h-4 inline mr-1" />Stop</> : <><Play className="w-4 h-4 inline mr-1" />Start</>}
             </button>
             <button
-              onClick={() => setShowConfigModal(true)}
+              onClick={() => setShowSettingsModal(true)}
               className="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg"
-              title="Configuration"
+              title="Settings"
             >
-              <Sliders className="w-4 h-4" />
+              <Settings className="w-4 h-4" />
             </button>
           </div>
 
@@ -951,7 +1302,7 @@ Generate a helpful response that bridges human NLP understanding, automaton meta
               <button
                 key={type}
                 onClick={() => generateMutation(type)}
-                disabled={isGenerating || !isWebLLMLoaded}
+                disabled={isGenerating || !llmService.isAvailable()}
                 className="px-2 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs disabled:opacity-50"
               >
                 {type.replace('-', ' ')}
@@ -1108,8 +1459,13 @@ Generate a helpful response that bridges human NLP understanding, automaton meta
                 <div className="flex items-center gap-3">
                   <div className={`w-3 h-3 rounded-full ${bridgeStatus.webllm ? 'bg-green-500' : 'bg-gray-500'}`}></div>
                   <div>
-                    <div className="text-white font-medium">WebLLM</div>
-                    <div className="text-xs text-gray-400">Browser-based LLM for AI evolution</div>
+                    <div className="text-white font-medium">LLM Provider ({llmProviderConfig.provider.toUpperCase()})</div>
+                    <div className="text-xs text-gray-400">
+                      {llmProviderConfig.provider === 'webllm' && 'Browser-based LLM for AI evolution'}
+                      {llmProviderConfig.provider === 'ollama' && 'Local Ollama server'}
+                      {llmProviderConfig.provider === 'openai' && 'OpenAI API'}
+                      {llmProviderConfig.provider === 'opencode' && 'OpenCode SDK'}
+                    </div>
                   </div>
                 </div>
                 <span className={`text-xs ${bridgeStatus.webllm ? 'text-green-400' : 'text-gray-500'}`}>
@@ -1256,84 +1612,6 @@ Generate a helpful response that bridges human NLP understanding, automaton meta
         )}
       </Modal>
 
-      {/* Configuration Modal */}
-      <Modal
-        isOpen={showConfigModal}
-        onClose={() => setShowConfigModal(false)}
-        title="WebLLM Configuration"
-        size="md"
-      >
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm text-gray-400 mb-2">Model</label>
-            <select
-              value={config.model}
-              onChange={(e) => setConfig(prev => ({ ...prev, model: e.target.value }))}
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-            >
-              <option value="llama-2-7b-chat">Llama 2 7B Chat</option>
-              <option value="llama-2-13b-chat">Llama 2 13B Chat</option>
-              <option value="codellama-7b">CodeLlama 7B</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm text-gray-400 mb-2">
-              Temperature: {config.temperature}
-            </label>
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.1"
-              value={config.temperature}
-              onChange={(e) => setConfig(prev => ({ ...prev, temperature: parseFloat(e.target.value) }))}
-              className="w-full"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm text-gray-400 mb-2">
-              Max Tokens: {config.maxTokens}
-            </label>
-            <input
-              type="range"
-              min="512"
-              max="4096"
-              step="256"
-              value={config.maxTokens}
-              onChange={(e) => setConfig(prev => ({ ...prev, maxTokens: parseInt(e.target.value) }))}
-              className="w-full"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm text-gray-400 mb-2">
-              Top P: {config.topP}
-            </label>
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.1"
-              value={config.topP}
-              onChange={(e) => setConfig(prev => ({ ...prev, topP: parseFloat(e.target.value) }))}
-              className="w-full"
-            />
-          </div>
-
-          <button
-            onClick={() => {
-              initializeWebLLM();
-              setShowConfigModal(false);
-            }}
-            className="w-full px-4 py-2 bg-[#6366f1] hover:bg-[#8b5cf6] text-white rounded-lg font-medium"
-          >
-            Apply Configuration
-          </button>
-        </div>
-      </Modal>
-
       {/* Settings Modal */}
       <Modal
         isOpen={showSettingsModal}
@@ -1341,9 +1619,175 @@ Generate a helpful response that bridges human NLP understanding, automaton meta
         title="Portal Settings"
         size="md"
       >
-        <div className="space-y-4">
+        <div className="space-y-6">
+          {/* LLM Provider Configuration */}
           <div>
-            <h3 className="text-white font-medium mb-2">Agent Settings</h3>
+            <h3 className="text-white font-medium mb-4">LLM Provider Configuration</h3>
+            <div className="space-y-4">
+              {/* Provider Selection */}
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">LLM Provider</label>
+                <select
+                  value={llmProviderConfig.provider}
+                  onChange={(e) => {
+                    const provider = e.target.value as LLMProviderConfig['provider'];
+                    setLlmProviderConfig(prev => ({
+                      ...prev,
+                      provider,
+                      // Set default models for each provider
+                      model: provider === 'ollama' ? 'llama2' :
+                             provider === 'openai' ? 'gpt-3.5-turbo' :
+                             provider === 'opencode' ? 'default' :
+                             'Llama-2-7b-chat-hf-q4f32_1'
+                    }));
+                  }}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                >
+                  <option value="webllm">WebLLM (Browser-based)</option>
+                  <option value="ollama">Ollama (Local Server)</option>
+                  <option value="openai">OpenAI API</option>
+                  <option value="opencode">OpenCode SDK</option>
+                </select>
+              </div>
+
+              {/* Provider-specific settings */}
+              {llmProviderConfig.provider === 'ollama' && (
+                <div>
+                  <label className="block text-sm text-gray-400 mb-2">Ollama URL</label>
+                  <input
+                    type="text"
+                    value={llmProviderConfig.ollamaUrl || 'http://localhost:11434'}
+                    onChange={(e) => setLlmProviderConfig(prev => ({ ...prev, ollamaUrl: e.target.value }))}
+                    placeholder="http://localhost:11434"
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                  />
+                  <div className="mt-2">
+                    <label className="block text-sm text-gray-400 mb-2">Model</label>
+                    <input
+                      type="text"
+                      value={llmProviderConfig.model}
+                      onChange={(e) => setLlmProviderConfig(prev => ({ ...prev, model: e.target.value }))}
+                      placeholder="llama2, mistral, codellama, etc."
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {llmProviderConfig.provider === 'openai' && (
+                <div>
+                  <label className="block text-sm text-gray-400 mb-2">OpenAI API Key</label>
+                  <input
+                    type="password"
+                    value={llmProviderConfig.openaiApiKey || ''}
+                    onChange={(e) => setLlmProviderConfig(prev => ({ ...prev, openaiApiKey: e.target.value }))}
+                    placeholder="sk-..."
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                  />
+                  <div className="mt-2">
+                    <label className="block text-sm text-gray-400 mb-2">Model</label>
+                    <select
+                      value={llmProviderConfig.model}
+                      onChange={(e) => setLlmProviderConfig(prev => ({ ...prev, model: e.target.value }))}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                    >
+                      <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                      <option value="gpt-4">GPT-4</option>
+                      <option value="gpt-4-turbo-preview">GPT-4 Turbo</option>
+                      <option value="gpt-4o">GPT-4o</option>
+                    </select>
+                  </div>
+                </div>
+              )}
+
+              {llmProviderConfig.provider === 'opencode' && (
+                <div>
+                  <label className="block text-sm text-gray-400 mb-2">OpenCode Endpoint</label>
+                  <input
+                    type="text"
+                    value={llmProviderConfig.opencodeEndpoint || 'http://localhost:3000/api/opencode'}
+                    onChange={(e) => setLlmProviderConfig(prev => ({ ...prev, opencodeEndpoint: e.target.value }))}
+                    placeholder="http://localhost:3000/api/opencode"
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                  />
+                </div>
+              )}
+
+              {llmProviderConfig.provider === 'webllm' && (
+                <div>
+                  <label className="block text-sm text-gray-400 mb-2">Model</label>
+                  <select
+                    value={llmProviderConfig.model}
+                    onChange={(e) => setLlmProviderConfig(prev => ({ ...prev, model: e.target.value }))}
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                  >
+                    <option value="Llama-2-7b-chat-hf-q4f32_1">Llama 2 7B Chat (Q4)</option>
+                    <option value="Llama-2-13b-chat-hf-q4f32_1">Llama 2 13B Chat (Q4)</option>
+                    <option value="TinyLlama-1.1B-Chat-v0.4">TinyLlama 1.1B Chat</option>
+                    <option value="Phi-3-mini-4k-instruct-q4f32_1-MLC">Phi-3 Mini 4K Instruct</option>
+                  </select>
+                </div>
+              )}
+
+              {/* Common settings */}
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">
+                  Temperature: {llmProviderConfig.temperature}
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.1"
+                  value={llmProviderConfig.temperature}
+                  onChange={(e) => setLlmProviderConfig(prev => ({ ...prev, temperature: parseFloat(e.target.value) }))}
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">
+                  Max Tokens: {llmProviderConfig.maxTokens}
+                </label>
+                <input
+                  type="range"
+                  min="512"
+                  max="4096"
+                  step="256"
+                  value={llmProviderConfig.maxTokens}
+                  onChange={(e) => setLlmProviderConfig(prev => ({ ...prev, maxTokens: parseInt(e.target.value) }))}
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">
+                  Top P: {llmProviderConfig.topP}
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.1"
+                  value={llmProviderConfig.topP}
+                  onChange={(e) => setLlmProviderConfig(prev => ({ ...prev, topP: parseFloat(e.target.value) }))}
+                  className="w-full"
+                />
+              </div>
+
+              <button
+                onClick={async () => {
+                  await initializeLLMProvider();
+                }}
+                className="w-full px-4 py-2 bg-[#6366f1] hover:bg-[#8b5cf6] text-white rounded-lg font-medium"
+              >
+                Apply LLM Configuration
+              </button>
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-gray-700">
+            <h3 className="text-white font-medium mb-4">Agent Settings</h3>
             <div className="space-y-2">
               <label className="flex items-center gap-2">
                 <input
@@ -1357,8 +1801,8 @@ Generate a helpful response that bridges human NLP understanding, automaton meta
             </div>
           </div>
 
-          <div>
-            <h3 className="text-white font-medium mb-2">Evolution Settings</h3>
+          <div className="pt-4 border-t border-gray-700">
+            <h3 className="text-white font-medium mb-4">Evolution Settings</h3>
             <div className="space-y-2">
               <label className="flex items-center gap-2">
                 <input

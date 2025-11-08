@@ -642,33 +642,54 @@ function executeAction(action: string) {
         break;
     }
 
-    // Add to execution history
+    // Add to execution history - validate entry is proper object
     const historyEntry = {
-      iteration: iterationCount,
-      action,
-      from: `${fromDim}D`,
-      to: `${toDim}D`,
+      iteration: typeof iterationCount === 'number' ? iterationCount : 0,
+      action: typeof action === 'string' ? action : 'unknown',
+      from: typeof fromDim === 'number' ? `${fromDim}D` : 'unknown',
+      to: typeof toDim === 'number' ? `${toDim}D` : 'unknown',
       timestamp: Date.now()
     };
     
-    if (!(automaton as any).executionHistory) {
-      (automaton as any).executionHistory = [];
+    // Ensure entry is valid before pushing
+    if (historyEntry && typeof historyEntry === 'object' && !Array.isArray(historyEntry)) {
+      if (!(automaton as any).executionHistory) {
+        (automaton as any).executionHistory = [];
+      }
+      (automaton as any).executionHistory.push(historyEntry);
     }
-    (automaton as any).executionHistory.push(historyEntry);
 
-    // Emit action execution with proper data
-    io.emit('action', { 
-      action, 
-      result: 'success', 
+    // Emit action execution with proper data - ensure all fields are strings/numbers
+    const actionData = {
+      action: typeof action === 'string' ? action : 'unknown',
+      result: 'success',
       timestamp: Date.now(),
-      from: `${fromDim}D`,
-      to: `${toDim}D`,
-      iteration: iterationCount
-    });
+      from: typeof fromDim === 'number' ? `${fromDim}D` : 'unknown',
+      to: typeof toDim === 'number' ? `${toDim}D` : 'unknown',
+      iteration: typeof iterationCount === 'number' ? iterationCount : 0
+    };
+    
+    // Validate before emitting
+    if (actionData && typeof actionData === 'object' && !Array.isArray(actionData)) {
+      io.emit('action', actionData);
+    }
 
   } catch (error) {
     console.error(`❌ Failed to execute action ${action}:`, error);
-    io.emit('error', { action: action, error: error instanceof Error ? error.message : 'Unknown error' });
+    // Safely convert error to string
+    let errorMessage: string;
+    if (error instanceof Error) {
+      errorMessage = error.message || String(error);
+    } else if (typeof error === 'string') {
+      errorMessage = error;
+    } else {
+      try {
+        errorMessage = String(error);
+      } catch (e) {
+        errorMessage = 'Unknown error occurred';
+      }
+    }
+    io.emit('error', { action: action, error: errorMessage });
   }
 }
 

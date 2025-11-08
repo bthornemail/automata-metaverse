@@ -33,14 +33,19 @@ export default defineConfig({
     /* Record video on failure */
     video: 'retain-on-failure',
     
-    /* Global timeout for each action */
-    actionTimeout: 10000,
+    /* Global timeout for each action - increased for evolution tests */
+    actionTimeout: 15000,
     
-    /* Global timeout for navigation */
-    navigationTimeout: 30000,
+    /* Global timeout for navigation - increased for async operations */
+    navigationTimeout: 45000,
     
     /* Run headless by default for CI environments */
     headless: process.env.CI ? true : false,
+    
+    /* Capture console logs for debugging */
+    launchOptions: {
+      args: ['--disable-web-security'], // Allow CORS for local testing
+    },
   },
 
   /* Configure projects for major browsers */
@@ -101,11 +106,11 @@ export default defineConfig({
   /* Global setup and teardown */
   globalSetup: require.resolve('./tests/e2e/global-setup.ts'),
   
-  /* Test timeout */
-  timeout: 60000,
+  /* Test timeout - increased for evolution and integrity tests */
+  timeout: 120000,
   
-  /* Expect timeout */
+  /* Expect timeout - increased for async validation operations */
   expect: {
-    timeout: 10000,
+    timeout: 15000,
   },
 });

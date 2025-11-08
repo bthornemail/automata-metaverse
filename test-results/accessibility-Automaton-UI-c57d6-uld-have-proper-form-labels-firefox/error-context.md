@@ -1,0 +1,112 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e6]:
+      - heading "Self-Referencing Automaton Interface" [level=1] [ref=e7]: Self-Referencing Automaton Interface
+      - generic [ref=e10]: "Phase 3: Quantum Visualization"
+  - generic [ref=e14]:
+    - button "Overview" [ref=e15] [cursor=pointer]:
+      - img [ref=e16]
+      - text: Overview
+    - button "Self-Reference" [ref=e18] [cursor=pointer]:
+      - img [ref=e19]
+      - text: Self-Reference
+    - button "History" [ref=e22] [cursor=pointer]:
+      - img [ref=e23]
+      - text: History
+    - button "Agents" [ref=e27] [cursor=pointer]:
+      - img [ref=e28]
+      - text: Agents
+    - button "Quantum" [ref=e30] [cursor=pointer]:
+      - img [ref=e31]
+      - text: Quantum
+    - button "Animations" [ref=e33] [cursor=pointer]:
+      - img [ref=e34]
+      - text: Animations
+    - button "WebGL 3D" [ref=e40] [cursor=pointer]:
+      - img [ref=e41]
+      - text: WebGL 3D
+    - button "Multiplayer" [ref=e44] [cursor=pointer]:
+      - img [ref=e45]
+      - text: Multiplayer
+    - button "AI Evolution" [ref=e48] [cursor=pointer]:
+      - img [ref=e49]
+      - text: AI Evolution
+    - button "Metaverse" [ref=e52] [cursor=pointer]:
+      - img [ref=e53]
+      - text: Metaverse
+    - button "OpenCode" [ref=e56] [cursor=pointer]:
+      - img [ref=e57]
+      - text: OpenCode
+    - button "Config" [active] [ref=e60] [cursor=pointer]:
+      - img [ref=e61]
+      - text: Config
+  - main [ref=e76]:
+    - generic [ref=e78]:
+      - generic [ref=e79]:
+        - heading "Configuration Management" [level=3] [ref=e80]:
+          - img [ref=e81]
+          - text: Configuration Management
+        - generic [ref=e84]:
+          - button "Save" [disabled] [ref=e85]:
+            - img [ref=e86]
+            - text: Save
+          - button [ref=e90] [cursor=pointer]:
+            - img [ref=e91]
+          - button [ref=e94] [cursor=pointer]:
+            - img [ref=e95]
+          - img [ref=e100] [cursor=pointer]
+      - generic [ref=e104]:
+        - button "General" [ref=e105] [cursor=pointer]:
+          - img [ref=e106]
+          - text: General
+        - button "Automaton" [ref=e109] [cursor=pointer]:
+          - img [ref=e110]
+          - text: Automaton
+        - button "Visualization" [ref=e112] [cursor=pointer]:
+          - img [ref=e113]
+          - text: Visualization
+        - button "Advanced" [ref=e117] [cursor=pointer]:
+          - img [ref=e118]
+          - text: Advanced
+      - generic [ref=e122]:
+        - generic [ref=e124]:
+          - generic [ref=e125]:
+            - generic [ref=e126]: Theme
+            - paragraph [ref=e127]: Choose the application theme
+          - combobox [ref=e129]:
+            - option "light"
+            - option "dark" [selected]
+            - option "auto"
+        - generic [ref=e131]:
+          - generic [ref=e132]:
+            - generic [ref=e133]: Language
+            - paragraph [ref=e134]: Interface language
+          - combobox [ref=e136]:
+            - option "en" [selected]
+            - option "es"
+            - option "fr"
+            - option "de"
+            - option "zh"
+        - generic [ref=e138]:
+          - generic [ref=e139]:
+            - generic [ref=e140]: Auto Save
+            - paragraph [ref=e141]: Automatically save configuration changes
+          - generic [ref=e143]:
+            - checkbox "Enabled" [checked] [ref=e144]
+            - generic [ref=e145]: Enabled
+      - generic [ref=e147]:
+        - generic [ref=e148]: Configuration loaded successfully
+        - generic [ref=e149]: 16 options available
+  - contentinfo [ref=e150]:
+    - generic [ref=e152]:
+      - generic [ref=e153]: Self-Referencing JSONL Automaton • 8-Dimensional Church Encoding
+      - generic [ref=e154]: Meta-Circular Evaluator • Quantum Visualization & Advanced Analytics
+  - generic [ref=e156]:
+    - img [ref=e157]
+    - generic [ref=e160]: Connected to automaton server
+    - button [ref=e161] [cursor=pointer]:
+      - img [ref=e162]
+```

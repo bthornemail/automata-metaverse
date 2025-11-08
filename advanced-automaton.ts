@@ -356,26 +356,39 @@ class AdvancedSelfReferencingAutomaton {
     this.currentDimension = nextDimension;
     
     const topologyCode = this.generateTopologyCode(nextDimension);
+    
+    // Ensure topologyCode has required fields
+    const safePattern = topologyCode.pattern || 'unknown';
+    const safeCode = typeof topologyCode.code === 'string' ? topologyCode.code : '';
+    
     const evolvedState: CanvasObject = {
       id: `${nextDimension}D-topology`,
       type: 'text',
       currentState: 'evolved',
-      dimensionalLevel: nextDimension,
+      dimensionalLevel: typeof nextDimension === 'number' ? nextDimension : 0,
       selfReference: {
-        file: this.filePath,
-        line: this.objects.length,
-        pattern: topologyCode.pattern
+        file: typeof this.filePath === 'string' ? this.filePath : 'automaton-kernel.jsonl',
+        line: Array.isArray(this.objects) ? this.objects.length : 0,
+        pattern: safePattern
       },
       x: -600 + (nextDimension % 3) * 300,
       y: 180 + Math.floor(nextDimension / 3) * 200,
       width: 280,
       height: 140 + (nextDimension * 10),
       color: String((nextDimension % 7) + 1),
-      text: topologyCode.code
+      text: safeCode
     };
     
-    this.objects.push(evolvedState);
-    console.log(`Evolved to ${topologyCode.pattern}: ${evolvedState.id}`);
+    // Validate evolvedState is a proper object before pushing
+    if (evolvedState && typeof evolvedState === 'object' && !Array.isArray(evolvedState)) {
+      if (!Array.isArray(this.objects)) {
+        this.objects = [];
+      }
+      this.objects.push(evolvedState);
+      console.log(`Evolved to ${safePattern}: ${evolvedState.id}`);
+    } else {
+      console.error('Failed to create valid evolved state:', evolvedState);
+    }
   }
 
   private generateTopologyCode(dimension: number): { code: string; pattern: string } {

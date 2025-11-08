@@ -9,10 +9,10 @@ import Dashboard from '@/components/Dashboard/Dashboard';
 import ControlPanel from '@/components/ControlPanel/ControlPanel';
 import SelfReferenceAnalyzer from '@/components/SelfReferenceAnalyzer/SelfReferenceAnalyzer';
 import AIPortal from '@/components/AIPortal/AIPortal';
-import WebGLMetaverseEvolution from '@/components/AdvancedAnimations/WebGLMetaverseEvolution';
 import MetaverseInterface from '@/components/AdvancedAnimations/MetaverseInterface';
 import Configuration from '@/components/Configuration/Configuration';
 import OpenCodeInterface from './components/OpenCodeInterface/OpenCodeInterface';
+import SchemeREPL from '@/components/SchemeREPL/SchemeREPL';
 
 console.log('App.tsx: OpenCodeInterface imported:', OpenCodeInterface);
 
@@ -24,6 +24,7 @@ const AppContent: React.FC = () => {
     { id: 'overview', label: 'Overview', icon: Activity },
     { id: 'analysis', label: 'Self-Reference', icon: Eye },
     { id: 'ai-portal', label: 'AI Portal', icon: Brain },
+    { id: 'scheme-repl', label: 'Scheme REPL', icon: Zap },
     { id: 'opencode', label: 'OpenCode', icon: Brain },
     { id: 'config', label: 'Config', icon: Cog }
   ];
@@ -81,26 +82,14 @@ const AppContent: React.FC = () => {
             animate={{ opacity: 1 }}
             className="space-y-6"
           >
-            {/* Top Row - Dashboard and WebGL */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Left Column - Dashboard */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <Dashboard />
-              </motion.div>
-
-              {/* Right Column - WebGL + Metaverse Evolution Tracker */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-              >
-                <WebGLMetaverseEvolution />
-              </motion.div>
-            </div>
+            {/* Dashboard */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Dashboard />
+            </motion.div>
 
             {/* Bottom Row - Control Panel (Dimensional Canvas merged into WebGL) */}
             <motion.div
@@ -143,6 +132,17 @@ const AppContent: React.FC = () => {
             className="max-w-6xl mx-auto"
           >
             <OpenCodeInterface />
+          </motion.div>
+        )}
+
+        {/* Scheme REPL Tab */}
+        {activeTab === 'scheme-repl' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="h-[calc(100vh-200px)] rounded-xl overflow-hidden shadow-xl"
+          >
+            <SchemeREPL />
           </motion.div>
         )}
 

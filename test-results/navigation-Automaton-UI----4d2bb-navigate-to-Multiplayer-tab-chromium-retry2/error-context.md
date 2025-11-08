@@ -1,0 +1,155 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e6]:
+      - heading "Self-Referencing Automaton Interface" [level=1] [ref=e7]: Self-Referencing Automaton Interface
+      - generic [ref=e10]: "Phase 3: Quantum Visualization"
+  - generic [ref=e14]:
+    - button "Overview" [ref=e15] [cursor=pointer]:
+      - img [ref=e16]
+      - text: Overview
+    - button "Self-Reference" [ref=e18] [cursor=pointer]:
+      - img [ref=e19]
+      - text: Self-Reference
+    - button "History" [ref=e22] [cursor=pointer]:
+      - img [ref=e23]
+      - text: History
+    - button "Agents" [ref=e27] [cursor=pointer]:
+      - img [ref=e28]
+      - text: Agents
+    - button "Quantum" [ref=e30] [cursor=pointer]:
+      - img [ref=e31]
+      - text: Quantum
+    - button "Animations" [ref=e33] [cursor=pointer]:
+      - img [ref=e34]
+      - text: Animations
+    - button "WebGL 3D" [ref=e36] [cursor=pointer]:
+      - img [ref=e37]
+      - text: WebGL 3D
+    - button "Multiplayer" [active] [ref=e40] [cursor=pointer]:
+      - img [ref=e41]
+      - text: Multiplayer
+    - button "AI Evolution" [ref=e44] [cursor=pointer]:
+      - img [ref=e45]
+      - text: AI Evolution
+    - button "Metaverse" [ref=e48] [cursor=pointer]:
+      - img [ref=e49]
+      - text: Metaverse
+    - button "OpenCode" [ref=e52] [cursor=pointer]:
+      - img [ref=e53]
+      - text: OpenCode
+    - button "Config" [ref=e56] [cursor=pointer]:
+      - img [ref=e57]
+      - text: Config
+  - main [ref=e68]:
+    - generic [ref=e70]:
+      - generic [ref=e72]:
+        - generic [ref=e73]:
+          - img [ref=e74]
+          - heading "Multiplayer Metaverse" [level=3] [ref=e77]
+        - generic [ref=e79]:
+          - generic [ref=e80]: 0 users online
+          - button [ref=e81] [cursor=pointer]:
+            - img [ref=e82]
+      - generic [ref=e85]:
+        - generic [ref=e86]:
+          - generic [ref=e88]:
+            - heading "Dimension 0" [level=4] [ref=e90]
+            - paragraph [ref=e91]: Connecting...
+          - generic [ref=e92]:
+            - button [ref=e93] [cursor=pointer]:
+              - img [ref=e94]
+            - button [ref=e100] [cursor=pointer]:
+              - img [ref=e101]
+        - generic [ref=e105]:
+          - generic [ref=e106]:
+            - heading "Voice Channels" [level=4] [ref=e107]
+            - button [ref=e108] [cursor=pointer]:
+              - img [ref=e109]
+          - generic [ref=e112]:
+            - button "0D Identity Lobby 0 participants • 0D 0" [ref=e114] [cursor=pointer]:
+              - generic [ref=e115]:
+                - generic [ref=e116]:
+                  - generic [ref=e117]: 0D Identity Lobby
+                  - generic [ref=e118]: 0 participants • 0D
+                - generic [ref=e119]:
+                  - img [ref=e120]
+                  - generic [ref=e125]: "0"
+            - button "1D Temporal Hall 0 participants • 1D 0" [ref=e127] [cursor=pointer]:
+              - generic [ref=e128]:
+                - generic [ref=e129]:
+                  - generic [ref=e130]: 1D Temporal Hall
+                  - generic [ref=e131]: 0 participants • 1D
+                - generic [ref=e132]:
+                  - img [ref=e133]
+                  - generic [ref=e138]: "0"
+            - button "2D Structural Space 0 participants • 2D 0" [ref=e140] [cursor=pointer]:
+              - generic [ref=e141]:
+                - generic [ref=e142]:
+                  - generic [ref=e143]: 2D Structural Space
+                  - generic [ref=e144]: 0 participants • 2D
+                - generic [ref=e145]:
+                  - img [ref=e146]
+                  - generic [ref=e151]: "0"
+            - button "3D Algebra Room 0 participants • 3D 0" [ref=e153] [cursor=pointer]:
+              - generic [ref=e154]:
+                - generic [ref=e155]:
+                  - generic [ref=e156]: 3D Algebra Room
+                  - generic [ref=e157]: 0 participants • 3D
+                - generic [ref=e158]:
+                  - img [ref=e159]
+                  - generic [ref=e164]: "0"
+            - button "4D Network Hub 0 participants • 4D 0" [ref=e166] [cursor=pointer]:
+              - generic [ref=e167]:
+                - generic [ref=e168]:
+                  - generic [ref=e169]: 4D Network Hub
+                  - generic [ref=e170]: 0 participants • 4D
+                - generic [ref=e171]:
+                  - img [ref=e172]
+                  - generic [ref=e177]: "0"
+            - button "5D Consensus Chamber 0 participants • 5D 0" [ref=e179] [cursor=pointer]:
+              - generic [ref=e180]:
+                - generic [ref=e181]:
+                  - generic [ref=e182]: 5D Consensus Chamber
+                  - generic [ref=e183]: 0 participants • 5D
+                - generic [ref=e184]:
+                  - img [ref=e185]
+                  - generic [ref=e190]: "0"
+            - button "6D AI Lab 0 participants • 6D 0" [ref=e192] [cursor=pointer]:
+              - generic [ref=e193]:
+                - generic [ref=e194]:
+                  - generic [ref=e195]: 6D AI Lab
+                  - generic [ref=e196]: 0 participants • 6D
+                - generic [ref=e197]:
+                  - img [ref=e198]
+                  - generic [ref=e203]: "0"
+            - button "7D Quantum Realm 0 participants • 7D 0" [ref=e205] [cursor=pointer]:
+              - generic [ref=e206]:
+                - generic [ref=e207]:
+                  - generic [ref=e208]: 7D Quantum Realm
+                  - generic [ref=e209]: 0 participants • 7D
+                - generic [ref=e210]:
+                  - img [ref=e211]
+                  - generic [ref=e216]: "0"
+          - generic [ref=e217]:
+            - heading "World State" [level=5] [ref=e218]
+            - generic [ref=e219]:
+              - generic [ref=e220]:
+                - generic [ref=e221]: "Current Dimension:"
+                - generic [ref=e222]: 0D
+              - generic [ref=e223]:
+                - generic [ref=e224]: "Active Users:"
+                - generic [ref=e225]: "0"
+              - generic [ref=e226]:
+                - generic [ref=e227]: "Total Mutations:"
+                - generic [ref=e228]: "0"
+              - generic [ref=e229]:
+                - generic [ref=e230]: "Connection:"
+                - generic [ref=e231]: Disconnected
+  - contentinfo [ref=e232]:
+    - generic [ref=e234]:
+      - generic [ref=e235]: Self-Referencing JSONL Automaton • 8-Dimensional Church Encoding
+      - generic [ref=e236]: Meta-Circular Evaluator • Quantum Visualization & Advanced Analytics
+```

@@ -636,9 +636,6 @@ const WebGLMetaverseEvolution: React.FC = () => {
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-lg font-bold text-white">3D Metaverse Portal</h3>
-            <p className="text-xs text-gray-400 mt-1">
-              Unified Quantum, Animations & Multiplayer in 3D Topology & Evolution Tracker
-            </p>
           </div>
           <div className="flex items-center gap-2">
             <div className="px-2 py-1 bg-green-600/20 border border-green-500 rounded text-xs text-green-300">

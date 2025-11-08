@@ -30,24 +30,39 @@ export const RecentActivity: React.FC<RecentActivityProps> = ({
   executionHistory,
   loading = false 
 }) => {
-  // Combine and sort by timestamp
+  // Combine and sort by timestamp with deduplication
+  const seenActivityIds = new Set<string>();
   const allActivities = [
-    ...modifications.map(mod => ({
-      type: 'modification' as const,
-      title: mod.type,
-      description: mod.details,
-      timestamp: mod.timestamp,
-      icon: FileText,
-      color: 'text-purple-400'
-    })),
-    ...executionHistory.map(entry => ({
-      type: 'execution' as const,
-      title: entry.actionDisplay,
-      description: `${entry.from} → ${entry.to}`,
-      timestamp: entry.timestamp,
-      icon: Zap,
-      color: 'text-blue-400'
-    }))
+    ...modifications
+      .filter(mod => {
+        const id = `${mod.type}-${mod.timestamp}`;
+        if (seenActivityIds.has(id)) return false;
+        seenActivityIds.add(id);
+        return true;
+      })
+      .map(mod => ({
+        type: 'modification' as const,
+        title: mod.type,
+        description: mod.details,
+        timestamp: mod.timestamp,
+        icon: FileText,
+        color: 'text-purple-400'
+      })),
+    ...executionHistory
+      .filter(entry => {
+        const id = `${entry.action}-${entry.timestamp}`;
+        if (seenActivityIds.has(id)) return false;
+        seenActivityIds.add(id);
+        return true;
+      })
+      .map(entry => ({
+        type: 'execution' as const,
+        title: entry.actionDisplay,
+        description: `${entry.from} → ${entry.to}`,
+        timestamp: entry.timestamp,
+        icon: Zap,
+        color: 'text-blue-400'
+      }))
   ].sort((a, b) => b.timestamp - a.timestamp).slice(0, 20);
 
   if (loading) {

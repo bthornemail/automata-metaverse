@@ -84,13 +84,26 @@ class TinyMLService {
     // Convert to pattern array
     const patterns: DimensionalPattern[] = [];
     patternMap.forEach((value, pattern) => {
-      const [from, to] = pattern.split('→').map(s => parseInt(s.replace('D', '')));
-      patterns.push({
-        dimension: to,
-        pattern,
-        frequency: value.count,
-        lastSeen: value.lastSeen
-      });
+      // Ensure pattern is a string before calling split
+      if (typeof pattern !== 'string') {
+        console.warn('TinyML: Pattern is not a string:', typeof pattern, pattern);
+        return;
+      }
+      try {
+        const [from, to] = pattern.split('→').map(s => parseInt(s.replace('D', '')));
+        if (isNaN(from) || isNaN(to)) {
+          console.warn('TinyML: Invalid pattern format:', pattern);
+          return;
+        }
+        patterns.push({
+          dimension: to,
+          pattern,
+          frequency: value.count,
+          lastSeen: value.lastSeen
+        });
+      } catch (error) {
+        console.warn('TinyML: Error processing pattern:', pattern, error);
+      }
     });
 
     return patterns.sort((a, b) => b.frequency - a.frequency);
@@ -107,20 +120,39 @@ class TinyMLService {
     
     // Find most common transition from current dimension
     const transitions = patterns.filter(p => {
-      const [from] = p.pattern.split('→').map(s => parseInt(s.replace('D', '')));
-      return from === currentDimension;
+      // Ensure pattern is a string
+      if (!p || typeof p.pattern !== 'string') {
+        return false;
+      }
+      try {
+        const parts = safeSplit(p.pattern, '→');
+        if (parts.length === 0) return false;
+        const [from] = parts.map(s => parseInt(s.replace('D', '')));
+        return !isNaN(from) && from === currentDimension;
+      } catch (error) {
+        console.warn('TinyML: Error filtering pattern:', p.pattern, error);
+        return false;
+      }
     });
 
     if (transitions.length > 0) {
       const mostLikely = transitions[0];
-      const [_, nextDim] = mostLikely.pattern.split('→').map(s => parseInt(s.replace('D', '')));
-      
-      return {
-        nextDimension: nextDim,
-        confidence: Math.min(0.95, 0.6 + (mostLikely.frequency / 10) * 0.1),
-        pattern: mostLikely.pattern,
-        reasoning: `Based on ${mostLikely.frequency} previous occurrences of this transition`
-      };
+      // Ensure pattern is a string
+      if (mostLikely && typeof mostLikely.pattern === 'string') {
+        try {
+          const [_, nextDim] = mostLikely.pattern.split('→').map(s => parseInt(s.replace('D', '')));
+          if (!isNaN(nextDim)) {
+            return {
+              nextDimension: nextDim,
+              confidence: Math.min(0.95, 0.6 + (mostLikely.frequency / 10) * 0.1),
+              pattern: mostLikely.pattern,
+              reasoning: `Based on ${mostLikely.frequency} previous occurrences of this transition`
+            };
+          }
+        } catch (error) {
+          console.warn('TinyML: Error parsing pattern:', mostLikely.pattern, error);
+        }
+      }
     }
 
     // Default: progress to next dimension

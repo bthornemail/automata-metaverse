@@ -1,0 +1,138 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e6]:
+      - heading "Self-Referencing Automaton Interface" [level=1] [ref=e7]: Self-Referencing Automaton Interface
+      - generic [ref=e10]: "Phase 3: Quantum Visualization"
+  - generic [ref=e14]:
+    - button "Overview" [ref=e15] [cursor=pointer]:
+      - img [ref=e16]
+      - text: Overview
+    - button "Self-Reference" [active] [ref=e18] [cursor=pointer]:
+      - img [ref=e19]
+      - text: Self-Reference
+    - button "History" [ref=e22] [cursor=pointer]:
+      - img [ref=e23]
+      - text: History
+    - button "Agents" [ref=e27] [cursor=pointer]:
+      - img [ref=e28]
+      - text: Agents
+    - button "Quantum" [ref=e30] [cursor=pointer]:
+      - img [ref=e31]
+      - text: Quantum
+    - button "Animations" [ref=e33] [cursor=pointer]:
+      - img [ref=e34]
+      - text: Animations
+    - button "WebGL 3D" [ref=e36] [cursor=pointer]:
+      - img [ref=e37]
+      - text: WebGL 3D
+    - button "Multiplayer" [ref=e40] [cursor=pointer]:
+      - img [ref=e41]
+      - text: Multiplayer
+    - button "AI Evolution" [ref=e44] [cursor=pointer]:
+      - img [ref=e45]
+      - text: AI Evolution
+    - button "Metaverse" [ref=e48] [cursor=pointer]:
+      - img [ref=e49]
+      - text: Metaverse
+    - button "OpenCode" [ref=e52] [cursor=pointer]:
+      - img [ref=e53]
+      - text: OpenCode
+    - button "Config" [ref=e56] [cursor=pointer]:
+      - img [ref=e57]
+      - text: Config
+  - main [ref=e68]:
+    - generic [ref=e70]:
+      - generic [ref=e71]:
+        - heading "Self-Reference Analyzer" [level=3] [ref=e72]:
+          - img [ref=e73]
+          - text: Self-Reference Analyzer
+        - button "Refresh" [ref=e76] [cursor=pointer]:
+          - img [ref=e77]
+          - text: Refresh
+      - generic [ref=e80]:
+        - heading "Integrity Status" [level=4] [ref=e81]
+        - generic [ref=e82]:
+          - img [ref=e83]
+          - generic [ref=e86]: Valid
+      - generic [ref=e87]:
+        - generic [ref=e88]:
+          - generic [ref=e89]: Self-Reference Objects
+          - generic [ref=e90]: "1"
+          - generic [ref=e91]: Total references
+        - generic [ref=e92]:
+          - generic [ref=e93]: Automata
+          - generic [ref=e94]: "8"
+          - generic [ref=e95]: Dimensional states
+        - generic [ref=e96]:
+          - generic [ref=e97]: Modifications
+          - generic [ref=e98]: "0"
+          - generic [ref=e99]: Dynamic changes
+      - generic [ref=e101]:
+        - img [ref=e102]
+        - textbox "Search self-references..." [ref=e105]
+      - generic [ref=e106]:
+        - heading "Self-Reference Objects" [level=4] [ref=e107]:
+          - img [ref=e108]
+          - text: Self-Reference Objects
+        - generic [ref=e112] [cursor=pointer]:
+          - generic [ref=e113]:
+            - generic [ref=e114]:
+              - generic [ref=e115]: "0"
+              - generic [ref=e116]:
+                - generic [ref=e117]: self-ref
+                - generic [ref=e118]: Line 0
+            - generic [ref=e119]: 3:21:12 AM
+          - generic [ref=e120]: self-reference
+      - generic [ref=e121]:
+        - heading "Dimensional Automata" [level=4] [ref=e122]
+        - generic [ref=e123]:
+          - generic [ref=e124]:
+            - generic [ref=e125]: 0D
+            - generic [ref=e126]: Identity
+            - generic [ref=e127]: λ0
+          - generic [ref=e128]:
+            - generic [ref=e129]: 1D
+            - generic [ref=e130]: Successor
+            - generic [ref=e131]: λ1
+          - generic [ref=e132]:
+            - generic [ref=e133]: 2D
+            - generic [ref=e134]: Pair
+            - generic [ref=e135]: λ2
+          - generic [ref=e136]:
+            - generic [ref=e137]: 3D
+            - generic [ref=e138]: Addition
+            - generic [ref=e139]: λ3
+          - generic [ref=e140]:
+            - generic [ref=e141]: 4D
+            - generic [ref=e142]: Network
+            - generic [ref=e143]: λ4
+          - generic [ref=e144]:
+            - generic [ref=e145]: 5D
+            - generic [ref=e146]: Consensus
+            - generic [ref=e147]: λ5
+          - generic [ref=e148]:
+            - generic [ref=e149]: 6D
+            - generic [ref=e150]: Intelligence
+            - generic [ref=e151]: λ6
+          - generic [ref=e152]:
+            - generic [ref=e153]: 7D
+            - generic [ref=e154]: Quantum
+            - generic [ref=e155]: λ7
+      - generic [ref=e156]:
+        - heading "Recent Modifications" [level=4] [ref=e157]:
+          - img [ref=e158]
+          - text: Recent Modifications
+        - generic [ref=e162]: No modifications recorded yet
+  - contentinfo [ref=e163]:
+    - generic [ref=e165]:
+      - generic [ref=e166]: Self-Referencing JSONL Automaton • 8-Dimensional Church Encoding
+      - generic [ref=e167]: Meta-Circular Evaluator • Quantum Visualization & Advanced Analytics
+  - generic [ref=e169]:
+    - img [ref=e170]
+    - generic [ref=e172]: entry.split is not a function
+    - button [ref=e173] [cursor=pointer]:
+      - img [ref=e174]
+```

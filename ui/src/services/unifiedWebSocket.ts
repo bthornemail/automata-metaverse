@@ -121,7 +121,30 @@ class UnifiedWebSocketService {
       });
 
       this.socket.on('error', (data: any) => {
-        this.eventBus.emit('error', data.error || data);
+        // Safely convert error to string
+        let errorMessage: string;
+        if (data && typeof data === 'object' && !Array.isArray(data)) {
+          if (typeof data.error === 'string') {
+            errorMessage = data.error;
+          } else if (data.error instanceof Error) {
+            errorMessage = data.error.message || String(data.error);
+          } else {
+            try {
+              errorMessage = String(data.error || data);
+            } catch (e) {
+              errorMessage = 'An error occurred';
+            }
+          }
+        } else if (typeof data === 'string') {
+          errorMessage = data;
+        } else {
+          try {
+            errorMessage = String(data);
+          } catch (e) {
+            errorMessage = 'An error occurred';
+          }
+        }
+        this.eventBus.emit('error', errorMessage);
       });
 
     } catch (error) {

@@ -158,19 +158,36 @@ export const useAutomatonStore = create<UnifiedAutomatonState & AutomatonActions
         // History actions
         setExecutionHistory: (history) => set({ executionHistory: history }),
         
-        addExecutionEntry: (entry) => set((state) => ({
-          executionHistory: state.executionHistory
-            ? {
-                ...state.executionHistory,
-                history: [...state.executionHistory.history, entry],
-              }
-            : {
-                history: [entry],
-                actionFrequency: new Map(),
-                dimensionalProgression: [],
-                performanceMetrics: { avgExecutionTime: 0, successRate: 0 },
-              },
-        })),
+        addExecutionEntry: (entry) => set((state) => {
+          // Validate entry is a proper object before adding
+          if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+            console.warn('addExecutionEntry: Invalid entry, skipping:', entry);
+            return state;
+          }
+          
+          // Ensure entry has required fields
+          const validatedEntry = {
+            action: entry.action || 'unknown',
+            timestamp: entry.timestamp || Date.now(),
+            from: entry.from || 'unknown',
+            to: entry.to || 'unknown',
+            iteration: typeof entry.iteration === 'number' ? entry.iteration : (state.executionHistory?.history.length || 0),
+          };
+          
+          return {
+            executionHistory: state.executionHistory
+              ? {
+                  ...state.executionHistory,
+                  history: [...state.executionHistory.history, validatedEntry],
+                }
+              : {
+                  history: [validatedEntry],
+                  actionFrequency: new Map(),
+                  dimensionalProgression: [],
+                  performanceMetrics: { avgExecutionTime: 0, successRate: 0 },
+                },
+          };
+        }),
         
         // Self-reference actions
         setSelfReference: (data) => set({ selfReference: data }),
@@ -182,9 +199,28 @@ export const useAutomatonStore = create<UnifiedAutomatonState & AutomatonActions
         
         addNotification: (notification) => {
           const id = `notification-${Date.now()}-${Math.random()}`;
+          
+          // Safely convert message to string
+          let safeMessage: string;
+          if (!notification.message) {
+            safeMessage = '';
+          } else if (typeof notification.message === 'string') {
+            safeMessage = notification.message;
+          } else if (notification.message instanceof Error) {
+            safeMessage = notification.message.message || String(notification.message);
+          } else {
+            try {
+              safeMessage = String(notification.message);
+            } catch (e) {
+              console.error('Failed to convert notification message to string:', e);
+              safeMessage = 'Error message could not be displayed';
+            }
+          }
+          
           const newNotification: Notification = {
             ...notification,
             id,
+            message: safeMessage,
             timestamp: Date.now(),
           };
           set((state) => ({

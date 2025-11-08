@@ -11,7 +11,7 @@
     "type-check": "tsc --noEmit",
     "lint": "eslint . --ext .ts --fix",
     "test": "jest",
-    "test:e2e": "CI=true playwright test --reporter=list",
+    "test:e2e": "CI=true playwright test --reporter=list --fully-parallel --host 0.0.0.0 --port 30022",
     "test:e2e:headless": "CI=true playwright test tests/e2e/headless.spec.ts --reporter=list",
     "test:e2e:jsonl": "CI=true playwright test tests/e2e/jsonl-data-components.spec.ts --reporter=list",
     "test:e2e:headed": "playwright test",

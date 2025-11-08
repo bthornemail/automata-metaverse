@@ -23,6 +23,21 @@ export const Toast: React.FC<{ notification: Notification }> = ({ notification }
 
   const Icon = icons[notification.type];
 
+  // Safely convert message to string - prevent "entry.split" errors
+  const safeMessage = React.useMemo(() => {
+    if (!notification.message) return '';
+    if (typeof notification.message === 'string') return notification.message;
+    if (notification.message instanceof Error) {
+      return notification.message.message || String(notification.message);
+    }
+    try {
+      return String(notification.message);
+    } catch (e) {
+      console.error('Failed to convert notification message to string:', e);
+      return 'Error message could not be displayed';
+    }
+  }, [notification.message]);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: -20, x: 300 }}
@@ -32,7 +47,7 @@ export const Toast: React.FC<{ notification: Notification }> = ({ notification }
     >
       <Icon className="w-5 h-5 text-white flex-shrink-0 mt-0.5" />
       <div className="flex-1 text-white text-sm">
-        {notification.message}
+        {safeMessage}
       </div>
       <button
         onClick={() => removeNotification(notification.id)}
