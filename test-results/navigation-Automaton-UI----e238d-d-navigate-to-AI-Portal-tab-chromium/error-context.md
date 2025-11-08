@@ -1,0 +1,113 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e6]:
+      - heading "Self-Referencing Automaton Interface" [level=1] [ref=e7]: Self-Referencing Automaton Interface
+      - generic [ref=e10]: "Phase 3: Quantum Visualization"
+  - generic [ref=e14]:
+    - button "Switch to Overview tab" [ref=e15] [cursor=pointer]:
+      - img [ref=e16]
+      - text: Overview
+    - button "Switch to Self-Reference tab" [ref=e18] [cursor=pointer]:
+      - img [ref=e19]
+      - text: Self-Reference
+    - button "Switch to AI Portal tab" [active] [ref=e22] [cursor=pointer]:
+      - img [ref=e23]
+      - text: AI Portal
+    - button "Switch to Code Editor tab" [ref=e26] [cursor=pointer]:
+      - img [ref=e27]
+      - text: Code Editor
+    - button "Switch to Config tab" [ref=e30] [cursor=pointer]:
+      - img [ref=e31]
+      - text: Config
+  - main [ref=e42]:
+    - generic [ref=e44]:
+      - generic [ref=e46]:
+        - generic [ref=e47]:
+          - img [ref=e49]
+          - generic [ref=e52]:
+            - heading "AI Portal" [level=2] [ref=e53]
+            - paragraph [ref=e54]: 3D Metaverse Portal - Bridging Human NLP ↔ Automaton Metaverse ↔ WebLLM ↔ TinyML
+        - generic [ref=e55]:
+          - generic [ref=e56]:
+            - button "Unified" [ref=e57] [cursor=pointer]
+            - button "Abstract" [ref=e58] [cursor=pointer]
+            - button "CanvasL 3D" [ref=e59] [cursor=pointer]
+          - button "View Chat" [ref=e60] [cursor=pointer]:
+            - img [ref=e61]
+            - generic [ref=e63]: View Chat
+          - button "NLP Metaverse WebLLM TinyML" [ref=e64] [cursor=pointer]:
+            - img [ref=e65]
+            - generic [ref=e70]:
+              - generic "NLP" [ref=e71]
+              - generic "Metaverse" [ref=e72]
+              - generic "WebLLM" [ref=e73]
+              - generic "TinyML" [ref=e74]
+          - generic [ref=e75]: Loading...
+          - button "Settings" [ref=e76] [cursor=pointer]:
+            - img [ref=e77]
+      - generic [ref=e82]:
+        - generic [ref=e84]:
+          - generic [ref=e85]:
+            - generic [ref=e86]: "Mode:"
+            - generic [ref=e87]:
+              - button "Environment" [ref=e88] [cursor=pointer]:
+                - img [ref=e89]
+                - text: Environment
+              - button "Symbol" [ref=e93] [cursor=pointer]:
+                - img [ref=e94]
+                - text: Symbol
+          - generic [ref=e98]:
+            - generic [ref=e99]: "Environment:"
+            - button "3D GLTF" [ref=e101] [cursor=pointer]:
+              - img [ref=e102]
+              - text: 3D GLTF
+              - img [ref=e105]
+          - generic [ref=e107]:
+            - generic [ref=e108]: "Major: environment"
+            - generic [ref=e109]: •
+            - generic [ref=e110]: "Minor: 3d-gltf"
+        - generic [ref=e112]:
+          - generic [ref=e116]:
+            - generic [ref=e117]:
+              - heading "3D Metaverse Portal" [level=3] [ref=e118]
+              - paragraph [ref=e119]: Bridging Human NLP ↔ Automaton Metaverse ↔ WebLLM ↔ TinyML
+            - generic [ref=e120]:
+              - generic [ref=e121]: 0 events
+              - generic [ref=e122]: 3 qubits
+              - generic [ref=e123]: 30 particles
+              - generic [ref=e124]: 2 users
+              - button "AI Portal" [ref=e125] [cursor=pointer]:
+                - img [ref=e126]
+                - generic [ref=e129]: AI Portal
+          - generic [ref=e136]:
+            - img [ref=e137]
+            - paragraph [ref=e139]: Loading Grok Metaverse...
+          - generic [ref=e141]:
+            - button "Abstract" [ref=e142] [cursor=pointer]:
+              - img [ref=e143]
+              - text: Abstract
+            - button "Grok" [ref=e147] [cursor=pointer]:
+              - img [ref=e148]
+              - text: Grok
+            - button "Both" [ref=e150] [cursor=pointer]:
+              - img [ref=e151]
+              - text: Both
+          - generic [ref=e155]:
+            - generic [ref=e156]: Abstract Stats
+            - generic [ref=e157]: "Dimension: 0D"
+            - generic [ref=e158]: "Evolution Events: 0"
+            - generic [ref=e159]: "Qubits: 3"
+            - generic [ref=e160]: "Particles: 30"
+  - contentinfo [ref=e161]:
+    - generic [ref=e163]:
+      - generic [ref=e164]: Self-Referencing JSONL Automaton • 8-Dimensional Church Encoding
+      - generic [ref=e165]: Meta-Circular Evaluator • Quantum Visualization & Advanced Analytics
+  - generic [ref=e167]:
+    - img [ref=e168]
+    - generic [ref=e171]: Connected to automaton server
+    - button [ref=e172] [cursor=pointer]:
+      - img [ref=e173]
+```

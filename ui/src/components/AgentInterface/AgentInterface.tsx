@@ -286,8 +286,9 @@ const AgentInterface: React.FC = () => {
           onClick={() => sendMessage(inputMessage)}
           disabled={!inputMessage.trim() || isTyping}
           className="control-button bg-[#6366f1] hover:bg-[#8b5cf6] text-white"
+          aria-label="Send message"
         >
-          <Send className="w-4 h-4" />
+          <Send className="w-4 h-4" aria-hidden="true" />
         </button>
       </div>
 

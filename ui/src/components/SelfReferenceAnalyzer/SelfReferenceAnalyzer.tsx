@@ -131,7 +131,7 @@ const SelfReferenceAnalyzer: React.FC = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-800 rounded-xl shadow-xl">
+    <div className="p-6 bg-gray-800 rounded-xl shadow-xl" data-testid="self-reference-analyzer">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xl font-bold text-white flex items-center gap-3">
           <Eye className="w-6 h-6" />

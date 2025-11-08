@@ -297,12 +297,14 @@ const Configuration: React.FC<ConfigurationProps> = ({ className = '' }) => {
     switch (option.type) {
       case 'boolean':
         return (
-          <label className="flex items-center gap-2">
+          <label className="flex items-center gap-2" htmlFor={`config-${option.key}`}>
             <input
+              id={`config-${option.key}`}
               type="checkbox"
               checked={option.value}
               onChange={(e) => handleChange(e.target.checked)}
               className="rounded"
+              aria-label={option.label}
             />
             <span className="text-gray-300">
               {option.value ? 'Enabled' : 'Disabled'}
@@ -313,29 +315,38 @@ const Configuration: React.FC<ConfigurationProps> = ({ className = '' }) => {
       case 'number':
         return (
           <input
+            id={`config-${option.key}`}
             type="number"
             value={option.value}
             onChange={(e) => handleChange(Number(e.target.value))}
             className="w-full px-3 py-2 bg-gray-600 text-white rounded-lg"
+            aria-label={option.label}
+            aria-describedby={`config-${option.key}-desc`}
           />
         );
 
       case 'string':
         return (
           <input
+            id={`config-${option.key}`}
             type="text"
             value={option.value}
             onChange={(e) => handleChange(e.target.value)}
             className="w-full px-3 py-2 bg-gray-600 text-white rounded-lg"
+            aria-label={option.label}
+            aria-describedby={`config-${option.key}-desc`}
           />
         );
 
       case 'select':
         return (
           <select
+            id={`config-${option.key}`}
             value={option.value}
             onChange={(e) => handleChange(e.target.value)}
             className="w-full px-3 py-2 bg-gray-600 text-white rounded-lg"
+            aria-label={option.label}
+            aria-describedby={`config-${option.key}-desc`}
           >
             {option.options?.map(opt => (
               <option key={opt} value={opt}>{opt}</option>
@@ -381,6 +392,7 @@ const Configuration: React.FC<ConfigurationProps> = ({ className = '' }) => {
           <button
             onClick={resetConfiguration}
             className="control-button bg-gray-600 hover:bg-gray-700 text-white"
+            aria-label="Reset configuration to defaults"
           >
             <RotateCcw className="w-4 h-4" />
           </button>
@@ -388,17 +400,19 @@ const Configuration: React.FC<ConfigurationProps> = ({ className = '' }) => {
           <button
             onClick={exportConfiguration}
             className="control-button bg-blue-600 hover:bg-blue-700 text-white"
+            aria-label="Export configuration"
           >
             <Download className="w-4 h-4" />
           </button>
           
-          <label className="control-button bg-purple-600 hover:bg-purple-700 text-white cursor-pointer">
+          <label className="control-button bg-purple-600 hover:bg-purple-700 text-white cursor-pointer" aria-label="Import configuration">
             <Upload className="w-4 h-4" />
             <input
               type="file"
               accept=".json"
               onChange={importConfiguration}
               className="hidden"
+              aria-label="Import configuration file"
             />
           </label>
         </div>
@@ -443,10 +457,10 @@ const Configuration: React.FC<ConfigurationProps> = ({ className = '' }) => {
             >
               <div className="flex items-start justify-between mb-2">
                 <div className="flex-1">
-                  <label className="block text-white font-medium mb-1">
+                  <label className="block text-white font-medium mb-1" htmlFor={`config-${option.key}`}>
                     {option.label}
                   </label>
-                  <p className="text-sm text-gray-400 mb-3">
+                  <p className="text-sm text-gray-400 mb-3" id={`config-${option.key}-desc`}>
                     {option.description}
                   </p>
                 </div>

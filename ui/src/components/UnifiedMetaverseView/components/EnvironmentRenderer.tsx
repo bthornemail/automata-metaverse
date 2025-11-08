@@ -8,7 +8,7 @@ import { EnvironmentRendererProps, EnvironmentType, Symbol } from '../types';
 import WebGLMetaverseEvolution from '../../AdvancedAnimations/WebGLMetaverseEvolution';
 import MetaverseCanvas3D from '../../MetaverseCanvas3D/MetaverseCanvas3D';
 import UnifiedEditor from '../../UnifiedEditor';
-import GrokMetaverseRenderer from '../../GrokMetaverse/GrokMetaverseRenderer';
+import { Combined3DEnvironment } from './Combined3DEnvironment';
 
 export const EnvironmentRenderer: React.FC<EnvironmentRendererProps> = ({
   environment,
@@ -19,28 +19,19 @@ export const EnvironmentRenderer: React.FC<EnvironmentRendererProps> = ({
 }) => {
   switch (environment) {
     case 'abstract':
+      // Abstract view is now part of 3d-gltf environment
       return (
-        <WebGLMetaverseEvolution
-          onOpenAIModal={() => {}}
-          onDimensionChange={(dimension) => {
-            // Handle dimension change
-          }}
-          onStatsUpdate={(stats) => {
-            // Handle stats update
-          }}
-        />
+        <div className="flex items-center justify-center h-full bg-gray-900 text-gray-400">
+          Abstract view is now integrated into 3D GLTF environment
+        </div>
       );
 
     case 'canvas-2d':
+      // Canvas 2D is now a symbol mode, not an environment
       return (
-        <UnifiedEditor
-          filename={config?.filename || 'automaton-kernel.canvasl'}
-          initialMode="canvas"
-          height="100%"
-          onSave={(content, format) => {
-            // Handle save
-          }}
-        />
+        <div className="flex items-center justify-center h-full bg-gray-900 text-gray-400">
+          Canvas 2D is available as a symbol mode
+        </div>
       );
 
     case 'code-media':
@@ -56,30 +47,16 @@ export const EnvironmentRenderer: React.FC<EnvironmentRendererProps> = ({
       );
 
     case '3d-gltf':
+      // Combined 3D environment with abstract view integrated
       return (
-        <GrokMetaverseRenderer
-          onAgentSelect={(agent) => {
-            if (agent) {
-              // Convert agent to symbol
-              const symbol: Symbol = {
-                id: agent.id,
-                name: agent.name,
-                type: agent.type === 'topology' ? 'node' : 'avatar',
-                environment: '3d-gltf',
-                position: agent.position,
-                data: agent,
-                metadata: {
-                  dimension: agent.dimension,
-                  churchEncoding: agent.churchEncoding,
-                  gltfModel: undefined
-                }
-              };
-              onSymbolSelect(symbol);
-            } else {
-              onSymbolSelect(null);
-            }
+        <Combined3DEnvironment
+          selectedSymbol={selectedSymbol}
+          onSymbolSelect={onSymbolSelect}
+          config={{
+            showAbstract: true,
+            showGrokMetaverse: true,
+            layout: 'layered'
           }}
-          selectedAgentId={selectedSymbol?.id || null}
         />
       );
 

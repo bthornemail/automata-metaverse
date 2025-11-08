@@ -22,16 +22,9 @@ test.describe('Automaton UI - Smoke Tests', () => {
   test('should display all navigation tabs', async ({ page }) => {
     const expectedTabs = [
       'Overview',
-      'Self-Reference', 
-      'History',
-      'Agents',
-      'Quantum',
-      'Animations',
-      'WebGL 3D',
-      'Multiplayer',
-      'AI Evolution',
-      'Metaverse',
-      'OpenCode',
+      'Self-Reference',
+      'AI Portal',
+      'Code Editor',
       'Config'
     ];
 
@@ -41,14 +34,15 @@ test.describe('Automaton UI - Smoke Tests', () => {
   });
 
   test('should show overview tab content by default', async ({ page }) => {
+    // Wait for page to load
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(2000); // Wait for React hydration and animations
+    
     // Check that overview tab is active
     await expect(page.locator('button:has-text("Overview")')).toHaveClass(/border-\[#6366f1\]/);
     
     // Check that dashboard component is visible
     await expect(page.locator('[data-testid="dashboard"]')).toBeVisible();
-    
-    // Check that dimensional canvas is visible
-    await expect(page.locator('[data-testid="dimensional-canvas"]')).toBeVisible();
     
     // Check that control panel is visible
     await expect(page.locator('[data-testid="control-panel"]')).toBeVisible();

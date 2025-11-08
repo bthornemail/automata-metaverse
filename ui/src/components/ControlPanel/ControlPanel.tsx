@@ -91,9 +91,11 @@ const ControlPanel: React.FC = () => {
                      ? 'border-[#6366f1] bg-[#6366f1]/20 text-white'
                     : 'border-gray-600 bg-gray-700/50 text-gray-300 hover:border-gray-500'
                 }`}
+                aria-label={`${action.name}: ${action.description}`}
+                aria-pressed={selectedAction === action.id}
               >
                 <div className="flex items-center gap-3">
-                  <Icon className="w-5 h-5" />
+                  <Icon className="w-5 h-5" aria-hidden="true" />
                   <div>
                     <div className="font-medium">{action.name}</div>
                     <div className="text-xs opacity-75">{action.description}</div>
@@ -122,10 +124,11 @@ const ControlPanel: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Interval Control */}
           <div>
-            <label className="block text-sm text-gray-300 mb-2">
+            <label htmlFor="execution-interval" className="block text-sm text-gray-300 mb-2">
               Execution Interval: {intervalMs}ms
             </label>
             <input
+              id="execution-interval"
               type="range"
               min="100"
               max="10000"
@@ -134,6 +137,7 @@ const ControlPanel: React.FC = () => {
               onChange={(e) => handleIntervalChange(Number(e.target.value))}
               className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
               disabled={status.isRunning}
+              aria-label="Execution interval in milliseconds"
             />
             <div className="flex justify-between text-xs text-gray-500 mt-1">
               <span>100ms</span>
@@ -143,10 +147,11 @@ const ControlPanel: React.FC = () => {
 
           {/* Max Iterations */}
           <div>
-            <label className="block text-sm text-gray-300 mb-2">
+            <label htmlFor="max-iterations" className="block text-sm text-gray-300 mb-2">
               Max Iterations: {maxIterations === Infinity ? 'Unlimited' : maxIterations}
             </label>
             <input
+              id="max-iterations"
               type="range"
               min="10"
               max="1000"
@@ -155,6 +160,7 @@ const ControlPanel: React.FC = () => {
               onChange={(e) => setMaxIterations(Number(e.target.value))}
               className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
               disabled={status.isRunning}
+              aria-label="Maximum number of iterations"
             />
             <div className="flex justify-between text-xs text-gray-500 mt-1">
               <span>10</span>
@@ -178,6 +184,7 @@ const ControlPanel: React.FC = () => {
                 variant={status.currentDimension === dim ? 'primary' : 'secondary'}
                 size="sm"
                 className="w-10 h-10"
+                aria-label={`Jump to dimension ${dim}D`}
               >
                 {dim}D
               </Button>

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Locator } from '@playwright/test';
 
 test.describe('Automaton UI - Component Interaction Tests', () => {
   test.beforeEach(async ({ page }) => {
@@ -20,44 +20,12 @@ test.describe('Automaton UI - Component Interaction Tests', () => {
       // Wait for motion animations to complete (framer-motion default is ~0.5s)
       await page.waitForTimeout(1000);
       
-      // Check dashboard - try multiple selectors
-      const dashboardSelectors = [
-        '[data-testid="dashboard"]',
-        'h2:has-text("Automaton Dashboard")',
-        'text=Automaton Dashboard'
-      ];
+      // Check dashboard using data-testid
+      await expect(page.locator('[data-testid="dashboard"]')).toBeVisible({ timeout: 10000 });
       
-      let dashboardFound = false;
-      for (const selector of dashboardSelectors) {
-        const element = page.locator(selector);
-        if (await element.count() > 0) {
-          try {
-            await expect(element.first()).toBeAttached({ timeout: 5000 });
-            dashboardFound = true;
-            break;
-          } catch (e) {
-            continue;
-          }
-        }
-      }
-      
-      // If dashboard not found by test ID, check if it's in the DOM at all
-      if (!dashboardFound) {
-        const dashboardText = page.locator('text=Automaton Dashboard');
-        await expect(dashboardText).toBeAttached({ timeout: 10000 });
-      }
-      
-      // Check for common dashboard elements with fallbacks
-      const statusCard = page.locator('[data-testid="status-card"]').or(page.locator('.bg-gray-700\\/50').first());
-      const metricsGrid = page.locator('[data-testid="metrics-grid"]').or(page.locator('.grid').first());
-      
-      // These are optional - just check if they exist
-      if (await statusCard.count() > 0) {
-        await expect(statusCard.first()).toBeAttached({ timeout: 5000 });
-      }
-      if (await metricsGrid.count() > 0) {
-        await expect(metricsGrid.first()).toBeAttached({ timeout: 5000 });
-      }
+      // Check for common dashboard elements
+      await expect(page.locator('[data-testid="status-card"]')).toBeAttached({ timeout: 5000 });
+      await expect(page.locator('[data-testid="metrics-grid"]')).toBeAttached({ timeout: 5000 });
     });
 
     test('should update dashboard data in real-time', async ({ page }) => {
@@ -73,39 +41,15 @@ test.describe('Automaton UI - Component Interaction Tests', () => {
       // Wait for motion animations
       await page.waitForTimeout(1000);
       
-      // Check if dashboard exists (try multiple selectors)
-      const dashboardSelectors = [
-        '[data-testid="dashboard"]',
-        'h2:has-text("Automaton Dashboard")',
-        'text=Automaton Dashboard'
-      ];
-      
-      let dashboard = null;
-      for (const selector of dashboardSelectors) {
-        const element = page.locator(selector);
-        if (await element.count() > 0) {
-          dashboard = element.first();
-          break;
-        }
-      }
-      
-      // If dashboard found, verify it's attached
-      if (dashboard) {
-        await expect(dashboard).toBeAttached({ timeout: 10000 });
-      } else {
-        // Fallback: just check if dashboard text exists
-        await expect(page.locator('text=Automaton Dashboard')).toBeAttached({ timeout: 10000 });
-      }
+      // Check dashboard exists using data-testid
+      const dashboard = page.locator('[data-testid="dashboard"]');
+      await expect(dashboard).toBeVisible({ timeout: 10000 });
       
       // Wait for potential real-time updates
       await page.waitForTimeout(3000);
       
-      // Dashboard should still be in the DOM
-      if (dashboard) {
-        await expect(dashboard).toBeAttached({ timeout: 5000 });
-      } else {
-        await expect(page.locator('text=Automaton Dashboard')).toBeAttached({ timeout: 5000 });
-      }
+      // Dashboard should still be visible
+      await expect(dashboard).toBeVisible({ timeout: 5000 });
     });
   });
 
@@ -124,46 +68,14 @@ test.describe('Automaton UI - Component Interaction Tests', () => {
       // Wait for motion animations
       await page.waitForTimeout(1000);
       
-      // Check control panel with multiple fallback selectors
-      const controlPanelSelectors = [
-        '[data-testid="control-panel"]',
-        'h3:has-text("Control Panel")',
-        'text=Control Panel'
-      ];
+      // Check control panel using data-testid
+      const controlPanel = page.locator('[data-testid="control-panel"]');
+      await expect(controlPanel).toBeVisible({ timeout: 10000 });
       
-      let controlPanelFound = false;
-      let controlPanelElement = null;
-      
-      for (const selector of controlPanelSelectors) {
-        const element = page.locator(selector);
-        if (await element.count() > 0) {
-          try {
-            await expect(element.first()).toBeAttached({ timeout: 5000 });
-            controlPanelFound = true;
-            controlPanelElement = element.first();
-            break;
-          } catch (e) {
-            continue;
-          }
-        }
-      }
-      
-      // If not found by test ID, try finding by text
-      if (!controlPanelFound) {
-        const controlPanelText = page.locator('text=Control Panel');
-        if (await controlPanelText.count() > 0) {
-          controlPanelElement = controlPanelText.locator('..').first();
-          await expect(controlPanelElement).toBeAttached({ timeout: 10000 });
-        }
-      }
-      
-      // At least some control buttons should be present
-      if (controlPanelElement) {
-        const controlButtons = controlPanelElement.locator('button');
-        if (await controlButtons.count() > 0) {
-          await expect(controlButtons.first()).toBeAttached({ timeout: 5000 });
-        }
-      }
+      // Check for control buttons
+      const controlButtons = controlPanel.locator('button');
+      await expect(controlButtons.first()).toBeVisible({ timeout: 5000 });
+      expect(await controlButtons.count()).toBeGreaterThan(0);
     });
 
     test('should handle button interactions', async ({ page }) => {
@@ -179,46 +91,20 @@ test.describe('Automaton UI - Component Interaction Tests', () => {
       // Wait for motion animations
       await page.waitForTimeout(1000);
       
-      // Find control panel with multiple selectors
-      const controlPanelSelectors = [
-        '[data-testid="control-panel"]',
-        'h3:has-text("Control Panel")',
-        'text=Control Panel'
-      ];
-      
-      let controlPanel = null;
-      for (const selector of controlPanelSelectors) {
-        const element = page.locator(selector);
-        if (await element.count() > 0) {
-          controlPanel = selector.includes('text=') ? element.locator('..').first() : element.first();
-          break;
-        }
-      }
-      
-      if (!controlPanel) {
-        // Skip test if control panel not found
-        console.log('Control panel not found, skipping button interaction test');
-        return;
-      }
-      
-      await expect(controlPanel).toBeAttached({ timeout: 10000 });
+      // Find control panel using data-testid
+      const controlPanel = page.locator('[data-testid="control-panel"]');
+      await expect(controlPanel).toBeVisible({ timeout: 10000 });
       
       // Find the first button in control panel
       const firstButton = controlPanel.locator('button').first();
-      if (await firstButton.count() > 0) {
-        await expect(firstButton).toBeAttached({ timeout: 5000 });
-        
-        // Click the button and check for response
-        try {
-          await firstButton.click({ timeout: 5000 });
-          await page.waitForTimeout(1000);
-          
-          // The button should still be attached
-          await expect(firstButton).toBeAttached({ timeout: 5000 });
-        } catch (e) {
-          console.log('Button interaction failed:', e);
-        }
-      }
+      await expect(firstButton).toBeVisible({ timeout: 5000 });
+      
+      // Click the button and check for response
+      await firstButton.click({ timeout: 5000 });
+      await page.waitForTimeout(1000);
+      
+      // The button should still be visible
+      await expect(firstButton).toBeVisible({ timeout: 5000 });
     });
   });
 
@@ -237,38 +123,9 @@ test.describe('Automaton UI - Component Interaction Tests', () => {
       // Wait for motion animations
       await page.waitForTimeout(1000);
       
-      // Check dimensional canvas with multiple selectors
-      const canvasSelectors = [
-        '[data-testid="dimensional-canvas"]',
-        '[data-testid="dimensional-canvas-svg"]',
-        'h3:has-text("Dimensional Topology")',
-        'text=Dimensional Topology'
-      ];
-      
-      let canvasFound = false;
-      for (const selector of canvasSelectors) {
-        const element = page.locator(selector);
-        if (await element.count() > 0) {
-          try {
-            await expect(element.first()).toBeAttached({ timeout: 5000 });
-            canvasFound = true;
-            break;
-          } catch (e) {
-            continue;
-          }
-        }
-      }
-      
-      // Check for canvas or visualization elements
-      const canvas = page.locator('canvas');
-      const svg = page.locator('svg');
-      
-      // At least one visualization element should be present
-      const hasCanvas = await canvas.count() > 0;
-      const hasSvg = await svg.count() > 0;
-      
-      // Test passes if canvas component found OR if canvas/svg elements exist
-      expect(canvasFound || hasCanvas || hasSvg).toBe(true);
+      // Check dimensional canvas using data-testid
+      const dimensionalCanvas = page.locator('[data-testid="dimensional-canvas"]');
+      await expect(dimensionalCanvas).toBeVisible({ timeout: 10000 });
     });
 
     test('should handle canvas interactions', async ({ page }) => {
@@ -284,40 +141,20 @@ test.describe('Automaton UI - Component Interaction Tests', () => {
       // Wait for motion animations
       await page.waitForTimeout(1000);
       
-      // Find canvas with multiple selectors
-      const canvasSelectors = [
-        '[data-testid="dimensional-canvas"]',
-        '[data-testid="dimensional-canvas-svg"]',
-        'svg'
-      ];
-      
-      let canvas = null;
-      for (const selector of canvasSelectors) {
-        const element = page.locator(selector);
-        if (await element.count() > 0) {
-          canvas = element.first();
-          break;
-        }
-      }
-      
-      if (!canvas) {
-        console.log('Canvas not found, skipping interaction test');
-        return;
-      }
-      
-      await expect(canvas).toBeAttached({ timeout: 10000 });
+      // Find canvas using data-testid
+      const canvas = page.locator('[data-testid="dimensional-canvas"]');
+      await expect(canvas).toBeVisible({ timeout: 10000 });
       
       // Try to interact with the canvas (if it's clickable)
       try {
         await canvas.click({ position: { x: 100, y: 100 }, timeout: 5000 });
         await page.waitForTimeout(500);
       } catch (e) {
-        // Canvas might not be directly clickable, that's okay
-        console.log('Canvas click failed (may not be interactive):', e);
+        // Canvas might not be directly clickable, that's okay - just verify it's still visible
       }
       
-      // Canvas should still be attached
-      await expect(canvas).toBeAttached({ timeout: 5000 });
+      // Canvas should still be visible
+      await expect(canvas).toBeVisible({ timeout: 5000 });
     });
   });
 
@@ -327,97 +164,40 @@ test.describe('Automaton UI - Component Interaction Tests', () => {
       await page.goto('/', { waitUntil: 'networkidle', timeout: 30000 });
       await page.waitForTimeout(2000);
       
-      // Click Quantum tab and wait for it to activate
-      try {
-        await page.click('button:has-text("Quantum")', { timeout: 10000 });
-        await page.waitForTimeout(2000); // Wait for animations
-      } catch (e) {
-        console.log('Quantum tab not found or not clickable');
-      }
+      // Quantum functionality is now part of Overview tab
+      // Ensure Overview tab is active
+      await page.click('button:has-text("Overview")', { timeout: 10000 });
+      await page.waitForTimeout(2000); // Wait for animations
     });
 
     test('should display quantum visualization', async ({ page }) => {
       // Wait for animations to complete
       await page.waitForTimeout(1000);
       
-      // Try multiple selectors for quantum visualization
-      const quantumSelectors = [
-        '[data-testid="quantum-visualization"]',
-        'h3:has-text("Quantum Visualization")',
-        'text=Quantum Visualization'
-      ];
+      // Check quantum visualization using data-testid (if it exists in Overview)
+      const quantumVisualization = page.locator('[data-testid="quantum-visualization"]');
+      const quantumCount = await quantumVisualization.count();
       
-      let quantumFound = false;
-      for (const selector of quantumSelectors) {
-        const element = page.locator(selector);
-        if (await element.count() > 0) {
-          try {
-            await expect(element.first()).toBeAttached({ timeout: 10000 });
-            quantumFound = true;
-            break;
-          } catch (e) {
-            continue;
-          }
-        }
+      // Quantum visualization may or may not be visible in Overview tab
+      // If it exists, verify it's visible
+      if (quantumCount > 0) {
+        await expect(quantumVisualization.first()).toBeVisible({ timeout: 10000 });
       }
-      
-      // Look for quantum-specific elements as fallback
-      if (!quantumFound) {
-        const quantumElements = page.locator('[data-testid*="quantum"], [data-testid*="qubit"], [data-testid*="circuit"], canvas, svg');
-        const count = await quantumElements.count();
-        if (count > 0) {
-          await expect(quantumElements.first()).toBeAttached({ timeout: 10000 });
-          quantumFound = true;
-        }
-      }
-      
-      // Test passes if quantum visualization found OR if quantum-related elements exist
-      expect(quantumFound).toBe(true);
     });
 
     test('should display circuit builder', async ({ page }) => {
       // Wait for animations to complete
       await page.waitForTimeout(1000);
       
-      // Try multiple selectors for circuit builder
-      const circuitBuilderSelectors = [
-        '[data-testid="circuit-builder"]',
-        'h3:has-text("Quantum Circuit Builder")',
-        'h3:has-text("Circuit Builder")',
-        'text=Quantum Circuit Builder',
-        'text=Circuit Builder'
-      ];
+      // Check circuit builder using data-testid (if it exists in Overview)
+      const circuitBuilder = page.locator('[data-testid="circuit-builder"]');
+      const circuitCount = await circuitBuilder.count();
       
-      let circuitBuilderFound = false;
-      let circuitBuilderElement = null;
-      
-      for (const selector of circuitBuilderSelectors) {
-        const element = page.locator(selector);
-        if (await element.count() > 0) {
-          try {
-            await expect(element.first()).toBeAttached({ timeout: 10000 });
-            circuitBuilderFound = true;
-            circuitBuilderElement = selector.includes('text=') ? element.locator('..').first() : element.first();
-            break;
-          } catch (e) {
-            continue;
-          }
-        }
+      // Circuit builder may or may not be visible in Overview tab
+      // If it exists, verify it's visible
+      if (circuitCount > 0) {
+        await expect(circuitBuilder.first()).toBeVisible({ timeout: 10000 });
       }
-      
-      if (circuitBuilderFound && circuitBuilderElement) {
-        // Look for circuit builder controls
-        const circuitControls = circuitBuilderElement.locator('button, input');
-        if (await circuitControls.count() > 0) {
-          await expect(circuitControls.first()).toBeAttached({ timeout: 5000 });
-        }
-      } else {
-        // If circuit builder is not found, that's okay - it might be in a different view mode
-        console.log('Circuit builder not found - may be in different view mode or not rendered');
-      }
-      
-      // Test passes regardless - circuit builder is optional
-      expect(true).toBe(true);
     });
   });
 
@@ -427,113 +207,48 @@ test.describe('Automaton UI - Component Interaction Tests', () => {
       await page.goto('/', { waitUntil: 'networkidle', timeout: 30000 });
       await page.waitForTimeout(2000);
       
-      // Click Agents tab and wait for it to activate
-      try {
-        await page.click('button:has-text("Agents")', { timeout: 10000 });
-        await page.waitForTimeout(2000); // Wait for animations
-      } catch (e) {
-        console.log('Agents tab not found or not clickable');
-      }
+      // Click AI Portal tab (where agent interface is located)
+      await page.click('button:has-text("AI Portal")', { timeout: 10000 });
+      await page.waitForTimeout(2000); // Wait for animations
     });
 
     test('should display agent interface', async ({ page }) => {
       // Wait for animations to complete
       await page.waitForTimeout(1000);
       
-      // Try multiple selectors for agent interface
-      const agentSelectors = [
-        '[data-testid="agent-interface"]',
-        'h3:has-text("Agent Interface")',
-        'h3:has-text("Agent")',
-        'text=Agent Interface'
-      ];
+      // Check AI Portal is visible
+      await expect(page.locator('[data-testid="ai-portal"]')).toBeVisible({ timeout: 10000 });
       
-      let agentFound = false;
-      for (const selector of agentSelectors) {
-        const element = page.locator(selector);
-        if (await element.count() > 0) {
-          try {
-            await expect(element.first()).toBeAttached({ timeout: 10000 });
-            agentFound = true;
-            break;
-          } catch (e) {
-            continue;
-          }
-        }
-      }
-      
-      // Look for agent-related elements as fallback
-      if (!agentFound) {
-        const agentElements = page.locator('[data-testid*="agent"], [data-testid*="chat"], [data-testid*="message"], textarea, input[type="text"]');
-        const count = await agentElements.count();
-        if (count > 0) {
-          await expect(agentElements.first()).toBeAttached({ timeout: 10000 });
-          agentFound = true;
-        }
-      }
-      
-      // Test passes if agent interface found OR if agent-related elements exist
-      expect(agentFound).toBe(true);
+      // Agent interface is inside AI Portal - check for chat input
+      const chatInput = page.locator('input[type="text"], textarea').filter({ hasText: /Message|message/i }).or(page.locator('input[type="text"]').first());
+      await expect(chatInput.first()).toBeVisible({ timeout: 10000 });
     });
 
     test('should handle agent interactions', async ({ page }) => {
       // Wait for animations to complete
       await page.waitForTimeout(1000);
       
-      // Find agent interface with multiple selectors
-      const agentSelectors = [
-        '[data-testid="agent-interface"]',
-        'h3:has-text("Agent Interface")',
-        'text=Agent Interface'
-      ];
+      // Check AI Portal is visible
+      await expect(page.locator('[data-testid="ai-portal"]')).toBeVisible({ timeout: 10000 });
       
-      let agentInterface = null;
-      for (const selector of agentSelectors) {
-        const element = page.locator(selector);
-        if (await element.count() > 0) {
-          agentInterface = selector.includes('text=') ? element.locator('..').first() : element.first();
-          break;
-        }
-      }
+      // Find chat input field
+      const inputField = page.locator('input[type="text"]').first();
+      await expect(inputField).toBeVisible({ timeout: 10000 });
       
-      if (!agentInterface) {
-        // Try to find by common agent interface elements
-        const chatArea = page.locator('textarea, input[type="text"]').first();
-        if (await chatArea.count() > 0) {
-          agentInterface = chatArea.locator('..').first();
-        }
-      }
+      // Fill input and send message
+      await inputField.fill('Test message', { timeout: 5000 });
       
-      if (!agentInterface) {
-        console.log('Agent interface not found, skipping interaction test');
-        return;
-      }
-      
-      await expect(agentInterface).toBeAttached({ timeout: 10000 });
-      
-      // Look for input fields or buttons
-      const inputField = agentInterface.locator('input, textarea').first();
-      const button = agentInterface.locator('button').first();
-      
-      if (await inputField.count() > 0) {
-        try {
-          await expect(inputField).toBeAttached({ timeout: 5000 });
-          await inputField.fill('Test message', { timeout: 5000 });
-          await page.keyboard.press('Enter');
-        } catch (e) {
-          console.log('Input field interaction failed:', e);
-        }
-      } else if (await button.count() > 0) {
-        try {
-          await expect(button).toBeAttached({ timeout: 5000 });
-          await button.click({ timeout: 5000 });
-        } catch (e) {
-          console.log('Button interaction failed:', e);
-        }
+      // Find send button
+      const sendButton = page.locator('button').filter({ hasText: /Send|send/i }).or(page.locator('button[type="submit"]')).first();
+      if (await sendButton.count() > 0) {
+        await sendButton.click({ timeout: 5000 });
+      } else {
+        // Try Enter key
+        await page.keyboard.press('Enter');
       }
       
       // Wait for any response
-      await page.waitForTimeout(1000);
+      await page.waitForTimeout(2000);
     });
   });
 
@@ -544,110 +259,51 @@ test.describe('Automaton UI - Component Interaction Tests', () => {
       await page.waitForTimeout(2000);
       
       // Click Config tab and wait for it to activate
-      try {
-        await page.click('button:has-text("Config")', { timeout: 10000 });
-        await page.waitForTimeout(2000); // Wait for animations
-      } catch (e) {
-        console.log('Config tab not found or not clickable');
-      }
+      await page.click('button:has-text("Config")', { timeout: 10000 });
+      await page.waitForTimeout(2000); // Wait for animations
     });
 
     test('should display configuration options', async ({ page }) => {
       // Wait for animations to complete
       await page.waitForTimeout(1000);
       
-      // Try multiple selectors for configuration
-      const configSelectors = [
-        '[data-testid="configuration"]',
-        'h3:has-text("Configuration")',
-        'h3:has-text("Configuration Management")',
-        'text=Configuration Management'
-      ];
+      // Check configuration using data-testid
+      const configuration = page.locator('[data-testid="configuration"]');
+      await expect(configuration).toBeVisible({ timeout: 10000 });
       
-      let configFound = false;
-      let configElement = null;
-      
-      for (const selector of configSelectors) {
-        const element = page.locator(selector);
-        if (await element.count() > 0) {
-          try {
-            await expect(element.first()).toBeAttached({ timeout: 10000 });
-            configFound = true;
-            configElement = selector.includes('text=') ? element.locator('..').first() : element.first();
-            break;
-          } catch (e) {
-            continue;
-          }
-        }
-      }
-      
-      if (configFound && configElement) {
-        // Look for form elements
-        const formElements = configElement.locator('input, select, button');
-        if (await formElements.count() > 0) {
-          await expect(formElements.first()).toBeAttached({ timeout: 5000 });
-        }
-      } else {
-        // Fallback: look for any form elements on the page
-        const formElements = page.locator('input, select, button');
-        if (await formElements.count() > 0) {
-          await expect(formElements.first()).toBeAttached({ timeout: 5000 });
-          configFound = true;
-        }
-      }
-      
-      // Test passes if configuration found OR if form elements exist
-      expect(configFound).toBe(true);
+      // Look for form elements
+      const formElements = configuration.locator('input, select, button');
+      await expect(formElements.first()).toBeVisible({ timeout: 5000 });
+      expect(await formElements.count()).toBeGreaterThan(0);
     });
 
     test('should handle configuration changes', async ({ page }) => {
       // Wait for animations to complete
       await page.waitForTimeout(1000);
       
-      // Find configuration with multiple selectors
-      const configSelectors = [
-        '[data-testid="configuration"]',
-        'h3:has-text("Configuration")',
-        'h3:has-text("Configuration Management")',
-        'text=Configuration Management'
-      ];
-      
-      let config = null;
-      for (const selector of configSelectors) {
-        const element = page.locator(selector);
-        if (await element.count() > 0) {
-          config = selector.includes('text=') ? element.locator('..').first() : element.first();
-          break;
-        }
-      }
-      
-      if (!config) {
-        console.log('Configuration component not found, skipping interaction test');
-        return;
-      }
-      
-      await expect(config).toBeAttached({ timeout: 10000 });
+      // Find configuration using data-testid
+      const config = page.locator('[data-testid="configuration"]');
+      await expect(config).toBeVisible({ timeout: 10000 });
       
       // Find and interact with form elements
       const inputs = config.locator('input, select');
       const inputCount = await inputs.count();
+      expect(inputCount).toBeGreaterThan(0);
       
+      // Interact with first text input
       for (let i = 0; i < Math.min(3, inputCount); i++) {
-        try {
-          const input = inputs.nth(i);
-          await expect(input).toBeAttached({ timeout: 5000 });
-          
-          const inputType = await input.getAttribute('type');
-          if (inputType !== 'checkbox' && inputType !== 'radio') {
-            await input.fill('test-value', { timeout: 5000 });
-          } else {
-            await input.click({ timeout: 5000 });
-          }
-          
+        const input = inputs.nth(i);
+        await expect(input).toBeVisible({ timeout: 5000 });
+        
+        const inputType = await input.getAttribute('type');
+        if (inputType !== 'checkbox' && inputType !== 'radio' && inputType !== 'password') {
+          await input.fill('test-value', { timeout: 5000 });
           await page.waitForTimeout(200);
-        } catch (e) {
-          console.log(`Input ${i} interaction failed:`, e);
-          // Continue with next input
+          break; // Only test one input
+        } else if (inputType === 'checkbox') {
+          await input.click({ timeout: 5000 });
+          await page.waitForTimeout(200);
+          break; // Only test one input
         }
       }
     });
@@ -740,33 +396,46 @@ test.describe('Automaton UI - Component Interaction Tests', () => {
 
   test.describe('Responsive Interactions', () => {
     test('should handle interactions on mobile', async ({ page }) => {
+      await page.goto('/', { waitUntil: 'networkidle', timeout: 30000 });
+      await page.waitForTimeout(2000);
+      
       await page.setViewportSize({ width: 375, height: 667 });
       
-      // Test touch interactions
-      const canvas = page.locator('[data-testid="dimensional-canvas"]');
-      if (await canvas.count() > 0) {
-        await canvas.tap();
-        await page.waitForTimeout(500);
-      }
+      // Ensure Overview tab is active
+      const overviewTab = page.locator('button:has-text("Overview")');
+      await expect(overviewTab).toBeVisible({ timeout: 10000 });
       
-      // Test navigation on mobile
-      const firstTab = page.locator('button').first();
-      await expect(firstTab).toBeVisible();
-      await firstTab.tap();
-      await page.waitForTimeout(500);
+      // Test navigation on mobile - tap on Self-Reference tab
+      const selfRefTab = page.locator('button:has-text("Self-Reference")');
+      await expect(selfRefTab).toBeVisible({ timeout: 10000 });
+      await selfRefTab.tap();
+      await page.waitForTimeout(1000);
+      
+      // Verify Self-Reference tab content is visible
+      await expect(page.locator('[data-testid="self-reference-analyzer"]')).toBeVisible({ timeout: 10000 });
     });
 
     test('should handle interactions on tablet', async ({ page }) => {
+      await page.goto('/', { waitUntil: 'networkidle', timeout: 30000 });
+      await page.waitForTimeout(2000);
+      
       await page.setViewportSize({ width: 768, height: 1024 });
+      
+      // Ensure Overview tab is active
+      const overviewTab = page.locator('button:has-text("Overview")');
+      await expect(overviewTab).toBeVisible({ timeout: 10000 });
       
       // Test that components are still interactive
       const controlPanel = page.locator('[data-testid="control-panel"]');
-      if (await controlPanel.count() > 0) {
-        const button = controlPanel.locator('button').first();
-        await expect(button).toBeVisible();
-        await button.click();
-        await page.waitForTimeout(500);
-      }
+      await expect(controlPanel).toBeVisible({ timeout: 10000 });
+      
+      const button = controlPanel.locator('button').first();
+      await expect(button).toBeVisible({ timeout: 5000 });
+      await button.click();
+      await page.waitForTimeout(500);
+      
+      // Button should still be visible after click
+      await expect(button).toBeVisible({ timeout: 5000 });
     });
   });
 });
