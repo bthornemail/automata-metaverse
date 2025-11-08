@@ -187,7 +187,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
   }
 
   return (
-    <div className="h-full flex flex-col bg-gray-900 text-white" style={{ height }}>
+    <div className="h-full flex flex-col bg-gray-900 text-white" style={{ height }} data-testid="unified-editor">
       {/* Toolbar */}
       <UnifiedToolbar
         mode={state.mode}

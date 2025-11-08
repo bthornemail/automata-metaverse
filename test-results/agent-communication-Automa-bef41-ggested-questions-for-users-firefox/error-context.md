@@ -1,100 +1,14 @@
 # Page snapshot
 
 ```yaml
-- generic [ref=e3]:
-  - banner [ref=e4]:
-    - generic [ref=e6]:
-      - heading "Self-Referencing Automaton Interface" [level=1] [ref=e7]: Self-Referencing Automaton Interface
-      - generic [ref=e10]: "Phase 3: Quantum Visualization"
-  - generic [ref=e14]:
-    - button "Overview" [ref=e15] [cursor=pointer]:
-      - img [ref=e16]
-      - text: Overview
-    - button "Self-Reference" [ref=e18] [cursor=pointer]:
-      - img [ref=e19]
-      - text: Self-Reference
-    - button "History" [ref=e22] [cursor=pointer]:
-      - img [ref=e23]
-      - text: History
-    - button "Agents" [ref=e27] [cursor=pointer]:
-      - img [ref=e28]
-      - text: Agents
-    - button "Quantum" [ref=e30] [cursor=pointer]:
-      - img [ref=e31]
-      - text: Quantum
-    - button "Animations" [ref=e33] [cursor=pointer]:
-      - img [ref=e34]
-      - text: Animations
-    - button "WebGL 3D" [ref=e40] [cursor=pointer]:
-      - img [ref=e41]
-      - text: WebGL 3D
-    - button "Multiplayer" [ref=e44] [cursor=pointer]:
-      - img [ref=e45]
-      - text: Multiplayer
-    - button "AI Evolution" [ref=e48] [cursor=pointer]:
-      - img [ref=e49]
-      - text: AI Evolution
-    - button "Metaverse" [ref=e52] [cursor=pointer]:
-      - img [ref=e53]
-      - text: Metaverse
-    - button "OpenCode" [ref=e56] [cursor=pointer]:
-      - img [ref=e57]
-      - text: OpenCode
-    - button "Config" [ref=e60] [cursor=pointer]:
-      - img [ref=e61]
-      - text: Config
-  - main [ref=e76]:
-    - generic [ref=e78]:
-      - generic [ref=e79]:
-        - heading "Agent Interface" [level=3] [ref=e80]:
-          - img [ref=e81]
-          - text: Agent Interface
-        - button [ref=e83] [cursor=pointer]:
-          - img [ref=e84]
-      - generic [ref=e87]:
-        - generic [ref=e88]: Active Agent
-        - generic [ref=e89]:
-          - button "automaton interface Main coordinator for all autom..." [ref=e90] [cursor=pointer]:
-            - generic [ref=e91]: automaton interface
-            - generic [ref=e92]: Main coordinator for all autom...
-          - button "automaton control Direct control and execution c..." [ref=e93] [cursor=pointer]:
-            - generic [ref=e94]: automaton control
-            - generic [ref=e95]: Direct control and execution c...
-          - button "automaton analyzer Pattern analysis and behaviora..." [active] [ref=e96] [cursor=pointer]:
-            - generic [ref=e97]: automaton analyzer
-            - generic [ref=e98]: Pattern analysis and behaviora...
-          - button "dimensional guide 0D-7D dimensional progression ..." [ref=e99] [cursor=pointer]:
-            - generic [ref=e100]: dimensional guide
-            - generic [ref=e101]: 0D-7D dimensional progression ...
-          - button "church encoding-expert Lambda calculus and Church enc..." [ref=e102] [cursor=pointer]:
-            - generic [ref=e103]: church encoding-expert
-            - generic [ref=e104]: Lambda calculus and Church enc...
-          - button "automaton visualizer Visual representations and dia..." [ref=e105] [cursor=pointer]:
-            - generic [ref=e106]: automaton visualizer
-            - generic [ref=e107]: Visual representations and dia...
-      - generic [ref=e109]:
-        - img [ref=e110]
-        - generic [ref=e117]: Start a conversation with automaton analyzer
-        - generic [ref=e118]: Pattern analysis and behavioral insights
-      - generic [ref=e119]:
-        - generic [ref=e120]:
-          - img [ref=e121]
-          - text: "Suggested questions:"
-        - generic [ref=e125]:
-          - button "Start the automaton with 2 second intervals" [ref=e126] [cursor=pointer]
-          - button "Analyze the self-modification patterns" [ref=e127] [cursor=pointer]
-          - button "Show me the current dimensional state" [ref=e128] [cursor=pointer]
-          - button "Explain 6D intelligence systems" [ref=e129] [cursor=pointer]
-          - button "Create a visualization of the topology" [ref=e130] [cursor=pointer]
-      - generic [ref=e131]:
-        - textbox "Message automaton analyzer..." [ref=e132]
-        - button [disabled] [ref=e133]:
-          - img [ref=e134]
-      - generic [ref=e137]:
-        - generic [ref=e140]: Ready
-        - generic [ref=e141]: 0 messages
-  - contentinfo [ref=e142]:
-    - generic [ref=e144]:
-      - generic [ref=e145]: Self-Referencing JSONL Automaton • 8-Dimensional Church Encoding
-      - generic [ref=e146]: Meta-Circular Evaluator • Quantum Visualization & Advanced Analytics
+- generic [ref=e6]:
+  - img [ref=e7]
+  - generic [ref=e11]:
+    - heading "Something went wrong" [level=2] [ref=e12]
+    - paragraph [ref=e13]: Error creating WebGL context.
+    - group [ref=e14]:
+      - generic "Error Details" [ref=e15] [cursor=pointer]
+    - generic [ref=e16]:
+      - button "Try Again" [ref=e17] [cursor=pointer]
+      - button "Reload Page" [ref=e18] [cursor=pointer]
 ```

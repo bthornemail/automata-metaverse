@@ -16,7 +16,7 @@ import { grokMetaverseService } from '../../services/grok-metaverse-service';
 
 export const UnifiedMetaverseView: React.FC<UnifiedMetaverseViewProps> = ({
   initialMajorMode = 'environment',
-  initialMinorMode = 'abstract',
+  initialMinorMode = '3d-gltf',
   onModeChange,
   onSymbolSelect,
   height = '100%'
@@ -26,7 +26,7 @@ export const UnifiedMetaverseView: React.FC<UnifiedMetaverseViewProps> = ({
     minorMode: initialMinorMode,
     selectedSymbol: null,
     selectedSymbols: new Set(),
-    activeEnvironments: new Set(['abstract']),
+    activeEnvironments: new Set(['3d-gltf']),
     environmentConfigs: new Map(),
     viewportLayout: 'single'
   });
@@ -139,6 +139,34 @@ export const UnifiedMetaverseView: React.FC<UnifiedMetaverseViewProps> = ({
         console.warn('Failed to load grok metaverse agents:', err);
       }
 
+      // Add Canvas 2D symbols for canvas files
+      const canvasFiles = [
+        'automaton-kernel.canvasl',
+        'automaton.canvas.space.jsonl',
+        'generate.metaverse.jsonl'
+      ];
+      
+      for (const filename of canvasFiles) {
+        try {
+          const entries = await databaseService.readJSONL(filename);
+          if (entries.length > 0) {
+            symbols.push({
+              id: `canvas-${filename}`,
+              name: `Canvas: ${filename}`,
+              type: 'node',
+              environment: 'canvas-2d' as EnvironmentType,
+              position: [0, 0, 0],
+              data: { filename, entries },
+              metadata: {
+                codeContent: entries.map(e => JSON.stringify(e)).join('\n')
+              }
+            });
+          }
+        } catch (err) {
+          console.warn(`Failed to load canvas symbol for ${filename}:`, err);
+        }
+      }
+
       setAvailableSymbols(symbols);
     } catch (err) {
       console.error('Failed to load symbols:', err);
@@ -193,22 +221,48 @@ export const UnifiedMetaverseView: React.FC<UnifiedMetaverseViewProps> = ({
         majorMode={state.majorMode}
         minorMode={state.minorMode}
         selectedSymbol={state.selectedSymbol}
-        availableEnvironments={['abstract', 'canvas-2d', 'code-media', '3d-gltf']}
+        availableEnvironments={['3d-gltf', 'code-media']}
         availableSymbols={availableSymbols}
         onMajorModeChange={handleMajorModeChange}
         onMinorModeChange={handleMinorModeChange}
         onSymbolSelect={handleSymbolSelect}
       />
 
-      {/* Environment Renderer */}
+      {/* Main Content Area */}
       <div className="flex-1 overflow-hidden">
-        <EnvironmentRenderer
-          environment={currentEnvironment}
-          selectedSymbol={state.selectedSymbol}
-          selectedSymbols={state.selectedSymbols}
-          onSymbolSelect={handleSymbolSelect}
-          config={getEnvironmentConfig(currentEnvironment)}
-        />
+        {state.majorMode === 'environment' ? (
+          <EnvironmentRenderer
+            environment={currentEnvironment}
+            selectedSymbol={state.selectedSymbol}
+            selectedSymbols={state.selectedSymbols}
+            onSymbolSelect={handleSymbolSelect}
+            config={getEnvironmentConfig(currentEnvironment)}
+          />
+        ) : state.majorMode === 'symbol' && state.selectedSymbol ? (
+          // Symbol mode: Show Canvas 2D if symbol is canvas-2d type
+          state.selectedSymbol.environment === 'canvas-2d' ? (
+            <UnifiedEditor
+              filename={state.selectedSymbol.data?.filename || state.selectedSymbol.id.replace('canvas-', '') || 'automaton-kernel.canvasl'}
+              initialMode="canvas"
+              height="100%"
+              onSave={(content, format) => {
+                // Handle save
+              }}
+            />
+          ) : (
+            <EnvironmentRenderer
+              environment={state.selectedSymbol.environment}
+              selectedSymbol={state.selectedSymbol}
+              selectedSymbols={state.selectedSymbols}
+              onSymbolSelect={handleSymbolSelect}
+              config={getEnvironmentConfig(state.selectedSymbol.environment)}
+            />
+          )
+        ) : (
+          <div className="flex items-center justify-center h-full bg-gray-900 text-gray-400">
+            Select a symbol to view
+          </div>
+        )}
       </div>
     </div>
   );

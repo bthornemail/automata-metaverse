@@ -59,8 +59,10 @@ const AppContent: React.FC = () => {
                        ? 'border-[#6366f1] text-white bg-[#6366f1]/10'
                       : 'border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-700/50'
                   }`}
+                  aria-label={`Switch to ${tab.label} tab`}
+                  aria-current={activeTab === tab.id ? 'page' : undefined}
                 >
-                  <Icon className="w-4 h-4" />
+                  <Icon className="w-4 h-4" aria-hidden="true" />
                   {tab.label}
                 </button>
               );

@@ -22,7 +22,9 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: process.env.BASE_URL || 'http://localhost:3000',
+    /* Auto-detect: Use Vite dev server (5173) if BASE_URL not set, otherwise use production build (3000) */
+    /* In CI/CD, prefer production build on port 3000 */
+    baseURL: process.env.BASE_URL || (process.env.CI ? 'http://localhost:3000' : 'http://localhost:5173'),
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -105,6 +107,7 @@ export default defineConfig({
 
   /* Global setup and teardown */
   globalSetup: require.resolve('./tests/e2e/global-setup.ts'),
+  globalTeardown: require.resolve('./tests/e2e/global-teardown.ts'),
   
   /* Test timeout - increased for evolution and integrity tests */
   timeout: 120000,

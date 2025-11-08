@@ -805,7 +805,7 @@ Generate a helpful, informative response:
   };
 
   return (
-    <div className="w-full h-full bg-gray-800 rounded-xl shadow-xl border border-gray-700 flex flex-col">
+    <div className="w-full h-full bg-gray-800 rounded-xl shadow-xl border border-gray-700 flex flex-col" data-testid="ai-portal">
       {/* Header */}
       <div className="p-4 border-b border-gray-700 bg-gradient-to-r from-purple-900/50 to-pink-900/50">
         <div className="flex items-center justify-between">
@@ -920,7 +920,7 @@ Generate a helpful, informative response:
           {metaverseMode === 'unified' ? (
             <UnifiedMetaverseView
               initialMajorMode="environment"
-              initialMinorMode="abstract"
+              initialMinorMode="3d-gltf"
               onModeChange={(major, minor) => {
                 addEvolutionLog(`Mode changed: ${major}/${minor}`);
               }}
@@ -1102,8 +1102,9 @@ Generate a helpful, informative response:
                     onClick={() => sendMessage(inputMessage)}
                     disabled={!inputMessage.trim() || isTyping}
                     className="px-4 py-2 bg-[#6366f1] hover:bg-[#8b5cf6] text-white rounded-lg disabled:opacity-50 transition-colors"
+                    aria-label="Send message"
                   >
-                    <Send className="w-4 h-4" />
+                    <Send className="w-4 h-4" aria-hidden="true" />
                   </button>
                 </div>
               </div>

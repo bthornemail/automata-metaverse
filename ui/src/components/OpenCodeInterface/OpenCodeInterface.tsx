@@ -968,11 +968,12 @@ console.log(fibonacci(10));`);
                     onClick={() => sendMessage(agentTask)}
                     disabled={!agentTask.trim() || isExecutingAgent}
                     className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg transition-colors"
+                    aria-label={isExecutingAgent ? "Sending message" : "Send message"}
                   >
                     {isExecutingAgent ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" />
                     ) : (
-                      <MessageSquare className="w-5 h-5" />
+                      <MessageSquare className="w-5 h-5" aria-hidden="true" />
                     )}
                   </button>
                 </div>
