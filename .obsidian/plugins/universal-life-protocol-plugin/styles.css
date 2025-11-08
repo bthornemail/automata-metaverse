@@ -1,0 +1,626 @@
+/* Universal Life Protocol Dashboard Styles */
+
+.ulp-ribbon-class {
+  color: var(--interactive-accent);
+}
+
+/* Dashboard Sections */
+.ulp-status-section,
+.ulp-metrics-section,
+.ulp-project-section,
+.ulp-controls-section {
+  margin: 20px 0;
+  padding: 15px;
+  background: var(--background-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--background-modifier-border);
+}
+
+.ulp-status-section h3,
+.ulp-metrics-section h3,
+.ulp-project-section h3,
+.ulp-controls-section h3 {
+  margin: 0 0 15px 0;
+  color: var(--text-accent);
+  border-bottom: 2px solid var(--interactive-accent);
+  padding-bottom: 5px;
+}
+
+/* Status Grid */
+.ulp-status-grid,
+.ulp-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+/* Status Cards */
+.ulp-status-card,
+.ulp-metric-card {
+  background: var(--background-primary);
+  border: 2px solid var(--background-modifier-border);
+  border-radius: 8px;
+  padding: 15px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.ulp-status-card:hover,
+.ulp-metric-card:hover {
+  border-color: var(--interactive-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.ulp-card-icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.ulp-card-title {
+  font-weight: 600;
+  color: var(--text-normal);
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.ulp-card-status,
+.ulp-card-value {
+  font-weight: 700;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Status-specific colors */
+.ulp-status-connected {
+  color: var(--text-success) !important;
+}
+
+.ulp-status-disconnected {
+  color: var(--text-error) !important;
+}
+
+.ulp-status-connecting {
+  color: var(--text-warning) !important;
+}
+
+.ulp-status-unknown {
+  color: var(--text-muted) !important;
+}
+
+/* Task List */
+.ulp-task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ulp-task-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--background-primary);
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+  transition: all 0.2s ease;
+}
+
+.ulp-task-item:hover {
+  background: var(--background-primary-alt);
+  border-color: var(--interactive-accent);
+}
+
+.ulp-task-item input[type="checkbox"] {
+  margin: 0;
+  scale: 1.2;
+}
+
+.ulp-task-item label {
+  flex: 1;
+  margin: 0;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+/* Priority Badges */
+.ulp-priority {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.ulp-priority-high {
+  background: var(--text-error);
+  color: white;
+}
+
+.ulp-priority-medium {
+  background: var(--text-warning);
+  color: white;
+}
+
+.ulp-priority-low {
+  background: var(--text-success);
+  color: white;
+}
+
+/* Button Group */
+.ulp-button-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ulp-button-group button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--interactive-normal);
+  background: var(--interactive-normal);
+  color: var(--text-on-accent);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.ulp-button-group button:hover {
+  background: var(--interactive-hover);
+  border-color: var(--interactive-hover);
+  transform: translateY(-1px);
+}
+
+.ulp-button-group button:active {
+  transform: translateY(0);
+}
+
+.ulp-button-group button.mod-cta {
+  background: var(--interactive-accent);
+  border-color: var(--interactive-accent);
+}
+
+.ulp-button-group button.mod-cta:hover {
+  background: var(--interactive-accent-hover);
+  border-color: var(--interactive-accent-hover);
+}
+
+/* Settings Styles */
+.ulp-test-section {
+  margin-top: 20px;
+  padding: 15px;
+  background: var(--background-secondary);
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+}
+
+.ulp-test-section button {
+  margin-bottom: 10px;
+}
+
+.test-result {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-weight: 500;
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+}
+
+/* Dashboard Layout */
+.view-content .ulp-dashboard-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.view-content h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: var(--text-accent);
+  font-size: 28px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .ulp-status-grid,
+  .ulp-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .ulp-button-group {
+    flex-direction: column;
+  }
+  
+  .ulp-button-group button {
+    width: 100%;
+  }
+  
+  .ulp-task-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+/* Animation for connecting status */
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+.ulp-status-connecting {
+  animation: pulse 1.5s infinite;
+}
+
+/* Dark mode adjustments */
+.theme-dark .ulp-status-card,
+.theme-dark .ulp-metric-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.theme-dark .ulp-status-card:hover,
+.theme-dark .ulp-metric-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* RSS Feed Cards */
+.ulp-rss-card {
+  background: var(--background-primary);
+  border: 2px solid var(--background-modifier-border);
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+  transition: all 0.2s ease;
+}
+
+.ulp-rss-card:hover {
+  border-color: var(--interactive-accent);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.ulp-rss-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.ulp-rss-header h4 {
+  margin: 0;
+  color: var(--text-accent);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.ulp-rss-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.ulp-rss-info span {
+  font-size: 12px;
+  color: var(--text-muted);
+  background: var(--background-secondary);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.ulp-rss-list {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 12px;
+}
+
+.ulp-rss-list ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ulp-rss-list li {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--background-modifier-border);
+  font-size: 14px;
+}
+
+.ulp-rss-list li:last-child {
+  border-bottom: none;
+}
+
+.ulp-rss-list a {
+  color: var(--text-normal);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.ulp-rss-list a:hover {
+  color: var(--interactive-accent);
+  text-decoration: underline;
+}
+
+/* MCP Server Cards */
+.ulp-mcp-card {
+  background: var(--background-primary);
+  border: 2px solid var(--background-modifier-border);
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 12px;
+  transition: all 0.2s ease;
+}
+
+.ulp-mcp-card:hover {
+  border-color: var(--interactive-accent);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.ulp-mcp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.ulp-mcp-name {
+  font-weight: 600;
+  color: var(--text-accent);
+  font-size: 14px;
+  margin: 0;
+}
+
+.ulp-mcp-status {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.ulp-mcp-status.active {
+  background: var(--text-success);
+  color: white;
+}
+
+.ulp-mcp-status.inactive {
+  background: var(--text-error);
+  color: white;
+}
+
+.ulp-mcp-status.unknown {
+  background: var(--text-muted);
+  color: white;
+}
+
+.ulp-mcp-details {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 8px;
+}
+
+.ulp-mcp-details strong {
+  color: var(--text-normal);
+}
+
+/* MQTT Connection Status */
+.ulp-mqtt-section {
+  margin: 20px 0;
+  padding: 15px;
+  background: var(--background-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--background-modifier-border);
+}
+
+.ulp-mqtt-section h3 {
+  margin: 0 0 15px 0;
+  color: var(--text-accent);
+  border-bottom: 2px solid var(--interactive-accent);
+  padding-bottom: 5px;
+}
+
+.ulp-mqtt-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.ulp-mqtt-card {
+  background: var(--background-primary);
+  border: 2px solid var(--background-modifier-border);
+  border-radius: 8px;
+  padding: 15px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.ulp-mqtt-card:hover {
+  border-color: var(--interactive-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.ulp-mqtt-port {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-accent);
+  margin-bottom: 8px;
+}
+
+.ulp-mqtt-status {
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Status bar styling */
+.status-bar-item.ulp-status {
+  background: var(--background-modifier-form-field);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 12px;
+}
+
+/* Code Editor Styles */
+.code-editor-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--background-secondary);
+  border-bottom: 1px solid var(--background-modifier-border);
+  gap: 10px;
+}
+
+.code-editor-lang-select {
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  color: var(--text-normal);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.code-editor-lang-select:hover {
+  border-color: var(--interactive-accent);
+}
+
+.code-editor-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.code-editor-buttons button {
+  padding: 4px 12px;
+  border-radius: 4px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--interactive-normal);
+  color: var(--text-on-accent);
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+.code-editor-buttons button:hover {
+  background: var(--interactive-hover);
+  border-color: var(--interactive-hover);
+}
+
+.code-editor-buttons button.mod-cta {
+  background: var(--interactive-accent);
+  border-color: var(--interactive-accent);
+}
+
+.code-editor-buttons button.mod-cta:hover {
+  background: var(--interactive-accent-hover);
+  border-color: var(--interactive-accent-hover);
+}
+
+.code-editor-container {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.code-editor-container .cm-editor {
+  height: 100%;
+}
+
+.code-editor-container .cm-scroller {
+  overflow: auto;
+}
+
+/* CodeMirror theme integration with Obsidian */
+.theme-dark .cm-editor {
+  background: var(--background-primary);
+  color: var(--text-normal);
+}
+
+.theme-light .cm-editor {
+  background: var(--background-primary);
+  color: var(--text-normal);
+}
+
+/* Front matter highlighting */
+.cm-frontMatter-section {
+  background-color: rgba(100, 100, 100, 0.08);
+  padding: 2px 0;
+  border-radius: 2px;
+}
+
+.cm-frontMatter-key {
+  color: var(--text-accent);
+  font-weight: 500;
+}
+
+.cm-frontMatter-value {
+  color: var(--text-normal);
+}
+
+.cm-frontMatter-string {
+  color: var(--text-accent);
+  font-style: italic;
+}
+
+.cm-frontMatter-boolean {
+  color: var(--text-accent);
+  font-weight: bold;
+}
+
+.cm-frontMatter-number {
+  color: var(--text-accent);
+}
+
+.cm-frontMatter-delimiter {
+  color: var(--text-muted);
+  font-weight: bold;
+  opacity: 0.8;
+}
+
+/* CanvasL highlighting */
+.cm-canvasl-id {
+  color: var(--text-accent);
+  font-weight: bold;
+}
+
+.cm-canvasl-type {
+  color: var(--text-accent);
+  font-weight: 500;
+}
+
+.cm-canvasl-edge-type {
+  color: var(--text-error);
+  font-weight: 500;
+}
+
+.cm-canvasl-r5rs-function {
+  color: var(--text-accent);
+  font-family: var(--font-monospace);
+  font-weight: 500;
+}
+
+.cm-canvasl-dimension {
+  color: var(--text-warning);
+  font-weight: bold;
+}
+
+.cm-canvasl-reference {
+  color: var(--text-accent);
+  font-weight: 500;
+}
+
+.cm-canvasl-directive {
+  color: var(--text-error);
+  font-weight: bold;
+}

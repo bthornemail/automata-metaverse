@@ -1,0 +1,50 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "module": "ESNext",
+    "target": "ES2020",
+    "downlevelIteration": true,
+    "allowJs": true,
+    "noImplicitAny": true,
+    "moduleResolution": "node",
+    "importHelpers": true,
+    "isolatedModules": true,
+    "strictNullChecks": true,
+    "lib": [
+      "DOM",
+      "ES2020"
+    ]
+  },
+  "include": [
+    "main.ts",
+    "src/views/**/*.ts",
+    "src/modals/**/*.ts",
+    "src/extensions/**/*.ts",
+    "src/utils/**/*.ts",
+    "src/agents/**/*.ts",
+    "src/blackboard/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "tests",
+    "src/auth.ts",
+    "src/auth copy 2.js",
+    "src/auth copy 3.js",
+    "src/axiom-canvas-mcp.ts",
+    "src/identity-mcp.ts",
+    "src/manifest-generator.ts",
+    "src/merkle-trie-mcp.ts",
+    "src/metadata-tracker.ts",
+    "src/obsidian-mcp.ts",
+    "src/obsidian-plugin-integration.ts",
+    "src/pipe.ts",
+    "src/self.auth.ts",
+    "src/shared-secrets.ts",
+    "src/transform.server copy.ts",
+    "src/test-mcp.js",
+    "src/**/*.md",
+    "src/**/*.txt"
+  ]
+}

@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "@codemirror/commands": "^6.10.0",
+    "@codemirror/lang-markdown": "^6.5.0",
     "@opencode-ai/sdk": "^1.0.39",
     "bcryptjs": "^2.4.3",
     "compression": "^1.7.4",

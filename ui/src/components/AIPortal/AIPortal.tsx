@@ -15,6 +15,7 @@ import { tinyMLService } from '@/services/tinyml-service';
 import { databaseService } from '@/services/database-service';
 import { llmService, LLMProviderConfig } from '@/services/llm-service';
 import WebGLMetaverseEvolution, { dimensionConfig } from '@/components/AdvancedAnimations/WebGLMetaverseEvolution';
+import JSONLCanvasEditor from '@/components/JSONLCanvasEditor/JSONLCanvasEditor';
 
 interface AIMutation {
   id: string;
@@ -149,7 +150,9 @@ const AIPortal: React.FC = () => {
   const [showAgentSelectModal, setShowAgentSelectModal] = useState(false);
   const [showBridgeModal, setShowBridgeModal] = useState(false);
   const [showAIEvolutionModal, setShowAIEvolutionModal] = useState(false);
-  const [activeAITab, setActiveAITab] = useState<'evolution' | 'metrics'>('evolution');
+  const [activeAITab, setActiveAITab] = useState<'evolution' | 'metrics' | 'canvas'>('evolution');
+  const [showCanvasEditor, setShowCanvasEditor] = useState(false);
+  const [selectedJSONLFile, setSelectedJSONLFile] = useState<string>('automaton-kernel.jsonl');
   
   // Metaverse Stats State
   const [metaverseStats, setMetaverseStats] = useState<{
@@ -1759,6 +1762,19 @@ Generate a helpful, informative response:
                 Metrics & Logs
               </div>
             </button>
+            <button
+              onClick={() => setActiveAITab('canvas')}
+              className={`px-4 py-2 text-sm font-medium transition-colors ${
+                activeAITab === 'canvas'
+                  ? 'text-white border-b-2 border-purple-500'
+                  : 'text-gray-400 hover:text-gray-300'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <FileText className="w-4 h-4" />
+                Canvas Editor
+              </div>
+            </button>
           </div>
 
           {/* Tab Content */}
@@ -2022,6 +2038,35 @@ Generate a helpful, informative response:
                       )}
                     </div>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* Canvas Editor Tab */}
+            {activeAITab === 'canvas' && (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm text-gray-400 mb-2">Select JSONL File</label>
+                  <select
+                    value={selectedJSONLFile}
+                    onChange={(e) => setSelectedJSONLFile(e.target.value)}
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                  >
+                    <option value="automaton-kernel.jsonl">automaton-kernel.jsonl</option>
+                    <option value="generate.metaverse.jsonl">generate.metaverse.jsonl</option>
+                    <option value="automaton.jsonl">automaton.jsonl</option>
+                    <option value="automaton.canvas.space.jsonl">automaton.canvas.space.jsonl</option>
+                    <option value="automaton-kernel.canvasl">automaton-kernel.canvasl (CanvasL)</option>
+                    <option value="generate.metaverse.canvasl">generate.metaverse.canvasl (CanvasL)</option>
+                  </select>
+                </div>
+                <div className="border border-gray-700 rounded-lg overflow-hidden" style={{ height: '600px' }}>
+                  <JSONLCanvasEditor
+                    filename={selectedJSONLFile}
+                    onSave={(content) => {
+                      addEvolutionLog(`Saved canvas: ${selectedJSONLFile}`);
+                    }}
+                  />
                 </div>
               </div>
             )}

@@ -5,10 +5,14 @@ import { opencodeApi } from '../../services/api';
 import { EditorView } from '@codemirror/view';
 import { EditorState } from '@codemirror/state';
 import { javascript } from '@codemirror/lang-javascript';
+import { markdown } from '@codemirror/lang-markdown';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { defaultKeymap } from '@codemirror/commands';
 import { keymap } from '@codemirror/view';
 import { motion, AnimatePresence } from 'framer-motion';
+import { frontMatterParser } from '../../utils/front-matter-parser';
+import { markdownService } from '../../services/markdown-service';
+import { databaseService } from '../../services/database-service';
 
 interface AnalysisResult {
   patterns: string[];
@@ -117,6 +121,10 @@ console.log(fibonacci(10));`);
     wordWrap: true
   });
   const [currentModel, setCurrentModel] = useState('llama2');
+  const [fileLanguage, setFileLanguage] = useState<'javascript' | 'markdown' | 'canvasl'>('javascript');
+  const [fileExtension, setFileExtension] = useState<string>('.js');
+  const [frontMatter, setFrontMatter] = useState<any>({});
+  const [jsonlReferences, setJsonlReferences] = useState<string[]>([]);
   const editorRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
 
@@ -133,38 +141,64 @@ console.log(fibonacci(10));`);
   }, [schemeHistory]);
 
   useEffect(() => {
-    if (editorRef.current && !viewRef.current) {
-      const startState = EditorState.create({
-        doc: code,
-        extensions: [
-          javascript(),
-          oneDark,
-          keymap.of(defaultKeymap),
-          EditorView.updateListener.of((update) => {
-            if (update.docChanged) {
-              setCode(update.state.doc.toString());
-            }
-          }),
-          EditorView.theme({
-            '&': {
-              height: '100%',
-              fontSize: '14px'
-            },
-            '.cm-scroller': {
-              overflow: 'auto'
-            },
-            '.cm-content': {
-              padding: '12px'
-            }
-          })
-        ]
-      });
+    if (!editorRef.current) return;
 
-      viewRef.current = new EditorView({
-        state: startState,
-        parent: editorRef.current
-      });
+    // Destroy existing editor if language changed
+    if (viewRef.current) {
+      viewRef.current.destroy();
+      viewRef.current = null;
     }
+
+    // Create new editor with appropriate language
+    // Use Lezer-compatible markdown with front matter support
+    // Support .canvasl extension as extended JSONL canvas format
+    let languageExtension: any;
+    if (fileLanguage === 'markdown') {
+      languageExtension = markdownWithFrontMatter();
+    } else if (fileLanguage === 'canvasl' || fileExtension === '.canvasl') {
+      languageExtension = canvaslLanguage();
+    } else {
+      languageExtension = javascript();
+    }
+    
+    const startState = EditorState.create({
+      doc: code,
+      extensions: [
+        languageExtension,
+        oneDark,
+        keymap.of(defaultKeymap),
+        EditorView.updateListener.of((update) => {
+          if (update.docChanged) {
+            const newCode = update.state.doc.toString();
+            setCode(newCode);
+            
+            // Parse front matter if markdown
+            if (fileLanguage === 'markdown') {
+              const parsed = frontMatterParser.parse(newCode);
+              setFrontMatter(parsed.frontMatter);
+              setJsonlReferences(frontMatterParser.extractJSONLReferences(parsed.frontMatter));
+            }
+          }
+        }),
+        EditorView.theme({
+          '&': {
+            height: '100%',
+            fontSize: '14px'
+          },
+          '.cm-scroller': {
+            overflow: 'auto'
+          },
+          '.cm-content': {
+            padding: '12px'
+          }
+        })
+      ]
+    });
+
+    viewRef.current = new EditorView({
+      state: startState,
+      parent: editorRef.current
+    });
 
     return () => {
       if (viewRef.current) {
@@ -172,7 +206,16 @@ console.log(fibonacci(10));`);
         viewRef.current = null;
       }
     };
-  }, []);
+  }, [fileLanguage]);
+
+  // Parse front matter when code changes (for markdown)
+  useEffect(() => {
+    if (fileLanguage === 'markdown' && code) {
+      const parsed = frontMatterParser.parse(code);
+      setFrontMatter(parsed.frontMatter);
+      setJsonlReferences(frontMatterParser.extractJSONLReferences(parsed.frontMatter));
+    }
+  }, [code, fileLanguage]);
 
   // Evaluate selected code from editor in REPL
   const evaluateSelectedCode = async () => {
@@ -197,15 +240,66 @@ console.log(fibonacci(10));`);
     setIsSchemeLoading(true);
 
     try {
+      // For markdown files, parse front matter and load JSONL references
+      let enhancedContext = { ...schemeContext };
+      
+      if (fileLanguage === 'markdown' && source === 'editor') {
+        const parsed = frontMatterParser.parse(codeToEvaluate);
+        const jsonlRefs = frontMatterParser.extractJSONLReferences(parsed.frontMatter);
+        
+        // Load JSONL files into context
+        for (const jsonlFile of jsonlRefs) {
+          try {
+            const entries = await databaseService.readJSONL(jsonlFile);
+            enhancedContext[`jsonl:${jsonlFile}`] = entries;
+            
+            // Add helper functions to context
+            enhancedContext[`load-jsonl-from-markdown`] = async (file: string) => {
+              return await databaseService.readJSONL(file);
+            };
+            enhancedContext[`get-canvas-refs`] = () => {
+              return frontMatterParser.extractJSONLReferences(parsed.frontMatter);
+            };
+            enhancedContext[`canvas-node`] = (nodeId: string) => {
+              return entries.find((e: any) => e.id === nodeId);
+            };
+            enhancedContext[`update-canvas-node`] = async (nodeId: string, updates: any) => {
+              const entry = entries.find((e: any) => e.id === nodeId);
+              if (entry) {
+                Object.assign(entry, updates);
+                await databaseService.writeJSONL(jsonlFile, entries);
+              }
+            };
+          } catch (err) {
+            console.warn(`Failed to load JSONL file ${jsonlFile}:`, err);
+          }
+        }
+        
+        // Extract code blocks from markdown
+        const codeBlockRegex = /```(?:scheme|javascript|js)?\n([\s\S]*?)```/g;
+        const codeBlocks: string[] = [];
+        let match;
+        while ((match = codeBlockRegex.exec(parsed.content)) !== null) {
+          codeBlocks.push(match[1]);
+        }
+        
+        // Evaluate code blocks
+        if (codeBlocks.length > 0) {
+          codeToEvaluate = codeBlocks.join('\n');
+        } else {
+          codeToEvaluate = parsed.content;
+        }
+      }
+      
       // Try to evaluate as JavaScript first, then Scheme
       let result: SchemeREPLResult;
       
       if (source === 'editor') {
         // For editor code, we might want to convert JS to Scheme or evaluate directly
         // For now, let's try evaluating as Scheme expression
-        result = await schemeREPLService.evaluateLine(codeToEvaluate, schemeContext);
+        result = await schemeREPLService.evaluateLine(codeToEvaluate, enhancedContext);
       } else {
-        result = await schemeREPLService.evaluateLine(codeToEvaluate, schemeContext);
+        result = await schemeREPLService.evaluateLine(codeToEvaluate, enhancedContext);
       }
       
       setSchemeHistory(prev => [...prev, {
@@ -214,6 +308,11 @@ console.log(fibonacci(10));`);
         timestamp: Date.now(),
         source
       }]);
+      
+      // Update context with new bindings
+      if (result.success && result.result) {
+        setSchemeContext(enhancedContext);
+      }
     } catch (error) {
       setSchemeHistory(prev => [...prev, {
         input: codeToEvaluate,
@@ -542,7 +641,39 @@ console.log(fibonacci(10));`);
         <div className="flex-1 flex overflow-hidden">
           <div className="flex-1 flex flex-col">
             <div className="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
-              <span className="text-sm text-gray-400">JavaScript Editor</span>
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-gray-400">
+                  {fileLanguage === 'markdown' ? 'Markdown Editor' : 
+                   fileLanguage === 'canvasl' ? 'CanvasL Editor' : 
+                   'JavaScript Editor'}
+                </span>
+                <select
+                  value={fileLanguage}
+                  onChange={(e) => {
+                    const lang = e.target.value as 'javascript' | 'markdown' | 'canvasl';
+                    setFileLanguage(lang);
+                    // Set extension based on language
+                    if (lang === 'canvasl') {
+                      setFileExtension('.canvasl');
+                    } else if (lang === 'markdown') {
+                      setFileExtension('.md');
+                    } else {
+                      setFileExtension('.js');
+                    }
+                  }}
+                  className="px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-xs"
+                >
+                  <option value="javascript">JavaScript</option>
+                  <option value="markdown">Markdown</option>
+                  <option value="canvasl">CanvasL (.canvasl)</option>
+                </select>
+                {fileLanguage === 'markdown' && jsonlReferences.length > 0 && (
+                  <div className="flex items-center gap-1 text-xs text-blue-400">
+                    <Database className="w-3 h-3" />
+                    {jsonlReferences.length} JSONL ref{jsonlReferences.length !== 1 ? 's' : ''}
+                  </div>
+                )}
+              </div>
               <span className="text-xs text-gray-500">CodeMirror 6</span>
             </div>
             <div className="flex-1 overflow-hidden" ref={editorRef} />
