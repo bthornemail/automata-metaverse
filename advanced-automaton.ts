@@ -48,7 +48,7 @@ class AdvancedSelfReferencingAutomaton {
   private filePath: string;
   private objects: CanvasObject[] = [];
   private currentDimension: number = 0;
-  private executionHistory: string[] = [];
+  private executionHistory: Array<string | { action: string; from?: string; to?: string; timestamp?: number; iteration?: number }> = [];
   private selfModificationCount: number = 0;
 
   constructor(filePath: string) {
@@ -809,7 +809,12 @@ class AdvancedSelfReferencingAutomaton {
   private executeSelfTraining(): void {
     const actionCounts = new Map<string, number>();
     this.executionHistory.forEach(entry => {
-      const action = entry.split(':')[0] || 'unknown';
+      let action = 'unknown';
+      if (typeof entry === 'string') {
+        action = entry.split(':')[0] || 'unknown';
+      } else if (entry && typeof entry === 'object' && 'action' in entry) {
+        action = entry.action || 'unknown';
+      }
       actionCounts.set(action, (actionCounts.get(action) || 0) + 1);
     });
     
@@ -886,7 +891,14 @@ class AdvancedSelfReferencingAutomaton {
       
       // Force progression if stuck
       if (this.executionHistory.length > 3 && 
-          this.executionHistory.slice(-3).every(h => h.includes('self-reference'))) {
+          this.executionHistory.slice(-3).every(h => {
+            if (typeof h === 'string') {
+              return h.includes('self-reference');
+            } else if (h && typeof h === 'object' && 'action' in h) {
+              return h.action === 'self-reference';
+            }
+            return false;
+          })) {
         console.log('Forcing dimensional progression...');
         const verticalTransition = this.getVerticalTransition(`0D-automaton`);
         if (verticalTransition) {
@@ -925,8 +937,14 @@ class AdvancedSelfReferencingAutomaton {
     console.log(`Execution history: ${this.executionHistory.length} actions`);
     if (this.executionHistory.length > 0) {
       console.log('Recent actions:');
-      this.executionHistory.slice(-5).forEach(action => {
-        console.log(`  ${action}`);
+      this.executionHistory.slice(-5).forEach(entry => {
+        if (typeof entry === 'string') {
+          console.log(`  ${entry}`);
+        } else if (entry && typeof entry === 'object' && 'action' in entry) {
+          console.log(`  ${entry.action}${entry.from && entry.to ? ` (${entry.from} → ${entry.to})` : ''}`);
+        } else {
+          console.log(`  ${JSON.stringify(entry)}`);
+        }
       });
     }
   }

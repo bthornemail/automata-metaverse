@@ -149,15 +149,47 @@ async function handleAPIRequest(path: string, req: any, res: any) {
           response.error = `File not found: ${fileName}`;
         } else {
           const content = readFileSync(filePath, 'utf-8');
-          const lines = content.trim().split('\n').filter((line: string) => line.trim());
-          const data = lines.map((line: string) => {
+          
+          // Ensure content is a string
+          if (typeof content !== 'string') {
+            response.success = false;
+            response.error = `Invalid file content: expected string, got ${typeof content}`;
+          } else {
+            // Handle both JSONL (line-by-line) and JSON array formats
+            let data: any[] = [];
+            
             try {
-              return JSON.parse(line);
-            } catch (e) {
-              return null;
+              // Try parsing as JSON array first (in case file is already JSON)
+              const parsed = JSON.parse(content);
+              if (Array.isArray(parsed)) {
+                data = parsed;
+              } else {
+                // Otherwise, treat as JSONL (line-by-line)
+                const lines = content.trim().split('\n').filter((line: string) => line.trim());
+                data = lines.map((line: string) => {
+                  try {
+                    return JSON.parse(line);
+                  } catch (e) {
+                    console.warn(`Failed to parse JSONL line: ${line.substring(0, 100)}`);
+                    return null;
+                  }
+                }).filter(Boolean);
+              }
+            } catch (parseError) {
+              // If JSON.parse fails, treat as JSONL
+              const lines = content.trim().split('\n').filter((line: string) => line.trim());
+              data = lines.map((line: string) => {
+                try {
+                  return JSON.parse(line);
+                } catch (e) {
+                  console.warn(`Failed to parse JSONL line: ${line.substring(0, 100)}`);
+                  return null;
+                }
+              }).filter(Boolean);
             }
-          }).filter(Boolean);
-          response.data = data;
+            
+            response.data = data;
+          }
         }
       } catch (error: any) {
         response.success = false;
@@ -300,7 +332,7 @@ async function handleAPIRequest(path: string, req: any, res: any) {
           response.data = {
             intervalMs: 2000,
             maxIterations: Infinity,
-            useOllama: false,
+            useWebLLM: false,
             model: 'llama2',
             automatonFile: './automaton.jsonl'
           };

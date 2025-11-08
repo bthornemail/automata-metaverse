@@ -229,16 +229,16 @@ const WebGLDimensionalVisualization: React.FC = () => {
   };
 
   return (
-    <div className="w-full h-full bg-gray-900 rounded-xl shadow-xl">
+    <div className="w-full h-full bg-gray-800/50 rounded-xl shadow-xl border border-gray-700">
       <div className="p-4 border-b border-gray-700">
-        <h3 className="text-xl font-bold text-white">WebGL Dimensional Topology</h3>
-        <p className="text-sm text-gray-400 mt-1">
-          Interactive 3D visualization of Church encoding dimensional progression
+        <h3 className="text-lg font-bold text-white">WebGL 3D Visualization</h3>
+        <p className="text-xs text-gray-400 mt-1">
+          Interactive 3D Church encoding topology
         </p>
       </div>
 
       {/* 3D Canvas */}
-      <div className="relative" style={{ height: '500px' }}>
+      <div className="relative" style={{ height: '400px' }}>
         <Canvas
           camera={{ position: [7, 3, 10], fov: 60 }}
           gl={{ antialias: true }}

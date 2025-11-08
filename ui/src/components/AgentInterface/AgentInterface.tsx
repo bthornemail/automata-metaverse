@@ -132,7 +132,7 @@ const AgentInterface: React.FC = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-800 rounded-xl shadow-xl h-full flex flex-col">
+    <div className="p-6 bg-gray-800 rounded-xl shadow-xl h-full flex flex-col" data-testid="agent-interface">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-xl font-bold text-white flex items-center gap-3">

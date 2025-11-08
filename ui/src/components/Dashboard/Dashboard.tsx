@@ -45,14 +45,14 @@ const Dashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <Card>
+      <Card data-testid="dashboard">
         <LoadingSpinner size="lg" text="Loading dashboard..." />
       </Card>
     );
   }
 
   return (
-    <Card>
+    <Card data-testid="dashboard">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-white flex items-center gap-3">
@@ -101,9 +101,9 @@ const Dashboard: React.FC = () => {
       )}
 
       {/* Main Status Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6" data-testid="metrics-grid">
         {/* Current Dimension */}
-        <div className="bg-gray-700/50 rounded-lg p-4">
+        <div className="bg-gray-700/50 rounded-lg p-4" data-testid="status-card">
           <div className="text-sm text-gray-400 mb-1">Current Dimension</div>
           <div className="flex items-center gap-2">
             <div className={`w-4 h-4 rounded ${dimensionColors[status.currentDimension]}`}></div>

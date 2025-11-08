@@ -176,7 +176,7 @@ const DimensionalCanvas: React.FC = () => {
   }, [dimensions, links, currentDimension]);
 
   return (
-    <Card title="Dimensional Topology">
+    <Card title="Dimensional Topology" data-testid="dimensional-canvas">
       
       <div className="relative">
         <svg
@@ -185,6 +185,7 @@ const DimensionalCanvas: React.FC = () => {
           height="400"
           className="w-full h-full border border-gray-700 rounded-lg bg-gray-900"
           viewBox="0 0 800 400"
+          data-testid="dimensional-canvas-svg"
         />
       </div>
 

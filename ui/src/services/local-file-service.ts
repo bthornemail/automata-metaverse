@@ -25,23 +25,66 @@ export interface LocalFileService {
 class LocalFileServiceImpl implements LocalFileService {
   async loadFromPublic(file: string): Promise<any[]> {
     try {
-      // Try /jsonl/ path first (public directory)
-      const response = await fetch(`/jsonl/${file}`);
+      // Browser-side folder: ui/public/jsonl/ → /jsonl/{file}
+      // Vite serves files from public/ directory at root
+      const response = await fetch(`/jsonl/${file}`, {
+        cache: 'no-cache', // Ensure fresh data
+        headers: {
+          'Accept': 'text/plain, application/json, */*'
+        }
+      });
+      
       if (response.ok) {
+        const contentType = response.headers.get('content-type') || '';
+        
+        // If it's JSON (from API proxy), parse as JSON
+        if (contentType.includes('application/json')) {
+          const data = await response.json();
+          if (Array.isArray(data)) {
+            console.log(`✓ Loaded ${data.length} items from browser-side JSON: /jsonl/${file}`);
+            return data;
+          }
+          // API response wrapper
+          if (data && typeof data === 'object' && 'success' in data && 'data' in data && Array.isArray(data.data)) {
+            console.log(`✓ Loaded ${data.data.length} items from browser-side API response: /jsonl/${file}`);
+            return data.data;
+          }
+          console.warn(`Unexpected JSON response format for ${file}`);
+          return [];
+        }
+        
+        // Otherwise, treat as text/JSONL and parse line by line
         const text = await response.text();
-        return this.parseJSONL(text);
+        if (typeof text !== 'string' || !text.trim()) {
+          console.warn(`Empty or invalid response for ${file}`);
+          return [];
+        }
+        
+        const data = this.parseJSONL(text);
+        console.log(`✓ Loaded ${data.length} items from browser-side JSONL file: /jsonl/${file}`);
+        return data;
       }
       
-      // Try root public directory
-      const rootResponse = await fetch(`/${file}`);
+      // Fallback: Try root public directory
+      const rootResponse = await fetch(`/${file}`, {
+        cache: 'no-cache',
+        headers: {
+          'Accept': 'text/plain, application/json, */*'
+        }
+      });
+      
       if (rootResponse.ok) {
         const text = await rootResponse.text();
-        return this.parseJSONL(text);
+        if (typeof text === 'string' && text.trim()) {
+          const data = this.parseJSONL(text);
+          console.log(`✓ Loaded ${data.length} items from browser-side root file: /${file}`);
+          return data;
+        }
       }
       
-      throw new Error(`File not found: ${file}`);
-    } catch (error) {
-      console.warn(`Failed to load local file ${file}:`, error);
+      throw new Error(`File not found in browser-side folder: ${file} (tried /jsonl/${file} and /${file})`);
+    } catch (error: any) {
+      console.warn(`Failed to load browser-side file ${file}:`, error.message);
       throw error;
     }
   }
@@ -72,6 +115,12 @@ class LocalFileServiceImpl implements LocalFileService {
   }
 
   parseJSONL(text: string): any[] {
+    // Guard against non-string input
+    if (typeof text !== 'string') {
+      console.warn('parseJSONL received non-string input:', typeof text);
+      return Array.isArray(text) ? text : [];
+    }
+    
     const lines = text.trim().split('\n').filter(line => line.trim());
     const data = lines.map((line, index) => {
       try {

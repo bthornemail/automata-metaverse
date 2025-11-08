@@ -1,2 +1,2 @@
 # JSONL files directory
-# Files in this directory are served at /jsonl/{filename}
+# Files in this directory are served statically by Vite

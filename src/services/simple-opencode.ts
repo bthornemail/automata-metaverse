@@ -1,10 +1,10 @@
-// Enhanced OpenCode integration with Ollama and agentic features
+// Enhanced OpenCode integration with WebLLM and agentic features
 export interface OpenCodeConfig {
   enabled: boolean;
   baseUrl?: string;
-  ollamaUrl?: string;
+  webllmUrl?: string;
   model?: string;
-  useOllama?: boolean;
+  useWebLLM?: boolean;
 }
 
 export interface MockAnalysisResult {
@@ -24,15 +24,21 @@ export interface AgentCapability {
 class SimpleOpenCodeService {
   private config: OpenCodeConfig;
   private connected = false;
-  private ollamaUrl: string;
-  private availableModels: string[] = [];
+  private webllmEngine: any = null;
+  private availableModels: string[] = [
+    'Llama-3.1-8B-Instruct-q4f32_1-MLC',
+    'Llama-3.2-3B-Instruct-q4f16_1-MLC',
+    'Phi-3.5-mini-instruct-q4f16_1-MLC',
+    'gemma-2-2b-it-q4f16_1-MLC',
+    'Mistral-7B-Instruct-v0.3-q4f16_1-MLC',
+    'Qwen2-1.5B-Instruct-q4f16_1-MLC'
+  ];
   private currentModel: string;
   private agents: Map<string, AgentCapability> = new Map();
 
   constructor(config: OpenCodeConfig = { enabled: false }) {
     this.config = config;
-    this.ollamaUrl = config.ollamaUrl || 'http://localhost:11434';
-    this.currentModel = config.model || 'llama2';
+    this.currentModel = config.model || config.webllmModel || 'Llama-3.2-3B-Instruct-q4f16_1-MLC';
     this.initializeAgents();
   }
 
@@ -63,16 +69,15 @@ class SimpleOpenCodeService {
         return false;
       }
 
-      // Try to connect to Ollama if enabled
-      if (this.config.useOllama !== false) {
-        await this.checkOllamaConnection();
-        await this.fetchAvailableModels();
+      // Try to initialize WebLLM if enabled
+      if (this.config.useWebLLM !== false) {
+        await this.initializeWebLLM();
       }
 
       this.connected = true;
       console.log('✅ Enhanced OpenCode service initialized');
-      if (this.config.useOllama !== false) {
-        console.log(`🤖 Using Ollama model: ${this.currentModel}`);
+      if (this.config.useWebLLM !== false && this.webllmEngine) {
+        console.log(`🤖 Using WebLLM model: ${this.currentModel}`);
       }
       return true;
     } catch (error) {
@@ -82,28 +87,28 @@ class SimpleOpenCodeService {
     }
   }
 
-  private async checkOllamaConnection(): Promise<void> {
+  private async checkWebLLMConnection(): Promise<void> {
     try {
-      const response = await fetch(`${this.ollamaUrl}/api/tags`);
+      const response = await fetch(`${this.webllmUrl}/models`);
       if (!response.ok) {
-        throw new Error('Ollama not responding');
+        throw new Error('WebLLM not responding');
       }
-      console.log('✅ Ollama connection established');
+      console.log('✅ WebLLM connection established');
     } catch (error) {
-      console.warn('⚠️ Ollama not available, using fallback analysis mode');
+      console.warn('⚠️ WebLLM not available, using fallback analysis mode');
       throw error;
     }
   }
 
   private async fetchAvailableModels(): Promise<void> {
     try {
-      const response = await fetch(`${this.ollamaUrl}/api/tags`);
+      const response = await fetch(`${this.webllmUrl}/models`);
       const data = await response.json() as any;
-      this.availableModels = data.models?.map((model: any) => model.name) || ['llama2', 'codellama', 'mistral'];
+      this.availableModels = data.models || ['Llama-3.1-8B-Instruct-q4f16_1', 'TinyLlama-1.1B-Chat-v0.4-q4f16_1', 'Phi-3-mini-4k-instruct-q4f16_1'];
       console.log(`📋 Available models: ${this.availableModels.join(', ')}`);
     } catch (error) {
-      this.availableModels = ['llama2', 'codellama', 'mistral'];
-      console.warn('⚠️ Using default model list');
+      this.availableModels = ['Llama-3.1-8B-Instruct-q4f16_1', 'TinyLlama-1.1B-Chat-v0.4-q4f16_1', 'Phi-3-mini-4k-instruct-q4f16_1'];
+      console.warn('⚠️ Using default WebLLM model list');
     }
   }
 
@@ -124,7 +129,7 @@ class SimpleOpenCodeService {
     return this.analyzeWithRules(automatonData);
   }
 
-  private async analyzeWithOllama(automatonData: any): Promise<MockAnalysisResult> {
+  private async analyzeWithWebLLM(automatonData: any): Promise<MockAnalysisResult> {
     const prompt = `Analyze this self-referencing automaton state and provide structured analysis:
 
 Current Dimension: ${automatonData.currentDimension}D
@@ -150,7 +155,7 @@ Focus on:
 3. Self-reference optimization
 4. Computational topology insights`;
 
-    const response = await fetch(`${this.ollamaUrl}/api/generate`, {
+    const response = await fetch(`${this.webllmUrl}/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -161,7 +166,7 @@ Focus on:
     });
 
     const data = await response.json() as any;
-    const analysisText = data.response;
+    const analysisText = data.response || data.text || data.content || '';
     
     try {
       // Extract JSON from response
@@ -170,7 +175,7 @@ Focus on:
         return JSON.parse(jsonMatch[0]);
       }
     } catch (error) {
-      console.warn('Failed to parse Ollama JSON response');
+      console.warn('Failed to parse WebLLM JSON response');
     }
     
     // Fallback to rule-based if parsing fails
@@ -225,7 +230,7 @@ Focus on:
     return this.getSuggestionsWithRules(currentDimension, availableActions);
   }
 
-  private async getSuggestionsWithOllama(currentDimension: number, availableActions: string[]): Promise<string[]> {
+  private async getSuggestionsWithWebLLM(currentDimension: number, availableActions: string[]): Promise<string[]> {
     const prompt = `As an expert in Church encoding and computational topology, suggest the best next action for an automaton at ${currentDimension}D.
 
 Available actions: ${availableActions.join(', ')}
@@ -239,18 +244,14 @@ Consider:
 Provide 3 specific suggestions in JSON format:
 ["action1 - reason", "action2 - reason", "action3 - reason"]`;
 
-    const response = await fetch(`${this.ollamaUrl}/api/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: this.currentModel,
-        prompt,
-        stream: false
-      })
+    const response = await this.webllmEngine.chat.completions.create({
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
+      max_tokens: 512,
+      stream: false
     });
 
-    const data = await response.json() as any;
-    const suggestionsText = data.response;
+    const suggestionsText = response.choices[0]?.message?.content || '';
     
     try {
       const jsonMatch = suggestionsText.match(/\[[\s\S]*\]/);
@@ -258,7 +259,7 @@ Provide 3 specific suggestions in JSON format:
         return JSON.parse(jsonMatch[0]);
       }
     } catch (error) {
-      console.warn('Failed to parse Ollama suggestions');
+      console.warn('Failed to parse WebLLM suggestions');
     }
     
     return this.getSuggestionsWithRules(currentDimension, availableActions);
@@ -288,11 +289,11 @@ Provide 3 specific suggestions in JSON format:
 
   async searchCodebase(pattern: string): Promise<any[]> {
     // Enhanced search with agent assistance
-    if (this.config.useOllama !== false && this.availableModels.length > 0) {
+    if (this.config.useWebLLM !== false && this.availableModels.length > 0) {
       try {
-        return await this.searchWithOllama(pattern);
+        return await this.searchWithWebLLM(pattern);
       } catch (error) {
-        console.warn('⚠️ Ollama search failed, using fallback:', error);
+        console.warn('⚠️ WebLLM search failed, using fallback:', error);
       }
     }
     
@@ -329,18 +330,14 @@ Provide search results in JSON format:
   }
 ]`;
 
-    const response = await fetch(`${this.ollamaUrl}/api/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: this.currentModel,
-        prompt,
-        stream: false
-      })
+    const response = await this.webllmEngine.chat.completions.create({
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
+      max_tokens: 1024,
+      stream: false
     });
 
-    const data = await response.json() as any;
-    const searchResults = data.response;
+    const searchResults = response.choices[0]?.message?.content || '';
     
     try {
       const jsonMatch = searchResults.match(/\[[\s\S]*\]/);
@@ -348,7 +345,7 @@ Provide search results in JSON format:
         return JSON.parse(jsonMatch[0]);
       }
     } catch (error) {
-      console.warn('Failed to parse Ollama search results');
+      console.warn('Failed to parse WebLLM search results');
     }
     
     return [];
@@ -360,9 +357,9 @@ Provide search results in JSON format:
       throw new Error(`Agent ${agentName} not found`);
     }
 
-    if (this.config.useOllama !== false && this.availableModels.length > 0) {
+    if (this.config.useWebLLM !== false && this.availableModels.length > 0) {
       try {
-        return await this.executeAgentWithOllama(agent, task);
+        return await this.executeAgentWithWebLLM(agent, task);
       } catch (error) {
         console.warn('⚠️ Agent execution failed, using fallback:', error);
       }
@@ -378,7 +375,7 @@ Task: ${task}
 
 Provide a detailed response in JSON format with insights, recommendations, and actionable steps.`;
 
-    const response = await fetch(`${this.ollamaUrl}/api/generate`, {
+    const response = await fetch(`${this.webllmUrl}/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -393,7 +390,7 @@ Provide a detailed response in JSON format with insights, recommendations, and a
     return {
       agent: agent.name,
       task,
-      response: data.response,
+      response: data.response || data.text || data.content || '',
       timestamp: Date.now(),
       model: this.currentModel
     };
@@ -418,11 +415,19 @@ Provide a detailed response in JSON format with insights, recommendations, and a
   }
 
   async setModel(model: string): Promise<boolean> {
-    // Always allow setting common models, even if Ollama isn't available
-    const commonModels = ['llama2', 'codellama', 'mistral', 'vicuna'];
-    if (this.availableModels.includes(model) || commonModels.includes(model)) {
+    // Check if model is in available WebLLM models
+    if (this.availableModels.includes(model)) {
       this.currentModel = model;
-      console.log(`🤖 Switched to model: ${model}`);
+      console.log(`🤖 Switched to WebLLM model: ${model}`);
+      
+      // Reinitialize WebLLM with new model if engine exists
+      if (this.webllmEngine && this.config.useWebLLM !== false) {
+        try {
+          await this.initializeWebLLM();
+        } catch (error) {
+          console.warn('Failed to reinitialize WebLLM with new model:', error);
+        }
+      }
       return true;
     }
     return false;

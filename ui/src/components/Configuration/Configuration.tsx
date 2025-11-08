@@ -357,7 +357,7 @@ const Configuration: React.FC<ConfigurationProps> = ({ className = '' }) => {
   }
 
   return (
-    <div className={`p-6 bg-gray-800 rounded-xl shadow-xl ${className}`}>
+    <div className={`p-6 bg-gray-800 rounded-xl shadow-xl ${className}`} data-testid="configuration">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xl font-bold text-white flex items-center gap-3">
           <Settings className="w-6 h-6 text-green-400" />

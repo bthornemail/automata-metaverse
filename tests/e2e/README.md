@@ -31,9 +31,31 @@ npm run test:e2e
 - `realtime-updates.spec.ts` - Real-time update handling and performance
 - `cross-component-dataflow.spec.ts` - Cross-component data flow and integration
 
+### Headless Testing
+- `headless.spec.ts` - Comprehensive headless browser testing suite
+  - Tests all functionality without visible browser
+  - Verifies API integration, WebSocket communication, navigation, error handling
+  - Performance monitoring and accessibility checks
+  - Run with: `npm run test:e2e:headless`
+
+### JSONL Data Components
+- `jsonl-data-components.spec.ts` - Comprehensive JSONL data component testing
+  - Tests JSONL file loading (public directory and API)
+  - Tests JSONL parsing (valid, invalid, malformed, empty files)
+  - Tests Self-Reference Analyzer component
+  - Tests Execution History component
+  - Tests OpenCode Interface JSONL generation
+  - Tests JSONL API endpoints (read, append)
+  - Tests error handling and validation
+  - Tests component integration with JSONL data
+  - Run with: `npm run test:e2e:jsonl`
+
 ## Available Scripts
 
-- `npm run test:e2e` - Run all E2E tests
+- `npm run test:e2e` - Run all E2E tests (headless by default)
+- `npm run test:e2e:headless` - Run only headless-specific tests
+- `npm run test:e2e:jsonl` - Run JSONL data component tests
+- `npm run test:e2e:headed` - Run tests with visible browser
 - `npm run test:e2e:ui` - Run tests with Playwright UI
 - `npm run test:e2e:debug` - Debug tests with Playwright inspector
 - `npm run test:e2e:codegen` - Generate tests with Playwright codegen

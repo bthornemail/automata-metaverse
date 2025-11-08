@@ -48,7 +48,7 @@ const ControlPanel: React.FC = () => {
   };
 
   return (
-    <Card title="Control Panel">
+    <Card title="Control Panel" data-testid="control-panel">
 
       {/* Quick Actions */}
       <div className="mb-6">

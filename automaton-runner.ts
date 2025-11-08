@@ -52,7 +52,7 @@ class SelfReferencingAutomaton {
   private filePath: string;
   private objects: CanvasObject[] = [];
   private currentLine: number = 0;
-  private executionHistory: string[] = [];
+  private executionHistory: Array<string | { action: string; from?: string; to?: string; timestamp?: number; iteration?: number }> = [];
 
   constructor(filePath: string) {
     this.filePath = filePath;
@@ -215,7 +215,12 @@ class SelfReferencingAutomaton {
     // Learn from execution history
     const actionCounts = new Map<string, number>();
     this.executionHistory.forEach(entry => {
-      const action = entry.split(':')[0] || 'unknown';
+      let action = 'unknown';
+      if (typeof entry === 'string') {
+        action = entry.split(':')[0] || 'unknown';
+      } else if (entry && typeof entry === 'object' && 'action' in entry) {
+        action = entry.action || 'unknown';
+      }
       actionCounts.set(action, (actionCounts.get(action) || 0) + 1);
     });
     
@@ -314,8 +319,14 @@ class SelfReferencingAutomaton {
     console.log(`Execution history: ${this.executionHistory.length} actions`);
     if (this.executionHistory.length > 0) {
       console.log('Recent actions:');
-      this.executionHistory.slice(-5).forEach(action => {
-        console.log(`  ${action}`);
+      this.executionHistory.slice(-5).forEach(entry => {
+        if (typeof entry === 'string') {
+          console.log(`  ${entry}`);
+        } else if (entry && typeof entry === 'object' && 'action' in entry) {
+          console.log(`  ${entry.action}${entry.from && entry.to ? ` (${entry.from} → ${entry.to})` : ''}`);
+        } else {
+          console.log(`  ${JSON.stringify(entry)}`);
+        }
       });
     }
   }

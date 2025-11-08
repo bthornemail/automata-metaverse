@@ -40,7 +40,42 @@ export async function loadJSONLFromBrowser(
     const response = await fetch(filePath);
     
     if (response.ok) {
+      const contentType = response.headers.get('content-type') || '';
+      
+      // Check if response is JSON (from API) or text (from static file)
+      if (contentType.includes('application/json')) {
+        const data = await response.json();
+        if (Array.isArray(data)) {
+          return {
+            data,
+            source: 'local',
+            filename,
+            itemCount: data.length
+          };
+        }
+        // If it's an API response wrapper
+        if (data.success && Array.isArray(data.data)) {
+          return {
+            data: data.data,
+            source: 'local',
+            filename,
+            itemCount: data.data.length
+          };
+        }
+      }
+      
+      // Otherwise, treat as text and parse JSONL
       const text = await response.text();
+      if (typeof text !== 'string') {
+        console.warn(`[JSONL Loader] Unexpected response type for ${filename}, expected string`);
+        return {
+          data: [],
+          source: 'error',
+          filename,
+          itemCount: 0
+        };
+      }
+      
       const lines = text.trim().split('\n').filter(line => line.trim());
       const data = lines.map((line, index) => {
         try {
