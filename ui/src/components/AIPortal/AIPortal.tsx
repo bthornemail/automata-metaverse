@@ -14,7 +14,7 @@ import { nlpService } from '@/services/nlp-service';
 import { tinyMLService } from '@/services/tinyml-service';
 import { databaseService } from '@/services/database-service';
 import { llmService, LLMProviderConfig } from '@/services/llm-service';
-import WebGLMetaverseEvolution from '@/components/AdvancedAnimations/WebGLMetaverseEvolution';
+import WebGLMetaverseEvolution, { dimensionConfig } from '@/components/AdvancedAnimations/WebGLMetaverseEvolution';
 
 interface AIMutation {
   id: string;
@@ -149,6 +149,24 @@ const AIPortal: React.FC = () => {
   const [showAgentSelectModal, setShowAgentSelectModal] = useState(false);
   const [showBridgeModal, setShowBridgeModal] = useState(false);
   const [showAIEvolutionModal, setShowAIEvolutionModal] = useState(false);
+  const [activeAITab, setActiveAITab] = useState<'evolution' | 'metrics'>('evolution');
+  
+  // Metaverse Stats State
+  const [metaverseStats, setMetaverseStats] = useState<{
+    evolutionEvents: any[];
+    qubits: any[];
+    particles: any[];
+    avatars: any[];
+    currentDimension: number;
+    evolutionCounts: Record<number, number>;
+  }>({
+    evolutionEvents: [],
+    qubits: [],
+    particles: [],
+    avatars: [],
+    currentDimension: automatonState.currentDimension || 0,
+    evolutionCounts: {}
+  });
   
   // Chat Panel State
   const [showChatPanel, setShowChatPanel] = useState(false);
@@ -841,7 +859,15 @@ Generate a helpful, informative response:
       <div className="flex-1 overflow-hidden relative">
         {/* 3D Metaverse Portal - Main Interface */}
         <div className="w-full h-full">
-          <WebGLMetaverseEvolution onOpenAIModal={() => setShowAIEvolutionModal(true)} />
+          <WebGLMetaverseEvolution 
+            onOpenAIModal={() => setShowAIEvolutionModal(true)}
+            onDimensionChange={(dimension) => {
+              automatonActions.setDimension(dimension);
+            }}
+            onStatsUpdate={(stats) => {
+              setMetaverseStats(stats);
+            }}
+          />
         </div>
 
         {/* Chat Panel Overlay - Toggleable */}
@@ -1003,140 +1029,6 @@ Generate a helpful, informative response:
             </motion.div>
           )}
         </AnimatePresence>
-
-        {/* Evolution Controls - Floating Panel */}
-        <div className="absolute bottom-4 left-4 bg-gray-900/90 backdrop-blur-lg rounded-lg p-4 border border-gray-700 shadow-xl z-40 max-w-sm">
-          <div className="flex items-center justify-between mb-3">
-            <h4 className="text-sm font-bold text-white">AI Evolution Engine</h4>
-            <button
-              onClick={() => setShowSettingsModal(true)}
-              className="p-1 rounded hover:bg-gray-800 transition-colors"
-              title="Settings"
-            >
-              <Settings className="w-4 h-4 text-gray-400" />
-            </button>
-          </div>
-
-          {/* Controls */}
-          <div className="flex gap-2 mb-3">
-            <button
-              onClick={() => isEvolutionActive ? stopEvolution() : startEvolution()}
-              className={`flex-1 px-3 py-2 rounded-lg text-xs font-medium ${
-                isEvolutionActive
-                  ? 'bg-red-600 hover:bg-red-700 text-white'
-                  : 'bg-green-600 hover:bg-green-700 text-white'
-              }`}
-            >
-              {isEvolutionActive ? <><Pause className="w-3 h-3 inline mr-1" />Stop</> : <><Play className="w-3 h-3 inline mr-1" />Start</>}
-            </button>
-          </div>
-
-          {/* Mutation Generation Buttons */}
-          <div className="grid grid-cols-2 gap-2 mb-3">
-            {(['church-encoding', 'dimensional', 'topological', 'self-reference'] as AIMutation['type'][]).map((type) => (
-              <button
-                key={type}
-                onClick={() => generateMutation(type)}
-                disabled={isGenerating || !llmService.isAvailable()}
-                className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs disabled:opacity-50"
-              >
-                {type.replace('-', ' ')}
-              </button>
-            ))}
-          </div>
-
-          {/* Metrics */}
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            <div className="bg-gray-800 rounded p-2">
-              <div className="text-gray-400">Mutations</div>
-              <div className="text-white font-bold">{mutations.length}</div>
-            </div>
-            <div className="bg-gray-800 rounded p-2">
-              <div className="text-gray-400">Confidence</div>
-              <div className="text-green-400 font-bold">
-                {evolutionMetrics.averageConfidence.toFixed(2)}
-              </div>
-            </div>
-          </div>
-
-          {/* Recent Mutations */}
-          {mutations.length > 0 && (
-            <div className="mt-3 max-h-32 overflow-y-auto space-y-1">
-              {mutations.slice(0, 3).map((mutation) => (
-                <div
-                  key={mutation.id}
-                  className="bg-gray-800 rounded p-2 cursor-pointer hover:bg-gray-700 transition-colors text-xs"
-                  onClick={() => {
-                    setSelectedMutation(mutation);
-                    setShowMutationModal(true);
-                  }}
-                >
-                  <div className="text-white font-medium truncate">{mutation.type}</div>
-                  <div className="text-gray-400 truncate">{mutation.description}</div>
-                  <div className="text-green-400 mt-1">
-                    {(mutation.confidence * 100).toFixed(0)}% confidence
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Metrics & Logs - Floating Panel */}
-        <div className="absolute top-4 right-4 bg-gray-900/90 backdrop-blur-lg rounded-lg p-4 border border-gray-700 shadow-xl z-40 max-w-xs">
-          <h4 className="text-sm font-bold text-white mb-3">Metrics & Logs</h4>
-          
-          {/* Bridge Status */}
-          <div className="mb-3 p-2 bg-gray-800 rounded-lg">
-            <div className="text-xs text-gray-400 mb-2">Bridge Status</div>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full ${bridgeStatus.nlp ? 'bg-green-500' : 'bg-gray-500'}`}></div>
-                <span className="text-gray-300">NLP</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full ${bridgeStatus.metaverse ? 'bg-green-500' : 'bg-gray-500'}`}></div>
-                <span className="text-gray-300">Metaverse</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full ${bridgeStatus.webllm ? 'bg-green-500' : 'bg-gray-500'}`}></div>
-                <span className="text-gray-300">WebLLM</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full ${bridgeStatus.tinyml ? 'bg-green-500' : 'bg-gray-500'}`}></div>
-                <span className="text-gray-300">TinyML</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Evolution Metrics */}
-          <div className="grid grid-cols-2 gap-2 mb-3 text-xs">
-            <div className="bg-gray-800 rounded p-2">
-              <div className="text-gray-400">Total</div>
-              <div className="text-white font-bold">{evolutionMetrics.totalMutations}</div>
-            </div>
-            <div className="bg-gray-800 rounded p-2">
-              <div className="text-gray-400">Success</div>
-              <div className="text-green-400 font-bold">
-                {evolutionMetrics.totalMutations > 0 
-                  ? ((evolutionMetrics.successfulMutations / evolutionMetrics.totalMutations) * 100).toFixed(0)
-                  : 0}%
-              </div>
-            </div>
-          </div>
-
-          {/* Evolution Log */}
-          <div className="bg-gray-800 rounded-lg p-2 max-h-32 overflow-y-auto">
-            <div className="text-xs font-bold text-white mb-2">Evolution Log</div>
-            <div className="space-y-1">
-              {evolutionLog.slice(0, 5).map((log, index) => (
-                <div key={index} className="text-xs text-gray-400 font-mono">
-                  {log}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Legacy Layout - Hidden (kept for reference but not rendered) */}
@@ -1827,6 +1719,312 @@ Generate a helpful, informative response:
             >
               Clear All Data
             </button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* AI Evolution Engine & Metrics Modal - Merged with Tabs */}
+      <Modal
+        isOpen={showAIEvolutionModal}
+        onClose={() => setShowAIEvolutionModal(false)}
+        title="AI Portal - Evolution Engine & Metrics"
+        size="lg"
+      >
+        <div className="space-y-4">
+          {/* Tab Navigation */}
+          <div className="flex gap-2 border-b border-gray-700">
+            <button
+              onClick={() => setActiveAITab('evolution')}
+              className={`px-4 py-2 text-sm font-medium transition-colors ${
+                activeAITab === 'evolution'
+                  ? 'text-white border-b-2 border-purple-500'
+                  : 'text-gray-400 hover:text-gray-300'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <Zap className="w-4 h-4" />
+                Evolution Engine
+              </div>
+            </button>
+            <button
+              onClick={() => setActiveAITab('metrics')}
+              className={`px-4 py-2 text-sm font-medium transition-colors ${
+                activeAITab === 'metrics'
+                  ? 'text-white border-b-2 border-purple-500'
+                  : 'text-gray-400 hover:text-gray-300'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <BarChart3 className="w-4 h-4" />
+                Metrics & Logs
+              </div>
+            </button>
+          </div>
+
+          {/* Tab Content */}
+          <div className="min-h-[400px]">
+            {/* Evolution Engine Tab */}
+            {activeAITab === 'evolution' && (
+              <div className="space-y-4">
+                {/* Controls */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => isEvolutionActive ? stopEvolution() : startEvolution()}
+                    className={`flex-1 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+                      isEvolutionActive
+                        ? 'bg-red-600 hover:bg-red-700 text-white shadow-lg'
+                        : 'bg-green-600 hover:bg-green-700 text-white shadow-lg'
+                    }`}
+                  >
+                    {isEvolutionActive ? (
+                      <><Pause className="w-4 h-4 inline mr-2" />Stop Evolution</>
+                    ) : (
+                      <><Play className="w-4 h-4 inline mr-2" />Start Evolution</>
+                    )}
+                  </button>
+                </div>
+
+                {/* Mutation Generation Buttons */}
+                <div>
+                  <label className="block text-sm text-gray-400 mb-2">Generate Mutations</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {(['church-encoding', 'dimensional', 'topological', 'self-reference'] as AIMutation['type'][]).map((type) => (
+                      <button
+                        key={type}
+                        onClick={() => generateMutation(type)}
+                        disabled={isGenerating || !llmService.isAvailable()}
+                        className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        {type.replace('-', ' ')}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Evolution Metrics Dashboard */}
+                <div>
+                  <label className="block text-sm text-gray-400 mb-2">Evolution Metrics</label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                      <div className="text-xs text-gray-400 mb-1">Total Mutations</div>
+                      <div className="text-2xl font-bold text-white">{mutations.length}</div>
+                    </div>
+                    <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                      <div className="text-xs text-gray-400 mb-1">Average Confidence</div>
+                      <div className="text-2xl font-bold text-green-400">
+                        {evolutionMetrics.averageConfidence.toFixed(2)}
+                      </div>
+                    </div>
+                    <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                      <div className="text-xs text-gray-400 mb-1">Complexity Score</div>
+                      <div className="text-2xl font-bold text-purple-400">
+                        {evolutionMetrics.complexityScore.toFixed(0)}
+                      </div>
+                    </div>
+                    <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                      <div className="text-xs text-gray-400 mb-1">Novelty Score</div>
+                      <div className="text-2xl font-bold text-pink-400">
+                        {evolutionMetrics.noveltyScore.toFixed(0)}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Recent Mutations */}
+                {mutations.length > 0 && (
+                  <div>
+                    <label className="block text-sm text-gray-400 mb-2">Recent Mutations</label>
+                    <div className="bg-gray-800 rounded-lg p-3 max-h-64 overflow-y-auto space-y-2 border border-gray-700">
+                      {mutations.slice(0, 10).map((mutation) => (
+                        <div
+                          key={mutation.id}
+                          className="bg-gray-900 rounded p-3 cursor-pointer hover:bg-gray-700 transition-colors border border-gray-700"
+                          onClick={() => {
+                            setSelectedMutation(mutation);
+                            setShowMutationModal(true);
+                            setShowAIEvolutionModal(false);
+                          }}
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <div className="text-white font-medium text-sm">{mutation.type}</div>
+                            <div className={`text-xs px-2 py-1 rounded ${
+                              mutation.impact === 'critical' ? 'bg-red-600/20 text-red-400 border border-red-500/30' :
+                              mutation.impact === 'high' ? 'bg-orange-600/20 text-orange-400 border border-orange-500/30' :
+                              mutation.impact === 'medium' ? 'bg-yellow-600/20 text-yellow-400 border border-yellow-500/30' :
+                              'bg-gray-600/20 text-gray-400 border border-gray-500/30'
+                            }`}>
+                              {mutation.impact}
+                            </div>
+                          </div>
+                          <div className="text-gray-400 text-xs mt-1">{mutation.description}</div>
+                          <div className="text-green-400 text-xs mt-2">
+                            {(mutation.confidence * 100).toFixed(0)}% confidence
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Metaverse Portal Control Panel */}
+                <div className="pt-4 border-t border-gray-700">
+                  <label className="block text-sm text-gray-400 mb-3">Metaverse Portal Controls</label>
+                  
+                  {/* Dimension Selector */}
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm text-gray-400">Current Dimension:</span>
+                        <span className="text-lg font-bold text-white">
+                          {metaverseStats.currentDimension}D - {dimensionConfig[metaverseStats.currentDimension]?.name || 'Unknown'}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-wrap gap-2">
+                      {dimensionConfig.map((node) => (
+                        <button
+                          key={node.id}
+                          onClick={() => {
+                            automatonActions.setDimension(node.level);
+                          }}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                            node.level === metaverseStats.currentDimension
+                              ? 'bg-blue-600 text-white shadow-lg'
+                              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                          }`}
+                          style={{ 
+                            borderColor: node.color, 
+                            borderWidth: node.level === metaverseStats.currentDimension ? '2px' : '1px',
+                            borderStyle: 'solid'
+                          }}
+                        >
+                          {node.id}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Unified Stats */}
+                  <div className="grid grid-cols-4 gap-3 mb-4">
+                    <div className="bg-gray-800 rounded-lg p-3 border border-gray-700">
+                      <div className="text-xs text-gray-400 mb-1">Total Events</div>
+                      <div className="text-lg font-bold text-white">{metaverseStats.evolutionEvents.length}</div>
+                    </div>
+                    <div className="bg-gray-800 rounded-lg p-3 border border-gray-700">
+                      <div className="text-xs text-gray-400 mb-1">Quantum Qubits</div>
+                      <div className="text-lg font-bold text-blue-400">{metaverseStats.qubits.length}</div>
+                    </div>
+                    <div className="bg-gray-800 rounded-lg p-3 border border-gray-700">
+                      <div className="text-xs text-gray-400 mb-1">Particles</div>
+                      <div className="text-lg font-bold text-purple-400">{metaverseStats.particles.length}</div>
+                    </div>
+                    <div className="bg-gray-800 rounded-lg p-3 border border-gray-700">
+                      <div className="text-xs text-gray-400 mb-1">Active Users</div>
+                      <div className="text-lg font-bold text-pink-400">{metaverseStats.avatars.length}</div>
+                    </div>
+                  </div>
+
+                  {/* Recent Evolution Events */}
+                  {metaverseStats.evolutionEvents.length > 0 && (
+                    <div className="bg-gray-800 rounded-lg p-3 border border-gray-700">
+                      <div className="text-xs text-gray-400 mb-2">Recent Evolution:</div>
+                      <div className="text-sm text-white font-mono">
+                        {metaverseStats.evolutionEvents[metaverseStats.evolutionEvents.length - 1]?.description || 'No events'}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Metrics & Logs Tab */}
+            {activeAITab === 'metrics' && (
+              <div className="space-y-4">
+                {/* Bridge Status */}
+                <div>
+                  <label className="block text-sm text-gray-400 mb-2">Bridge Status</label>
+                  <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-4 h-4 rounded-full ${bridgeStatus.nlp ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`}></div>
+                        <div>
+                          <span className="text-gray-300 text-sm font-medium">NLP</span>
+                          <div className="text-xs text-gray-500">Natural Language Processing</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className={`w-4 h-4 rounded-full ${bridgeStatus.metaverse ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`}></div>
+                        <div>
+                          <span className="text-gray-300 text-sm font-medium">Metaverse</span>
+                          <div className="text-xs text-gray-500">Automaton State</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className={`w-4 h-4 rounded-full ${bridgeStatus.webllm ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`}></div>
+                        <div>
+                          <span className="text-gray-300 text-sm font-medium">LLM</span>
+                          <div className="text-xs text-gray-500">{llmProviderConfig.provider.toUpperCase()}</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className={`w-4 h-4 rounded-full ${bridgeStatus.tinyml ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`}></div>
+                        <div>
+                          <span className="text-gray-300 text-sm font-medium">TinyML</span>
+                          <div className="text-xs text-gray-500">Pattern Recognition</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Evolution Summary Metrics */}
+                <div>
+                  <label className="block text-sm text-gray-400 mb-2">Evolution Summary</label>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                      <div className="text-xs text-gray-400 mb-1">Total Mutations</div>
+                      <div className="text-xl font-bold text-white">{evolutionMetrics.totalMutations}</div>
+                    </div>
+                    <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                      <div className="text-xs text-gray-400 mb-1">Success Rate</div>
+                      <div className="text-xl font-bold text-green-400">
+                        {evolutionMetrics.totalMutations > 0 
+                          ? ((evolutionMetrics.successfulMutations / evolutionMetrics.totalMutations) * 100).toFixed(0)
+                          : 0}%
+                      </div>
+                    </div>
+                    <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                      <div className="text-xs text-gray-400 mb-1">Church Encoding Accuracy</div>
+                      <div className="text-xl font-bold text-blue-400">
+                        {evolutionMetrics.churchEncodingAccuracy.toFixed(0)}%
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Evolution Log */}
+                <div>
+                  <label className="block text-sm text-gray-400 mb-2">Evolution Log</label>
+                  <div className="bg-gray-800 rounded-lg p-4 max-h-96 overflow-y-auto border border-gray-700">
+                    <div className="space-y-2">
+                      {evolutionLog.length === 0 ? (
+                        <div className="text-xs text-gray-500 text-center py-8">No log entries yet</div>
+                      ) : (
+                        evolutionLog.map((log, index) => (
+                          <div 
+                            key={index} 
+                            className="text-xs text-gray-400 font-mono border-b border-gray-700/50 pb-2 hover:bg-gray-700/30 px-2 py-1 rounded transition-colors"
+                          >
+                            {log}
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </Modal>

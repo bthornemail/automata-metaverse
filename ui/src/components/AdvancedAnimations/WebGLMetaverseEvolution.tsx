@@ -3,6 +3,7 @@ import { Box, Sphere, Line, Text, OrbitControls } from '@react-three/drei';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useAutomatonState } from '@/hooks/useAutomatonState';
+import { Brain } from 'lucide-react';
 
 interface DimensionNode3D {
   id: string;
@@ -50,7 +51,7 @@ interface Avatar3D {
 }
 
 // Enhanced 3D topology layout - arranged in a spiral/helix pattern for better 3D visualization
-const dimensionConfig: DimensionNode3D[] = [
+export const dimensionConfig: DimensionNode3D[] = [
   { id: '0D-topology', name: 'Topology', level: 0, color: '#6366f1', position: [0, 0, 0], churchEncoding: 'λf.λx.x' },
   { id: '1D-temporal', name: 'Temporal', level: 1, color: '#8b5cf6', position: [2, 1, 0], churchEncoding: 'λn.λf.λx.f(nfx)' },
   { id: '2D-structural', name: 'Structural', level: 2, color: '#ec4899', position: [3, 2, -1], churchEncoding: 'λx.λy.λf.fxy' },
@@ -487,7 +488,24 @@ const EvolutionScene: React.FC<{
 };
 
 // Main component
-const WebGLMetaverseEvolution: React.FC = () => {
+interface WebGLMetaverseEvolutionProps {
+  onOpenAIModal?: () => void;
+  onDimensionChange?: (dimension: number) => void;
+  onStatsUpdate?: (stats: {
+    evolutionEvents: EvolutionEvent[];
+    qubits: QubitState[];
+    particles: Particle3D[];
+    avatars: Avatar3D[];
+    currentDimension: number;
+    evolutionCounts: Record<number, number>;
+  }) => void;
+}
+
+const WebGLMetaverseEvolution: React.FC<WebGLMetaverseEvolutionProps> = ({ 
+  onOpenAIModal,
+  onDimensionChange,
+  onStatsUpdate
+}) => {
   const { state } = useAutomatonState();
   const [currentDimension, setCurrentDimension] = useState(state.currentDimension || 0);
   const [selectedNode, setSelectedNode] = useState<DimensionNode3D | null>(null);
@@ -623,7 +641,20 @@ const WebGLMetaverseEvolution: React.FC = () => {
   const handleDimensionSelect = (level: number) => {
     setCurrentDimension(level);
     setSelectedNode(dimensionConfig.find(node => node.level === level) || null);
+    onDimensionChange?.(level);
   };
+
+  // Update stats when they change
+  useEffect(() => {
+    onStatsUpdate?.({
+      evolutionEvents,
+      qubits,
+      particles,
+      avatars,
+      currentDimension,
+      evolutionCounts
+    });
+  }, [evolutionEvents, qubits, particles, avatars, currentDimension, evolutionCounts, onStatsUpdate]);
 
   // Initialize selected node
   useEffect(() => {
@@ -636,6 +667,7 @@ const WebGLMetaverseEvolution: React.FC = () => {
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-lg font-bold text-white">3D Metaverse Portal</h3>
+            <p className="text-xs text-gray-400 mt-1">Bridging Human NLP ↔ Automaton Metaverse ↔ WebLLM ↔ TinyML</p>
           </div>
           <div className="flex items-center gap-2">
             <div className="px-2 py-1 bg-green-600/20 border border-green-500 rounded text-xs text-green-300">
@@ -650,6 +682,16 @@ const WebGLMetaverseEvolution: React.FC = () => {
             <div className="px-2 py-1 bg-pink-600/20 border border-pink-500 rounded text-xs text-pink-300">
               {avatars.length} users
             </div>
+            {onOpenAIModal && (
+              <button
+                onClick={onOpenAIModal}
+                className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg transition-all shadow-lg hover:shadow-xl"
+                title="AI Evolution Engine & Metrics"
+              >
+                <Brain className="w-4 h-4" />
+                <span className="text-xs font-medium">AI Portal</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -673,64 +715,6 @@ const WebGLMetaverseEvolution: React.FC = () => {
         </Canvas>
       </div>
 
-      {/* Control Panel */}
-      <div className="p-4 border-t border-gray-700 space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-400">Current Dimension:</span>
-            <span className="text-lg font-bold text-white">
-              {currentDimension}D - {dimensionConfig[currentDimension]?.name}
-            </span>
-          </div>
-          
-          <div className="flex gap-2">
-            {dimensionConfig.map((node) => (
-              <button
-                key={node.id}
-                onClick={() => handleDimensionSelect(node.level)}
-                className={`px-2 py-1 rounded text-xs font-medium transition-all ${
-                  node.level === currentDimension
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                }`}
-                style={{ borderColor: node.color, borderWidth: '1px' }}
-              >
-                {node.id}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Unified Stats */}
-        <div className="grid grid-cols-4 gap-2 text-xs">
-          <div className="p-2 bg-gray-800 rounded">
-            <div className="text-gray-400">Total Events</div>
-            <div className="text-white font-bold">{evolutionEvents.length}</div>
-          </div>
-          <div className="p-2 bg-gray-800 rounded">
-            <div className="text-gray-400">Quantum Qubits</div>
-            <div className="text-white font-bold">{qubits.length}</div>
-          </div>
-          <div className="p-2 bg-gray-800 rounded">
-            <div className="text-gray-400">Particles</div>
-            <div className="text-white font-bold">{particles.length}</div>
-          </div>
-          <div className="p-2 bg-gray-800 rounded">
-            <div className="text-gray-400">Active Users</div>
-            <div className="text-white font-bold">{avatars.length}</div>
-          </div>
-        </div>
-
-        {/* Recent Evolution Events */}
-        {evolutionEvents.length > 0 && (
-          <div className="mt-2 p-2 bg-gray-800 rounded max-h-20 overflow-y-auto">
-            <div className="text-xs text-gray-400 mb-1">Recent Evolution:</div>
-            <div className="text-xs text-white font-mono">
-              {evolutionEvents[evolutionEvents.length - 1]?.description}
-            </div>
-          </div>
-        )}
-      </div>
     </div>
   );
 };

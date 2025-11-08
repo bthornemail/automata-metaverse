@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Activity, Eye, MessageSquare, History, Zap, Sparkles, Cog, Brain } from 'lucide-react';
+import { Activity, Eye, MessageSquare, History, Zap, Sparkles, Cog, Brain, Code } from 'lucide-react';
 import { AutomatonProvider } from '@/contexts/AutomatonContext';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { ToastContainer } from '@/components/shared/Toast';
@@ -11,10 +11,7 @@ import SelfReferenceAnalyzer from '@/components/SelfReferenceAnalyzer/SelfRefere
 import AIPortal from '@/components/AIPortal/AIPortal';
 import MetaverseInterface from '@/components/AdvancedAnimations/MetaverseInterface';
 import Configuration from '@/components/Configuration/Configuration';
-import OpenCodeInterface from './components/OpenCodeInterface/OpenCodeInterface';
-import SchemeREPL from '@/components/SchemeREPL/SchemeREPL';
-
-console.log('App.tsx: OpenCodeInterface imported:', OpenCodeInterface);
+import CodeEditor from './components/CodeEditor/CodeEditor';
 
 const AppContent: React.FC = () => {
   const activeTab = useAutomatonStore((state) => state.activeTab);
@@ -24,8 +21,7 @@ const AppContent: React.FC = () => {
     { id: 'overview', label: 'Overview', icon: Activity },
     { id: 'analysis', label: 'Self-Reference', icon: Eye },
     { id: 'ai-portal', label: 'AI Portal', icon: Brain },
-    { id: 'scheme-repl', label: 'Scheme REPL', icon: Zap },
-    { id: 'opencode', label: 'OpenCode', icon: Brain },
+    { id: 'code-editor', label: 'Code Editor', icon: Code },
     { id: 'config', label: 'Config', icon: Cog }
   ];
 
@@ -124,25 +120,14 @@ const AppContent: React.FC = () => {
           </motion.div>
         )}
 
-        {/* OpenCode Tab */}
-        {activeTab === 'opencode' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="max-w-6xl mx-auto"
-          >
-            <OpenCodeInterface />
-          </motion.div>
-        )}
-
-        {/* Scheme REPL Tab */}
-        {activeTab === 'scheme-repl' && (
+        {/* Code Editor Tab - Merged Scheme REPL & OpenCode */}
+        {activeTab === 'code-editor' && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="h-[calc(100vh-200px)] rounded-xl overflow-hidden shadow-xl"
           >
-            <SchemeREPL />
+            <CodeEditor />
           </motion.div>
         )}
 
