@@ -11,6 +11,10 @@ import { join, extname } from 'path';
 import WordNetIntegration from './src/services/wordnet';
 import { simpleOpenCodeService } from './src/services/simple-opencode';
 import OpenCodeIntegration from './opencode-integration';
+import { securityConfig } from './src/config/security';
+import { rateLimiters } from './src/middleware/rate-limit';
+import authRoutes from './src/routes/auth';
+import { verifySession } from './src/auth/session';
 
 const HTTP_PORT = parseInt(process.env.PORT || '3000', 10);
 const WS_PORT = parseInt(process.env.WS_PORT || '3001', 10);
@@ -33,78 +37,96 @@ const mimeTypes: Record<string, string> = {
   '.eot': 'application/vnd.ms-fontobject',
 };
 
-// Simple HTTP server for API endpoints and static files
-const httpServer = createServer((req, res) => {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+// Express app for better middleware support
+const app = express();
 
-  if (req.method === 'OPTIONS') {
-    res.writeHead(200);
-    res.end();
-    return;
-  }
+// Security middleware
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"], // Needed for Vite
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'", "ws:", "wss:"],
+    },
+  },
+  crossOriginEmbedderPolicy: false, // Needed for WebGL
+}));
 
-  const requestUrl = req.url ?? `http://localhost:${HTTP_PORT}`;
-  const url = new URL(requestUrl, `http://localhost:${HTTP_PORT}`);
-  const path = url.pathname || '';
+// CORS with restricted origins
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin) {
+      return callback(null, true);
+    }
+    
+    if (securityConfig.cors.allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.warn(`CORS blocked origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: securityConfig.cors.credentials,
+  methods: securityConfig.cors.methods,
+  allowedHeaders: securityConfig.cors.allowedHeaders,
+}));
 
-  // Health check endpoint
-  if (path === '/health' || path === '/api/health') {
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ status: 'healthy', timestamp: Date.now() }));
-    return;
-  }
+// Compression
+app.use(compression());
 
-  // API Routes
-  if (path.startsWith('/api/')) {
-    handleAPIRequest(path, req, res);
-  } else {
-    // Serve static files from UI dist
-    serveStaticFile(path, res);
-  }
+// Body parsing
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Logging
+app.use(morgan('combined'));
+
+// Rate limiting for all routes
+app.use(rateLimiters.api);
+
+// Health check endpoints
+app.get('/health', (req, res) => {
+  res.json({ status: 'healthy', timestamp: Date.now() });
 });
 
-function serveStaticFile(path: string, res: any) {
-  // Default to index.html for root or non-file paths
-  let filePath = path === '/' ? 'index.html' : path;
-  
-  // Remove leading slash
-  if (filePath.startsWith('/')) {
-    filePath = filePath.substring(1);
-  }
-  
-  const fullPath = join(UI_DIST_PATH, filePath);
-  const ext = extname(fullPath);
-  
-  // If no extension and file doesn't exist, try index.html (for SPA routing)
-  if (!ext && !existsSync(fullPath)) {
-    const indexPath = join(UI_DIST_PATH, 'index.html');
-    if (existsSync(indexPath)) {
-      filePath = 'index.html';
-    }
-  }
-  
-  const finalPath = join(UI_DIST_PATH, filePath);
-  
-  if (!existsSync(finalPath)) {
-    res.writeHead(404, { 'Content-Type': 'text/plain' });
-    res.end('Not Found');
-    return;
-  }
-  
-  try {
-    const content = readFileSync(finalPath);
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'healthy', timestamp: Date.now() });
+});
+
+// Authentication routes (before other API routes)
+app.use('/api/auth', authRoutes);
+
+// Main API routes
+import apiRoutes from './src/routes/api';
+app.use('/api', apiRoutes);
+
+// Serve static files from UI dist
+app.use(express.static(UI_DIST_PATH, {
+  setHeaders: (res, filePath) => {
+    const ext = extname(filePath);
     const contentType = mimeTypes[ext] || 'application/octet-stream';
-    
-    res.writeHead(200, { 'Content-Type': contentType });
-    res.end(content);
-  } catch (error) {
-    res.writeHead(500, { 'Content-Type': 'text/plain' });
-    res.end('Internal Server Error');
+    res.setHeader('Content-Type', contentType);
+  },
+}));
+
+// SPA fallback - serve index.html for all non-API routes
+app.get('*', (req, res, next) => {
+  // Skip API routes
+  if (req.path.startsWith('/api')) {
+    return next();
   }
-}
+  
+  // Serve index.html for SPA routing
+  const indexPath = join(UI_DIST_PATH, 'index.html');
+  if (existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.status(404).send('Not Found');
+  }
+});
 
 // Socket.IO server for WebSocket connections
 const io = new SocketIOServer({
@@ -144,12 +166,44 @@ async function initializeNLQueryRouter() {
   return nlQueryRouter;
 }
 
-// API Request Handler
-async function handleAPIRequest(path: string, req: any, res: any) {
-    const apiPath = path.replace('/api/', '') || '';
+// Legacy API handler middleware (for backward compatibility)
+// Migrates existing endpoints to Express format
+app.use('/api', async (req, res, next) => {
+  // Skip routes already handled by Express routers
+  if (req.path.startsWith('/auth') || res.headersSent) {
+    return next();
+  }
+
+  const apiPath = req.path.replace('/api/', '') || '';
+  
+  // Helper to parse request body
+  const parseRequestBody = async (req: any): Promise<any> => {
+    return new Promise((resolve) => {
+      let body = '';
+      req.on('data', (chunk: Buffer) => {
+        body += chunk.toString();
+      });
+      req.on('end', () => {
+        try {
+          resolve(body ? JSON.parse(body) : {});
+        } catch {
+          resolve({});
+        }
+      });
+    });
+  };
   
   try {
     let response: any = { success: true, timestamp: Date.now() };
+    
+    // Parse body if needed (Express already parsed it, but handle both cases)
+    let body: any = {};
+    if ((req as any).body) {
+      body = (req as any).body;
+    } else {
+      body = await parseRequestBody(req);
+      (req as any).body = body;
+    }
 
     // Handle NL Query endpoints
     if (apiPath.startsWith('nl-query/')) {
@@ -220,8 +274,13 @@ async function handleAPIRequest(path: string, req: any, res: any) {
         response.error = error.message || 'Failed to read JSONL file';
       }
       
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(response));
+      // Use Express response if available, otherwise raw HTTP
+      if (res.json) {
+        res.json(response);
+      } else {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(response));
+      }
       return;
     }
 
@@ -243,7 +302,6 @@ async function handleAPIRequest(path: string, req: any, res: any) {
           response.success = false;
           response.error = 'Automaton is already running';
         } else {
-          const body = await parseRequestBody(req);
           const intervalMs = body.intervalMs || 2000;
           const maxIterations = body.maxIterations || Infinity;
           
@@ -291,7 +349,6 @@ async function handleAPIRequest(path: string, req: any, res: any) {
 
       case 'automaton/dimension':
         if (!isRunning) {
-          const body = await parseRequestBody(req);
           const dimension = body.dimension;
           
           if (dimension >= 0 && dimension <= 7) {
@@ -339,7 +396,6 @@ async function handleAPIRequest(path: string, req: any, res: any) {
         break;
 
       case 'agent/chat':
-        const body = await parseRequestBody(req);
         const agent = body.agent;
         const message = body.message;
         
@@ -367,8 +423,7 @@ async function handleAPIRequest(path: string, req: any, res: any) {
         break;
 
       case 'file/load':
-        const loadBody = await parseRequestBody(req);
-        const filePath = loadBody.filePath;
+        const filePath = body.filePath;
         
         if (filePath) {
           try {
@@ -411,8 +466,7 @@ async function handleAPIRequest(path: string, req: any, res: any) {
         break;
 
       case 'wordnet/lookup':
-        const lookupBody = await parseRequestBody(req);
-        const lookupWord = lookupBody.word || apiPath.replace('wordnet/lookup/', '');
+        const lookupWord = body.word || apiPath.replace('wordnet/lookup/', '');
         if (lookupWord) {
           response.data = await wordNet.lookupWord(lookupWord);
         } else {
@@ -433,8 +487,7 @@ async function handleAPIRequest(path: string, req: any, res: any) {
         break;
 
       case 'wordnet/relationships':
-        const relBody = await parseRequestBody(req);
-        const relWords = relBody.words || [relBody.word1, relBody.word2];
+        const relWords = body.words || [body.word1, body.word2];
         if (relWords && relWords.length >= 2) {
           response.data = await wordNet.findSemanticRelationships(relWords[0], relWords[1]);
         } else {
@@ -470,8 +523,7 @@ async function handleAPIRequest(path: string, req: any, res: any) {
         break;
 
       case 'opencode/search':
-        const searchBody = await parseRequestBody(req);
-        const pattern = searchBody.pattern;
+        const pattern = body.pattern;
         if (pattern) {
           response.data = await simpleOpenCodeService.searchCodebase(pattern);
         } else {
@@ -528,9 +580,8 @@ async function handleAPIRequest(path: string, req: any, res: any) {
         break;
 
       case 'opencode/execute':
-        const executeBody = await parseRequestBody(req);
-        const tool = executeBody.tool;
-        const toolArgs = executeBody.args || [];
+        const tool = body.tool;
+        const toolArgs = body.args || [];
         
         if (tool) {
           try {
@@ -552,19 +603,20 @@ async function handleAPIRequest(path: string, req: any, res: any) {
         response.error = 'Unknown endpoint';
     }
 
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify(response));
+    // Send response using Express
+    res.json(response);
+    return;
 
   } catch (error) {
     console.error('API Error:', error);
-    res.writeHead(500, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({
+    const errorResponse = {
       success: false,
       error: error instanceof Error ? error.message : 'Internal server error',
       timestamp: Date.now()
-    }));
+    };
+    res.status(500).json(errorResponse);
   }
-}
+});
 
 // Automaton Control Functions
 function startAutomaton(intervalMs: number, maxIterations: number) {
@@ -1017,13 +1069,19 @@ io.on('connection', (socket) => {
   });
 });
 
-// Start servers
+// Create HTTP server with Express app
+const httpServer = createServer(app);
+
+// Attach Socket.IO to HTTP server
+io.attach(httpServer);
+
+// Start server
 httpServer.listen(HTTP_PORT, () => {
   console.log(`🌐 HTTP API server running on http://localhost:${HTTP_PORT}`);
+  console.log(`🔌 WebSocket server attached to HTTP server`);
+  console.log(`🔒 Security enabled: CORS restricted, Rate limiting active, Auth available`);
+  console.log(`📋 Allowed origins: ${securityConfig.cors.allowedOrigins.join(', ')}`);
 });
-
-io.attach(httpServer);
-console.log(`🔌 WebSocket server attached to HTTP server`);
 
 console.log('🚀 Automaton Backend Server Started');
 console.log(`📊 API: http://localhost:${HTTP_PORT}/api`);
