@@ -1,0 +1,151 @@
+services:
+  # Backend API Service
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: automaton-backend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - WS_PORT=3001
+      - AUTOMATON_FILE=./automaton.jsonl
+      - LOG_LEVEL=info
+    volumes:
+      - ./automaton.jsonl:/app/automaton.jsonl:ro
+      - ./automaton-kernel.jsonl:/app/automaton-kernel.jsonl:ro
+      - ./automaton-kernel.seed.jsonl:/app/automaton-kernel.seed.jsonl:ro
+      - ./automaton.canvas.space.jsonl:/app/automaton.canvas.space.jsonl:ro
+      - ./generate.metaverse.jsonl:/app/generate.metaverse.jsonl:ro
+      - ./r5rs-functions-trie.jsonl:/app/r5rs-functions-trie.jsonl:ro
+      - ./logs:/app/logs
+      - ./grok_files:/app/grok_files:ro
+    networks:
+      - automaton-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    depends_on:
+      - redis
+
+  # Frontend UI Service
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.ui
+    container_name: automaton-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:3000/api
+      - VITE_WS_URL=ws://localhost:3001
+    networks:
+      - automaton-network
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Redis for caching and session storage
+  redis:
+    image: redis:7-alpine
+    container_name: automaton-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - automaton-network
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Prometheus for monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: automaton-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    networks:
+      - automaton-network
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+
+  # Grafana for visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: automaton-grafana
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    networks:
+      - automaton-network
+    depends_on:
+      - prometheus
+
+  # Nginx Load Balancer (optional for production)
+  nginx:
+    image: nginx:alpine
+    container_name: automaton-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx-prod.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    networks:
+      - automaton-network
+    depends_on:
+      - frontend
+      - backend
+    profiles:
+      - production
+
+volumes:
+  redis-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+
+networks:
+  automaton-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

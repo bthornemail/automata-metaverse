@@ -1,0 +1,17 @@
+0f4780ca589e12e7a8dce1c1e8d17ae726add38c commit	refs/heads/cursor
+6fcc8d419ae23e292c6a5cc87b47104994d0aa67 commit	refs/heads/evolution
+0c54de39de9115e741fbe7a8a4d4d918881a7a8f commit	refs/heads/main
+5c68504c33f7ad0505835ada57817a906d423c25 commit	refs/heads/opencode
+de7afc0e08d1e8d6b7de51f1ade6c186de20c53c commit	refs/heads/opencode-ui
+96f11bda5fdd40e0bd70268540167aa1aa16fb3d commit	refs/heads/root
+c2d8728aee400a1669c2e144c5fc7656dfc40b79 commit	refs/heads/ui
+a1d3b34e6687ca756691476c5149fbfafe5c12ea commit	refs/heads/ui-clean
+9c30f49d2634ed568566bcffe5669023e2d42a4b commit	refs/heads/wordnet
+0c54de39de9115e741fbe7a8a4d4d918881a7a8f commit	refs/remotes/origin/HEAD
+0f4780ca589e12e7a8dce1c1e8d17ae726add38c commit	refs/remotes/origin/cursor
+9a50c41b1a1d7d0a37a9952f566f0fa5df7c651a commit	refs/remotes/origin/evolution
+0c54de39de9115e741fbe7a8a4d4d918881a7a8f commit	refs/remotes/origin/main
+5c68504c33f7ad0505835ada57817a906d423c25 commit	refs/remotes/origin/opencode
+de7afc0e08d1e8d6b7de51f1ade6c186de20c53c commit	refs/remotes/origin/opencode-ui
+96f11bda5fdd40e0bd70268540167aa1aa16fb3d commit	refs/remotes/origin/root
+9c30f49d2634ed568566bcffe5669023e2d42a4b commit	refs/remotes/origin/wordnet

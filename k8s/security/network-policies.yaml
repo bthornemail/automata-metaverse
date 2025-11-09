@@ -1,0 +1,147 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: automaton-security
+  labels:
+    name: automaton-security
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/warn: restricted
+---
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: automaton-restricted
+  namespace: automaton-security
+spec:
+  privileged: false
+  allowPrivilegeEscalation: false
+  requiredDropCapabilities:
+    - ALL
+  volumes:
+    - 'configMap'
+    - 'emptyDir'
+    - 'projected'
+    - 'secret'
+    - 'downwardAPI'
+    - 'persistentVolumeClaim'
+  runAsUser:
+    rule: 'MustRunAsNonRoot'
+  seLinux:
+    rule: 'RunAsAny'
+  fsGroup:
+    rule: 'RunAsAny'
+  readOnlyRootFilesystem: true
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: automaton-deny-all
+  namespace: automaton-security
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: automaton-frontend-policy
+  namespace: automaton-security
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: automaton
+      app.kubernetes.io/component: frontend
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    ports:
+    - protocol: TCP
+      port: 80
+  egress:
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 53
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 443
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: automaton-backend-policy
+  namespace: automaton-security
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: automaton
+      app.kubernetes.io/component: backend
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    ports:
+    - protocol: TCP
+      port: 5555
+  - from:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/name: automaton
+          app.kubernetes.io/component: frontend
+    ports:
+    - protocol: TCP
+      port: 5555
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/name: automaton
+          app.kubernetes.io/component: redis
+    ports:
+    - protocol: TCP
+      port: 6379
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 53
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 443
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: automaton-redis-policy
+  namespace: automaton-security
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: automaton
+      app.kubernetes.io/component: redis
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/name: automaton
+          app.kubernetes.io/component: backend
+    ports:
+    - protocol: TCP
+      port: 6379
+  egress: []

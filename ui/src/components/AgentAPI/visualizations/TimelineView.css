@@ -1,0 +1,87 @@
+.timeline-view-container {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.timeline-header {
+  margin-bottom: 20px;
+}
+
+.timeline-header h3 {
+  margin: 0;
+  color: #333;
+}
+
+.timeline-content {
+  position: relative;
+}
+
+.timeline-item {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.timeline-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.timeline-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 0 0 2px currentColor;
+  z-index: 1;
+}
+
+.timeline-line {
+  width: 2px;
+  flex: 1;
+  background: #ddd;
+  margin-top: 5px;
+}
+
+.timeline-content-item {
+  flex: 1;
+  padding-bottom: 10px;
+}
+
+.timeline-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+  text-transform: uppercase;
+}
+
+.timeline-time {
+  font-size: 12px;
+  color: #666;
+}
+
+.timeline-message {
+  font-size: 14px;
+  color: #555;
+  margin-top: 5px;
+}
+
+.timeline-empty {
+  padding: 40px;
+  text-align: center;
+  color: #999;
+}

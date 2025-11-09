@@ -1,0 +1,58 @@
+services:
+  # Backend API Service (Development)
+  backend-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend.dev
+    container_name: automaton-backend-dev
+    restart: "no"
+    ports:
+      - "5555:5555"
+      - "9001:9001"
+      - "9229:9229"  # Node.js debugging
+    environment:
+      - NODE_ENV=development
+      - PORT=5555
+      - WS_PORT=9001
+      - LOG_LEVEL=debug
+    volumes:
+      - .:/app:delegated
+      - /app/node_modules
+      - ./logs:/app/logs
+    networks:
+      - automaton-network
+
+  # Frontend UI Service (Development)
+  frontend-dev:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile.dev
+    container_name: automaton-frontend-dev
+    restart: "no"
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:5555/api
+      - VITE_WS_URL=ws://localhost:9001
+      - VITE_DEV_MODE=true
+    volumes:
+      - ./ui:/app:delegated
+      - /app/node_modules
+    networks:
+      - automaton-network
+    depends_on:
+      - backend-dev
+
+  # Redis for development
+  redis-dev:
+    image: redis:7-alpine
+    container_name: automaton-redis-dev
+    restart: "no"
+    ports:
+      - "6379:6379"
+    networks:
+      - automaton-network
+
+networks:
+  automaton-network:
+    driver: bridge

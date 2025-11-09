@@ -1,0 +1,26 @@
+{"id":"node-1","type":"node","x":100,"y":200,"text":"Compute Attention","function":"r5rs:attention","args":["Q","K","V"],"metadata":{"description":"Attention mechanism computation"}}
+{"id":"node-2","type":"node","x":300,"y":200,"text":"SPARQL Query","function":"r5rs:sparql-query","args":["SELECT ?x WHERE { ?x rdfs:subClassOf canvas:0D-topology }"],"metadata":{"description":"Query RDF triples"}}
+{"id":"edge-1","type":"horizontal","from":"node-1","to":"node-2","function":"r5rs:rdf-query","args":["?","canvas:implements","?"],"metadata":{"description":"Query implementation relationships"}}
+{"id":"node-3","type":"node","x":500,"y":200,"text":"Church Addition","function":"r5rs:church-add","args":["m","n"],"metadata":{"description":"Church numeral addition"}}
+{"id":"node-4","type":"node","x":100,"y":400,"text":"Parse JSONL","function":"r5rs:parse-jsonl-canvas","args":["canvas.jsonl"],"metadata":{"description":"Load canvas from JSONL file"}}
+{"id":"node-5","type":"node","x":300,"y":400,"text":"Extract Facts","function":"r5rs:extract-facts","args":["parsed-objects"],"metadata":{"description":"Extract Datalog facts from parsed JSONL"}}
+{"id":"edge-2","type":"vertical","from":"node-4","to":"node-5","function":"r5rs:query-facts","args":["facts","(node ?id ?type . ?rest)"],"metadata":{"description":"Query node facts"}}
+{"id":"node-6","type":"node","x":500,"y":400,"text":"Convert to RDF","function":"r5rs:jsonl-to-rdf","args":["facts"],"metadata":{"description":"Convert facts to RDF triples"}}
+{"id":"node-7","type":"node","x":100,"y":600,"text":"OWL Reasoning","function":"r5rs:owl-entail","args":["triples"],"metadata":{"description":"Apply OWL entailment rules"}}
+{"id":"node-8","type":"node","x":300,"y":600,"text":"SHACL Validation","function":"r5rs:shacl-validate","args":["shapes","triples"],"metadata":{"description":"Validate RDF graph against SHACL shapes"}}
+{"id":"node-9","type":"node","x":500,"y":600,"text":"Prolog Query","function":"r5rs:prolog-query","args":["db","(inherits ?x canvas:0D-topology)"],"metadata":{"description":"Query using Prolog engine"}}
+{"id":"node-10","type":"node","x":100,"y":800,"text":"Datalog Query","function":"r5rs:datalog-query","args":["program","(inherits ?x ?y)"],"metadata":{"description":"Query using Datalog engine"}}
+{"id":"node-11","type":"node","x":300,"y":800,"text":"M to S Expression","function":"r5rs:m->s","args":["expr","mappings"],"metadata":{"description":"Convert M-expression to S-expression"}}
+{"id":"node-12","type":"node","x":500,"y":800,"text":"NLP Evaluation","function":"r5rs:nlp-eval","args":["pair x y","mappings"],"metadata":{"description":"Natural language processing"}}
+{"id":"node-13","type":"node","x":100,"y":1000,"text":"Quantum Qubit","function":"r5rs:qubit","args":["alpha","beta"],"metadata":{"description":"Create quantum qubit state"}}
+{"id":"node-14","type":"node","x":300,"y":1000,"text":"Apply Quantum Gate","function":"r5rs:apply-gate","args":["state","gate"],"metadata":{"description":"Apply quantum gate to qubit"}}
+{"id":"edge-3","type":"horizontal","from":"node-13","to":"node-14","function":"r5rs:mat-vec-mul","args":["gate","state"],"metadata":{"description":"Matrix-vector multiplication for quantum gates"}}
+{"id":"node-15","type":"node","x":500,"y":1000,"text":"RDFS Entailment","function":"r5rs:rdfs-entail","args":["triples"],"metadata":{"description":"Apply RDFS entailment rules"}}
+{"id":"node-16","type":"node","x":100,"y":1200,"text":"Load SHACL Shapes","function":"r5rs:load-shacl-shapes","args":["facts"],"metadata":{"description":"Load SHACL shapes from canvas facts"}}
+{"id":"node-17","type":"node","x":300,"y":1200,"text":"Church Successor","function":"r5rs:church-succ","args":["n"],"metadata":{"description":"Church numeral successor function"}}
+{"id":"node-18","type":"node","x":500,"y":1200,"text":"Church Multiplication","function":"r5rs:church-mult","args":["m","n"],"metadata":{"description":"Church numeral multiplication"}}
+{"id":"edge-4","type":"vertical","from":"node-17","to":"node-18","function":"r5rs:church-add","args":["m","n"],"metadata":{"description":"Church numeral addition"}}
+{"id":"node-19","type":"node","x":100,"y":1400,"text":"S to M Expression","function":"r5rs:s->m","args":["expr","mappings"],"metadata":{"description":"Convert S-expression to M-expression"}}
+{"id":"node-20","type":"node","x":300,"y":1400,"text":"Church Exponentiation","function":"r5rs:church-exp","args":["m","n"],"metadata":{"description":"Church numeral exponentiation"}}
+{"id":"node-21","type":"node","x":500,"y":1400,"text":"Unification","function":"r5rs:unify","args":["x","y","bindings"],"metadata":{"description":"Unify two terms with bindings"}}
+{"id":"metadata-node","type":"text","x":0,"y":0,"text":"# R5RS Function Reference Canvas\n\nThis canvas demonstrates how to reference R5RS functions from JSONL nodes and edges.\n\n## Function Reference Format\n\nEach node or edge can specify:\n- `function`: Name of the function in the registry (e.g., \"r5rs:attention\")\n- `args`: Array of argument names or values\n- `metadata`: Additional metadata about the function call\n\n## Example Usage\n\n```scheme\n(invoke-from-jsonl 'r5rs:attention '(Q K V) context)\n```\n\n## Available Functions\n\nAll functions from r5rs-canvas-engine.scm are registered in the function registry\nand can be invoked via JSONL references."}

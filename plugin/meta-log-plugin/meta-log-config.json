@@ -1,0 +1,6 @@
+{
+  "enableProlog": false,
+  "enableDatalog": true,
+  "enableRdf": true,
+  "enableShacl": true
+}

@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: automaton-config
+  namespace: automaton
+  labels:
+    app: automaton
+    component: backend
+data:
+  NODE_ENV: "production"
+  PORT: "3000"
+  WS_PORT: "3001"
+  LOG_LEVEL: "info"
+  AUTOMATON_FILE: "./automaton.jsonl"
+  REDIS_HOST: "automaton-redis"
+  REDIS_PORT: "6379"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+  namespace: automaton
+  labels:
+    app: automaton
+    component: frontend
+data:
+  VITE_API_URL: "http://automaton-backend.automaton.svc.cluster.local:3000/api"
+  VITE_WS_URL: "ws://automaton-backend.automaton.svc.cluster.local:3001"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: automaton-secrets
+  namespace: automaton
+  labels:
+    app: automaton
+type: Opaque
+data:
+  # Base64 encoded values - replace with actual secrets
+  # echo -n 'admin123' | base64
+  grafana-admin-password: YWRtaW4xMjM=
+  redis-password: ""
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: automaton-data-pvc
+  namespace: automaton
+  labels:
+    app: automaton
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: fast-ssd

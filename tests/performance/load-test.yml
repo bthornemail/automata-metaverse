@@ -1,0 +1,53 @@
+config:
+  target: 'http://localhost:5555'
+  phases:
+    - duration: 60
+      arrivalRate: 10
+      name: "Warm up"
+    - duration: 120
+      arrivalRate: 50
+      name: "Load test"
+    - duration: 60
+      arrivalRate: 100
+      name: "Stress test"
+    - duration: 30
+      arrivalRate: 200
+      name: "Peak load"
+
+scenarios:
+  - name: "API Health Check"
+    weight: 40
+    flow:
+      - get:
+          url: "/health"
+          expect:
+            - statusCode: 200
+
+  - name: "Automaton Status"
+    weight: 30
+    flow:
+      - get:
+          url: "/api/automaton/status"
+          expect:
+            - statusCode: 200
+
+  - name: "Execute Automaton Operation"
+    weight: 20
+    flow:
+      - post:
+          url: "/api/automaton/execute"
+          json:
+            operation: "evolve"
+            parameters: {}
+          expect:
+            - statusCode: 200
+
+  - name: "Query Automaton State"
+    weight: 10
+    flow:
+      - post:
+          url: "/api/automaton/query"
+          json:
+            query: "state"
+          expect:
+            - statusCode: 200

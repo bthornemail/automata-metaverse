@@ -1,0 +1,325 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  release:
+    types: [published]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd ui && npm ci
+
+      - name: Run linting
+        run: |
+          npm run lint
+          cd ui && npm run lint
+
+      - name: Run type checking
+        run: |
+          npm run typecheck
+          cd ui && npm run typecheck
+
+      - name: Run tests
+        run: |
+          npm test
+          cd ui && npm test
+
+      - name: Build application
+        run: |
+          npm run build
+          cd ui && npm run build
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  build-and-push:
+    name: Build and Push Images
+    runs-on: ubuntu-latest
+    needs: [test, security-scan]
+    if: github.event_name != 'pull_request'
+    outputs:
+      backend-image: ${{ steps.backend-meta.outputs.tags }}
+      frontend-image: ${{ steps.frontend-meta.outputs.tags }}
+      image-digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract backend metadata
+        id: backend-meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-backend
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      - name: Extract frontend metadata
+        id: frontend-meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      - name: Build and push backend image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.backend
+          push: true
+          tags: ${{ steps.backend-meta.outputs.tags }}
+          labels: ${{ steps.backend-meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./ui
+          file: ./ui/Dockerfile
+          push: true
+          tags: ${{ steps.frontend-meta.outputs.tags }}
+          labels: ${{ steps.frontend-meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+
+  helm-lint:
+    name: Helm Lint
+    runs-on: ubuntu-latest
+    needs: [test]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'v3.12.0'
+
+      - name: Add Helm repositories
+        run: |
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+          helm repo update
+
+      - name: Lint Helm chart
+        run: |
+          helm lint ./helm/automaton
+
+      - name: Template Helm chart
+        run: |
+          helm template my-automaton ./helm/automaton \
+            --namespace automaton \
+            --create-namespace \
+            --set image.tag=${{ github.sha }}
+
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [build-and-push, helm-lint]
+    if: github.ref == 'refs/heads/develop'
+    environment: staging
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'v3.12.0'
+
+      - name: Configure kubectl
+        uses: azure/k8s-set-context@v3
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBE_CONFIG_STAGING }}
+
+      - name: Deploy to staging
+        run: |
+          helm upgrade --install automaton-staging ./helm/automaton \
+            --namespace automaton-staging \
+            --create-namespace \
+            --set image.tag=${{ github.sha }} \
+            --set ingress.hosts[0].host=automaton-staging.example.com \
+            --set environment=staging \
+            --wait \
+            --timeout=10m
+
+      - name: Run smoke tests
+        run: |
+          kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=automaton -n automaton-staging --timeout=300s
+          # Add smoke test commands here
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [build-and-push, helm-lint]
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'v3.12.0'
+
+      - name: Configure kubectl
+        uses: azure/k8s-set-context@v3
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBE_CONFIG_PROD }}
+
+      - name: Deploy to production
+        run: |
+          helm upgrade --install automaton ./helm/automaton \
+            --namespace automaton \
+            --create-namespace \
+            --set image.tag=${{ github.sha }} \
+            --set ingress.hosts[0].host=automaton.example.com \
+            --set environment=production \
+            --set replicaCount=5 \
+            --set backend.replicaCount=5 \
+            --set frontend.replicaCount=3 \
+            --wait \
+            --timeout=15m
+
+      - name: Run health checks
+        run: |
+          kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=automaton -n automaton --timeout=600s
+          # Add health check commands here
+
+      - name: Notify deployment
+        uses: 8398a7/action-slack@v3
+        if: always()
+        with:
+          status: ${{ job.status }}
+          channel: '#deployments'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: [deploy-production]
+    if: github.event_name == 'release'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Generate changelog from git commits
+          echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
+          git log --pretty=format:"- %s" $(git describe --tags --abbrev=0 HEAD^)..HEAD >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            ## Changes
+            ${{ steps.changelog.outputs.CHANGELOG }}
+            
+            ## Docker Images
+            - Backend: ${{ needs.build-and-push.outputs.backend-image }}
+            - Frontend: ${{ needs.build-and-push.outputs.frontend-image }}
+            
+            ## Deployment
+            ```bash
+            helm upgrade --install automaton ./helm/automaton \
+              --namespace automaton \
+              --set image.tag=${{ github.ref_name }}
+            ```
+          draft: false
+          prerelease: false
+
+  cleanup:
+    name: Cleanup
+    runs-on: ubuntu-latest
+    needs: [deploy-staging, deploy-production]
+    if: always()
+    steps:
+      - name: Cleanup old images
+        uses: actions/delete-package-versions@v4
+        with:
+          package-name: 'automaton-backend'
+          package-type: 'container'
+          min-versions-to-keep: 10
+          delete-only-untagged-versions: true
+
+      - name: Cleanup old images (frontend)
+        uses: actions/delete-package-versions@v4
+        with:
+          package-name: 'automaton-frontend'
+          package-type: 'container'
+          min-versions-to-keep: 10
+          delete-only-untagged-versions: true

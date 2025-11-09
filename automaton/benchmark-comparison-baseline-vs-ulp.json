@@ -1,0 +1,268 @@
+{
+  "phase14": {
+    "timestamp": "2025-11-08T22:58:26.823Z",
+    "config": {
+      "docsPath": "./docs",
+      "outputPath": "./benchmark-results-baseline.json",
+      "expectedAgents": 15,
+      "expectedFacts": 1263,
+      "expectedRules": 164,
+      "expectedFunctions": 92
+    },
+    "completeness": {
+      "facts": {
+        "extracted": 1324,
+        "expected": 1263,
+        "coverage": 104.82977038796517,
+        "missing": []
+      },
+      "rules": {
+        "extracted": 167,
+        "expected": 164,
+        "coverage": 101.82926829268293,
+        "missing": []
+      },
+      "agents": {
+        "extracted": 15,
+        "expected": 15,
+        "coverage": 100,
+        "missing": []
+      },
+      "functions": {
+        "extracted": 92,
+        "expected": 92,
+        "coverage": 100,
+        "missing": []
+      }
+    },
+    "performance": {
+      "extraction": {
+        "totalTime": 246,
+        "averageTimePerFile": 1.7083333333333333,
+        "filesPerSecond": 585.3658536585366,
+        "peakMemory": 18365296,
+        "averageMemory": 22366208
+      },
+      "storage": {
+        "jsonlSize": 1063338,
+        "loadTime": 8,
+        "queryTime": 1
+      }
+    },
+    "understanding": {
+      "knowledgeGraph": {
+        "nodes": 240,
+        "edges": 605,
+        "averageDegree": 5.041666666666667
+      },
+      "relationships": {
+        "prerequisites": 180,
+        "enables": 0,
+        "related": 322,
+        "brokenLinks": 0
+      },
+      "completeness": {
+        "documentsWithFrontmatter": 133,
+        "documentsWithRelationships": 121,
+        "overallCompleteness": 0
+      }
+    },
+    "summary": {
+      "overallScore": 101.10983978010802,
+      "strengths": [
+        "✅ Perfect agent extraction (15/15)",
+        "✅ Excellent fact extraction (1324 facts)",
+        "✅ Excellent rule extraction (167 rules)",
+        "✅ Fast extraction (585.4 files/sec)",
+        "✅ Low memory usage (17.5MB)",
+        "✅ Rich knowledge graph (240 nodes, 605 edges)"
+      ],
+      "weaknesses": [],
+      "recommendations": []
+    }
+  },
+  "phase15": {
+    "timestamp": "2025-11-08T23:06:07.041Z",
+    "config": {
+      "docsPath": "/home/main/universal-life-vault",
+      "outputPath": "./benchmark-results-ulp.json",
+      "expectedAgents": 15
+    },
+    "completeness": {
+      "facts": {
+        "extracted": 4302,
+        "expected": 0,
+        "coverage": 0,
+        "missing": []
+      },
+      "rules": {
+        "extracted": 738,
+        "expected": 0,
+        "coverage": 0,
+        "missing": []
+      },
+      "agents": {
+        "extracted": 4,
+        "expected": 15,
+        "coverage": 26.666666666666668,
+        "missing": [
+          "0D-Topology-Agent",
+          "1D-Temporal-Agent",
+          "2D-Structural-Agent",
+          "3D-Algebraic-Agent",
+          "4D-Network-Agent",
+          "5D-Consensus-Agent",
+          "6D-Intelligence-Agent",
+          "7D-Quantum-Agent",
+          "Query-Interface-Agent",
+          "Visualization-Agent",
+          "Multiplayer-Agent",
+          "AI-Assist-Agent",
+          "Self-Modification-Agent",
+          "Goal-Oriented-Agent",
+          "OpenCode-Integration-Agent"
+        ]
+      },
+      "functions": {
+        "extracted": 132,
+        "expected": 0,
+        "coverage": 0,
+        "missing": []
+      }
+    },
+    "performance": {
+      "extraction": {
+        "totalTime": 718,
+        "averageTimePerFile": 1.2273504273504274,
+        "filesPerSecond": 814.7632311977716,
+        "peakMemory": 44992224,
+        "averageMemory": 46802944
+      },
+      "storage": {
+        "jsonlSize": 4981360,
+        "loadTime": 23,
+        "queryTime": 0
+      }
+    },
+    "understanding": {
+      "knowledgeGraph": {
+        "nodes": 600,
+        "edges": 406,
+        "averageDegree": 1.3533333333333333
+      },
+      "relationships": {
+        "prerequisites": 125,
+        "enables": 0,
+        "related": 229,
+        "brokenLinks": 0
+      },
+      "completeness": {
+        "documentsWithFrontmatter": 464,
+        "documentsWithRelationships": 139,
+        "overallCompleteness": 0
+      }
+    },
+    "summary": {
+      "overallScore": 87.77777777777779,
+      "strengths": [
+        "✅ Fast extraction (814.8 files/sec)",
+        "✅ Low memory usage (42.9MB)",
+        "✅ Rich knowledge graph (600 nodes, 406 edges)"
+      ],
+      "weaknesses": [
+        "⚠️  Agent extraction incomplete (4/15, 26.7%)"
+      ],
+      "recommendations": [
+        "Fix agent extraction to reach 100% coverage"
+      ]
+    }
+  },
+  "differences": {
+    "completeness": {
+      "facts": {
+        "phase14": 1324,
+        "phase15": 4302,
+        "change": 2978,
+        "changePercent": 224.92447129909365
+      },
+      "rules": {
+        "phase14": 167,
+        "phase15": 738,
+        "change": 571,
+        "changePercent": 341.91616766467064
+      },
+      "agents": {
+        "phase14": 15,
+        "phase15": 4,
+        "change": -11,
+        "changePercent": -73.33333333333333
+      },
+      "functions": {
+        "phase14": 92,
+        "phase15": 132,
+        "change": 40,
+        "changePercent": 43.47826086956522
+      }
+    },
+    "performance": {
+      "extractionTime": {
+        "phase14": 246,
+        "phase15": 718,
+        "change": 472,
+        "changePercent": 191.869918699187
+      },
+      "filesPerSecond": {
+        "phase14": 585.3658536585366,
+        "phase15": 814.7632311977716,
+        "change": 229.39737753923498,
+        "changePercent": 39.188718662952645
+      },
+      "memoryUsage": {
+        "phase14": 17.514511108398438,
+        "phase15": 42.907928466796875,
+        "change": 25.393417358398438,
+        "changePercent": 144.98501957169654
+      }
+    },
+    "understanding": {
+      "knowledgeGraph": {
+        "phase14": {
+          "nodes": 240,
+          "edges": 605
+        },
+        "phase15": {
+          "nodes": 600,
+          "edges": 406
+        },
+        "change": {
+          "nodes": 360,
+          "edges": -199
+        }
+      },
+      "relationships": {
+        "phase14": 502,
+        "phase15": 354,
+        "change": -148
+      }
+    }
+  },
+  "analysis": {
+    "knowledgeGrowth": [
+      "✅ Facts increased by 2978 (224.9%)",
+      "✅ Rules increased by 571 (341.9%)",
+      "✅ Functions increased by 40 (43.5%)"
+    ],
+    "qualityImprovement": [
+      "⚠️  Overall score decreased by 13.3% (101.1% → 87.8%)"
+    ],
+    "performanceChanges": [
+      "⚠️  Extraction time increased by 191.9%",
+      "✅ Throughput improved by 39.2%"
+    ],
+    "recommendations": [
+      "Investigate agent extraction regression",
+      "Optimize memory usage (increased by 145.0%)",
+      "Investigate quality regression"
+    ]
+  }
+}

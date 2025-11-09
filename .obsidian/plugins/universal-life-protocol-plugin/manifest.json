@@ -1,0 +1,16 @@
+{
+	"id": "universal-life-protocol-plugin",
+	"name": "Universal Life Protocol Plugin",
+	"version": "1.0.0",
+	"minAppVersion": "0.15.0",
+	"description": "Dashboard for monitoring Universal Life Protocol hypergraph connections, DevOps, project management, and CRM functionality",
+	"author": "Universal Life Protocol",
+	"authorUrl": "https://github.com/bthornemail/UniversalLifeProtocol",
+	"fundingUrl": {
+		"Buy Me a Coffee": "https://buymeacoffee.com",
+		"GitHub Sponsor": "https://github.com/sponsors",
+		"Patreon": "https://www.patreon.com/",
+		"Support Project": "https://github.com/bthornemail/UniversalLifeProtocol/funding"
+	},
+	"isDesktopOnly": false
+}

@@ -1,0 +1,157 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: automaton-backend
+  namespace: automaton
+  labels:
+    app: automaton
+    component: backend
+    version: v1.0.0
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: automaton
+      component: backend
+  template:
+    metadata:
+      labels:
+        app: automaton
+        component: backend
+        version: v1.0.0
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3000"
+        prometheus.io/path: "/api/metrics"
+    spec:
+      containers:
+      - name: backend
+        image: automaton/backend:1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3000
+          name: http
+          protocol: TCP
+        - containerPort: 3001
+          name: websocket
+          protocol: TCP
+        env:
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: automaton-config
+              key: NODE_ENV
+        - name: PORT
+          valueFrom:
+            configMapKeyRef:
+              name: automaton-config
+              key: PORT
+        - name: WS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: automaton-config
+              key: WS_PORT
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: automaton-config
+              key: LOG_LEVEL
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: automaton-config
+              key: REDIS_HOST
+        - name: REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: automaton-config
+              key: REDIS_PORT
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /api/status
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /api/status
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        volumeMounts:
+        - name: automaton-data
+          mountPath: /app/data
+        - name: logs
+          mountPath: /app/logs
+      volumes:
+      - name: automaton-data
+        persistentVolumeClaim:
+          claimName: automaton-data-pvc
+      - name: logs
+        emptyDir: {}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        fsGroup: 1001
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: automaton-backend
+  namespace: automaton
+  labels:
+    app: automaton
+    component: backend
+spec:
+  type: ClusterIP
+  ports:
+  - port: 3000
+    targetPort: 3000
+    protocol: TCP
+    name: http
+  - port: 3001
+    targetPort: 3001
+    protocol: TCP
+    name: websocket
+  selector:
+    app: automaton
+    component: backend
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: automaton-backend-headless
+  namespace: automaton
+  labels:
+    app: automaton
+    component: backend
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - port: 3000
+    targetPort: 3000
+    name: http
+  - port: 3001
+    targetPort: 3001
+    name: websocket
+  selector:
+    app: automaton
+    component: backend

@@ -1,0 +1,22 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src"
+  },
+  "include": [
+    "src/core/**/*",
+    "src/adapters/opencode.ts",
+    "src/utils/**/*",
+    "src/types/**/*",
+    "src/opencode.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.test.ts",
+    "src/adapters/obsidian.ts",
+    "src/views/**/*",
+    "src/examples/**/*"
+  ]
+}

@@ -1,0 +1,148 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sRequiredLabels
+metadata:
+  name: automaton-mandatory-labels
+  labels:
+    app.kubernetes.io/name: automaton
+spec:
+  enforcementAction: deny
+  match:
+    kinds:
+    - apiGroups: [""]
+      kinds: ["Pod"]
+    - apiGroups: ["apps"]
+      kinds: ["Deployment", "StatefulSet", "DaemonSet"]
+    namespaces: ["automaton-security"]
+  parameters:
+    labels:
+      - key: "app.kubernetes.io/name"
+        allowedRegex: "^[a-z0-9-]+$"
+      - key: "app.kubernetes.io/version"
+        allowedRegex: "^[0-9]+\.[0-9]+\.[0-9]+$"
+      - key: "security.scan"
+        allowedRegex: "^(passed|failed)$"
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sDisallowPrivileged
+metadata:
+  name: automaton-no-privileged
+  labels:
+    app.kubernetes.io/name: automaton
+spec:
+  enforcementAction: deny
+  match:
+    kinds:
+    - apiGroups: [""]
+      kinds: ["Pod"]
+    namespaces: ["automaton-security"]
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAllowPrivilegeEscalationContainer
+metadata:
+  name: automaton-no-privilege-escalation
+  labels:
+    app.kubernetes.io/name: automaton
+spec:
+  enforcementAction: deny
+  match:
+    kinds:
+    - apiGroups: [""]
+      kinds: ["Pod"]
+    namespaces: ["automaton-security"]
+  parameters:
+    allowPrivilegeEscalation: false
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPReadOnlyRootFilesystem
+metadata:
+  name: automaton-readonly-filesystem
+  labels:
+    app.kubernetes.io/name: automaton
+spec:
+  enforcementAction: deny
+  match:
+    kinds:
+    - apiGroups: [""]
+      kinds: ["Pod"]
+    namespaces: ["automaton-security"]
+  parameters:
+    readOnlyRootFilesystem: true
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPRunAsUser
+metadata:
+  name: automaton-run-as-non-root
+  labels:
+    app.kubernetes.io/name: automaton
+spec:
+  enforcementAction: deny
+  match:
+    kinds:
+    - apiGroups: [""]
+      kinds: ["Pod"]
+    namespaces: ["automaton-security"]
+  parameters:
+    runAsUser:
+      rule: MustRunAsNonRoot
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPCapabilities
+metadata:
+  name: automaton-capabilities
+  labels:
+    app.kubernetes.io/name: automaton
+spec:
+  enforcementAction: deny
+  match:
+    kinds:
+    - apiGroups: [""]
+      kinds: ["Pod"]
+    namespaces: ["automaton-security"]
+  parameters:
+    requiredDropCapabilities: ["ALL"]
+    allowedCapabilities: []
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sAllowedRepos
+metadata:
+  name: automaton-allowed-repos
+  labels:
+    app.kubernetes.io/name: automaton
+spec:
+  enforcementAction: deny
+  match:
+    kinds:
+    - apiGroups: [""]
+      kinds: ["Pod"]
+    namespaces: ["automaton-security"]
+  parameters:
+    repos:
+    - "ghcr.io"
+    - "docker.io/automaton"
+    - "k8s.gcr.io"
+    - "quay.io"
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sImageVerify
+metadata:
+  name: automaton-image-verification
+  labels:
+    app.kubernetes.io/name: automaton
+spec:
+  enforcementAction: deny
+  match:
+    kinds:
+    - apiGroups: [""]
+      kinds: ["Pod"]
+    namespaces: ["automaton-security"]
+  parameters:
+    attestors:
+    - name: notary-attestor
+      count: 1
+      entries:
+      - keyless:
+          url: "https://fulcio.sigstore.dev"
+          identities:
+          - issuer: "https://token.actions.githubusercontent.com"
+            subject: "https://github.com/automaton/automaton"
+    repository: "ghcr.io/automaton/*"

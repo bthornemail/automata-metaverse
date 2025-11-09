@@ -1,0 +1,22 @@
+Next steps
+
+  To trigger the GitHub workflow:
+
+  git push origin evolution
+
+  The workflow will automatically:
+  1. Run automaton evolution (5 minutes default)
+  2. Capture snapshots using Meta-Log-Db
+  3. Analyze evolution patterns
+  4. Generate optimized variants
+  5. Validate variants
+  6. Commit updated variants back to the evolution branch
+
+  Monitor the workflow:
+
+  After pushing, you can monitor the workflow at:
+  • GitHub Actions: https://github.com/<your-repo>/actions/workflows/evolution.yml
+  • Check workflow logs for progress
+  • Review generated artifacts
+
+  The evolution logging system is committed and ready to use.

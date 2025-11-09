@@ -1,0 +1,66 @@
+# Multi-stage build for production-optimized UI
+FROM node:18-alpine AS builder
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY ui/package*.json ./
+COPY ui/tsconfig.json ./
+COPY ui/vite.config.ts ./
+COPY ui/tailwind.config.js ./
+COPY ui/postcss.config.js ./
+COPY ui/index.html ./
+
+# Install dependencies
+RUN npm ci --only=production=false
+
+# Copy source code
+COPY ui/src ./src
+
+# Build the application
+RUN npm run build
+
+# Production stage
+FROM nginx:alpine AS production
+
+# Install additional tools
+RUN apk add --no-cache curl
+
+# Create nginx temp directories and set permissions
+RUN mkdir -p /var/cache/nginx/client_temp \
+    && mkdir -p /var/cache/nginx/proxy_temp \
+    && mkdir -p /var/cache/nginx/fastcgi_temp \
+    && mkdir -p /var/cache/nginx/uwsgi_temp \
+    && mkdir -p /var/cache/nginx/scgi_temp \
+    && chown -R nginx:nginx /var/cache/nginx \
+    && chmod -R 755 /var/cache/nginx
+
+# Copy custom nginx configuration
+COPY docker/nginx.simple.conf /etc/nginx/nginx.conf
+
+# Copy built application
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Create healthcheck script
+RUN echo '#!/bin/sh\ncurl -f http://localhost/health || exit 1' > /healthcheck.sh && \
+    chmod +x /healthcheck.sh
+
+# Create nginx pid and temp directories
+RUN mkdir -p /var/run/nginx /var/cache/nginx && \
+    chown -R nginx:nginx /var/run/nginx /var/cache/nginx
+
+# Expose port
+EXPOSE 80
+
+# Add labels
+LABEL maintainer="Automaton Team"
+LABEL version="1.0.0"
+LABEL description="Self-Referencing Automaton UI"
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost/health || exit 1
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]

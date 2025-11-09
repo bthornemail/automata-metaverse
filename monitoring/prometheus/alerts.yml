@@ -1,0 +1,200 @@
+groups:
+- name: automaton.rules
+  rules:
+  # Application alerts
+  - alert: AutomatonHighErrorRate
+    expr: rate(http_requests_total{job="automaton-backend",status=~"5.."}[5m]) / rate(http_requests_total{job="automaton-backend"}[5m]) > 0.05
+    for: 5m
+    labels:
+      severity: critical
+      service: automaton-backend
+    annotations:
+      summary: "High error rate detected in Automaton backend"
+      description: "Error rate is {{ $value | humanizePercentage }} for the last 5 minutes"
+
+  - alert: AutomatonHighResponseTime
+    expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job="automaton-backend"}[5m])) > 1
+    for: 5m
+    labels:
+      severity: warning
+      service: automaton-backend
+    annotations:
+      summary: "High response time detected in Automaton backend"
+      description: "95th percentile response time is {{ $value }}s"
+
+  - alert: AutomatonDown
+    expr: up{job="automaton-backend"} == 0
+    for: 1m
+    labels:
+      severity: critical
+      service: automaton-backend
+    annotations:
+      summary: "Automaton backend is down"
+      description: "Automaton backend has been down for more than 1 minute"
+
+  # Resource alerts
+  - alert: AutomatonHighMemoryUsage
+    expr: process_resident_memory_bytes{job="automaton-backend"} / 1024 / 1024 > 400
+    for: 10m
+    labels:
+      severity: warning
+      service: automaton-backend
+    annotations:
+      summary: "High memory usage in Automaton backend"
+      description: "Memory usage is {{ $value }}MB"
+
+  - alert: AutomatonHighCPUUsage
+    expr: rate(process_cpu_seconds_total{job="automaton-backend"}[5m]) > 0.8
+    for: 10m
+    labels:
+      severity: warning
+      service: automaton-backend
+    annotations:
+      summary: "High CPU usage in Automaton backend"
+      description: "CPU usage is {{ $value | humanizePercentage }}"
+
+  # Redis alerts
+  - alert: RedisDown
+    expr: up{job="redis"} == 0
+    for: 1m
+    labels:
+      severity: critical
+      service: redis
+    annotations:
+      summary: "Redis is down"
+      description: "Redis has been down for more than 1 minute"
+
+  - alert: RedisHighMemoryUsage
+    expr: redis_used_memory_bytes{job="redis"} / redis_memory_max_bytes{job="redis"} > 0.9
+    for: 5m
+    labels:
+      severity: warning
+      service: redis
+    annotations:
+      summary: "Redis high memory usage"
+      description: "Redis memory usage is {{ $value | humanizePercentage }} of max memory"
+
+  - alert: RedisTooManyConnections
+    expr: redis_connected_clients{job="redis"} > 100
+    for: 5m
+    labels:
+      severity: warning
+      service: redis
+    annotations:
+      summary: "Redis too many connections"
+      description: "Redis has {{ $value }} connected clients"
+
+  # Kubernetes alerts
+  - alert: AutomatonPodCrashLooping
+    expr: rate(kube_pod_container_status_restarts_total{namespace="automaton",pod=~"automaton-.*"}[15m]) > 0
+    for: 5m
+    labels:
+      severity: warning
+      service: kubernetes
+    annotations:
+      summary: "Automaton pod is crash looping"
+      description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is crash looping"
+
+  - alert: AutomatonPodNotReady
+    expr: kube_pod_status_ready{condition="true",namespace="automaton"} == 0
+    for: 10m
+    labels:
+      severity: warning
+      service: kubernetes
+    annotations:
+      summary: "Automaton pod not ready"
+      description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is not ready"
+
+  - alert: AutomatonDeploymentUnavailable
+    expr: kube_deployment_status_replicas_unavailable{namespace="automaton"} > 0
+    for: 10m
+    labels:
+      severity: warning
+      service: kubernetes
+    annotations:
+      summary: "Automaton deployment has unavailable replicas"
+      description: "Deployment {{ $labels.deployment }} in namespace {{ $labels.namespace }} has {{ $value }} unavailable replicas"
+
+  # Security alerts
+  - alert: AutomatonUnauthorizedAccess
+    expr: rate(http_requests_total{job="automaton-backend",status="401"}[5m]) > 10
+    for: 2m
+    labels:
+      severity: warning
+      service: security
+    annotations:
+      summary: "High rate of unauthorized access attempts"
+      description: "{{ $value }} unauthorized requests per second"
+
+  - alert: AutomatonForbiddenAccess
+    expr: rate(http_requests_total{job="automaton-backend",status="403"}[5m]) > 5
+    for: 2m
+    labels:
+      severity: warning
+      service: security
+    annotations:
+      summary: "High rate of forbidden access attempts"
+      description: "{{ $value }} forbidden requests per second"
+
+  # Business logic alerts
+  - alert: AutomatonOperationFailure
+    expr: rate(automaton_operations_total{job="automaton-backend",status="failed"}[5m]) / rate(automaton_operations_total{job="automaton-backend"}[5m]) > 0.1
+    for: 5m
+    labels:
+      severity: warning
+      service: automaton-backend
+    annotations:
+      summary: "High automaton operation failure rate"
+      description: "Operation failure rate is {{ $value | humanizePercentage }}"
+
+  - alert: AutomatonSelfModificationActivity
+    expr: rate(automaton_self_modifications_total{job="automaton-backend"}[5m]) > 1
+    for: 1m
+    labels:
+      severity: info
+      service: automaton-backend
+    annotations:
+      summary: "Automaton self-modification activity detected"
+      description: "{{ $value }} self-modifications per second"
+
+  # Frontend alerts
+  - alert: AutomatonFrontendDown
+    expr: up{job="automaton-frontend"} == 0
+    for: 1m
+    labels:
+      severity: critical
+      service: automaton-frontend
+    annotations:
+      summary: "Automaton frontend is down"
+      description: "Automaton frontend has been down for more than 1 minute"
+
+  - alert: AutomatonFrontendHighErrorRate
+    expr: rate(http_requests_total{job="automaton-frontend",status=~"4..|5.."}[5m]) / rate(http_requests_total{job="automaton-frontend"}[5m]) > 0.05
+    for: 5m
+    labels:
+      severity: warning
+      service: automaton-frontend
+    annotations:
+      summary: "High error rate in Automaton frontend"
+      description: "Frontend error rate is {{ $value | humanizePercentage }}"
+
+  # System alerts
+  - alert: NodeDiskSpaceHigh
+    expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) * 100 < 10
+    for: 5m
+    labels:
+      severity: warning
+      service: system
+    annotations:
+      summary: "Low disk space on node"
+      description: "Node {{ $labels.instance }} has {{ $value }}% free disk space"
+
+  - alert: NodeMemoryHigh
+    expr: (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 < 10
+    for: 5m
+    labels:
+      severity: warning
+      service: system
+    annotations:
+      summary: "Low memory on node"
+      description: "Node {{ $labels.instance }} has {{ $value }}% available memory"

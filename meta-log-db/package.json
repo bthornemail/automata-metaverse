@@ -1,0 +1,42 @@
+{
+  "name": "meta-log-db",
+  "version": "1.0.0",
+  "description": "Native database package for Meta-Log (ProLog, DataLog, R5RS)",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run build",
+    "test": "jest"
+  },
+  "keywords": [
+    "meta-log",
+    "prolog",
+    "datalog",
+    "r5rs",
+    "jsonl",
+    "canvasl",
+    "database"
+  ],
+  "author": "Automaton System",
+  "license": "MIT",
+  "dependencies": {
+    "ethers": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "@types/node": "^20.0.0",
+    "jest": "^29.0.0",
+    "ts-jest": "^29.4.5",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

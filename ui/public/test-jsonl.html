@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSONL Browser Test</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .test {
+            margin: 20px 0;
+            padding: 15px;
+            background: #2a2a2a;
+            border-radius: 5px;
+        }
+        .success { border-left: 4px solid #4caf50; }
+        .error { border-left: 4px solid #f44336; }
+        .info { border-left: 4px solid #2196f3; }
+        pre { overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>JSONL Browser-Side Loading Test</h1>
+    <div id="results"></div>
+
+    <script>
+        const files = [
+            'generate.metaverse.jsonl',
+            'automaton-kernel.jsonl',
+            'automaton.jsonl',
+            'r5rs-functions-trie.jsonl',
+            'automaton.canvas.space.jsonl',
+            'automaton-kernel.seed.jsonl'
+        ];
+
+        async function testFile(file) {
+            const result = {
+                file,
+                local: { success: false, error: null, count: 0 },
+                api: { success: false, error: null, count: 0 }
+            };
+
+            // Test 1: Load from local /jsonl/ folder
+            try {
+                const localResponse = await fetch(`/jsonl/${file}`);
+                if (localResponse.ok) {
+                    const text = await localResponse.text();
+                    const lines = text.trim().split('\n').filter(l => l.trim());
+                    const data = lines.map(l => {
+                        try { return JSON.parse(l); } catch(e) { return null; }
+                    }).filter(Boolean);
+                    result.local = { success: true, count: data.length };
+                } else {
+                    result.local = { success: false, error: `${localResponse.status} ${localResponse.statusText}` };
+                }
+            } catch (error) {
+                result.local = { success: false, error: error.message };
+            }
+
+            // Test 2: Load from API (fallback)
+            try {
+                const apiUrl = 'http://localhost:3000/api';
+                const apiResponse = await fetch(`${apiUrl}/jsonl/${file}`);
+                if (apiResponse.ok) {
+                    const data = await apiResponse.json();
+                    result.api = { 
+                        success: data.success, 
+                        count: data.data?.length || 0 
+                    };
+                } else {
+                    result.api = { success: false, error: `${apiResponse.status} ${apiResponse.statusText}` };
+                }
+            } catch (error) {
+                result.api = { success: false, error: error.message };
+            }
+
+            return result;
+        }
+
+        async function runTests() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<p>Testing JSONL file loading...</p>';
+
+            const results = [];
+            for (const file of files) {
+                const result = await testFile(file);
+                results.push(result);
+            }
+
+            // Display results
+            let html = '';
+            results.forEach(result => {
+                const localClass = result.local.success ? 'success' : 'error';
+                const apiClass = result.api.success ? 'success' : 'error';
+                
+                html += `
+                    <div class="test">
+                        <h3>${result.file}</h3>
+                        <div class="${localClass}">
+                            <strong>Local (/jsonl/${result.file}):</strong>
+                            ${result.local.success 
+                                ? `✅ Success - ${result.local.count} items loaded`
+                                : `❌ Failed - ${result.local.error}`
+                            }
+                        </div>
+                        <div class="${apiClass}">
+                            <strong>API (http://localhost:3000/api/jsonl/${result.file}):</strong>
+                            ${result.api.success 
+                                ? `✅ Success - ${result.api.count} items loaded`
+                                : `❌ Failed - ${result.api.error}`
+                            }
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Summary
+            const localSuccess = results.filter(r => r.local.success).length;
+            const apiSuccess = results.filter(r => r.api.success).length;
+            
+            html += `
+                <div class="test info">
+                    <h3>Summary</h3>
+                    <p>Local files: ${localSuccess}/${files.length} successful</p>
+                    <p>API fallback: ${apiSuccess}/${files.length} successful</p>
+                    <p><strong>JSONL-First Status:</strong> ${localSuccess > 0 ? '✅ Working' : '❌ Not Working'}</p>
+                </div>
+            `;
+
+            resultsDiv.innerHTML = html;
+        }
+
+        // Run tests on load
+        runTests();
+    </script>
+</body>
+</html>

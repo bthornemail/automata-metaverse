@@ -1,0 +1,174 @@
+.status-dashboard-container {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.dashboard-header h2 {
+  margin: 0;
+  color: #333;
+}
+
+.dashboard-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.monitor-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.monitor-button.active {
+  background: #4caf50;
+  color: white;
+}
+
+.monitor-button:not(.active) {
+  background: #2196f3;
+  color: white;
+}
+
+.monitor-button:hover {
+  opacity: 0.9;
+}
+
+.dashboard-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+.agents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.agent-status-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.agent-status-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.agent-status-card.selected {
+  border-color: #2196f3;
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+}
+
+.agent-status-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.agent-status-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.status-indicator {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+  text-transform: uppercase;
+}
+
+.agent-dimension {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.status-timestamp {
+  font-size: 12px;
+  color: #999;
+}
+
+.status-history-panel {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.status-history-panel h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.history-timeline {
+  margin-top: 15px;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.history-item:last-child {
+  border-bottom: none;
+}
+
+.history-status {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+  text-transform: uppercase;
+  min-width: 60px;
+  text-align: center;
+}
+
+.history-time {
+  flex: 1;
+  font-size: 12px;
+  color: #666;
+}
+
+.history-message {
+  font-size: 12px;
+  color: #999;
+  font-style: italic;
+}
+
+.no-history {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+}
+
+@media (max-width: 1024px) {
+  .dashboard-content {
+    grid-template-columns: 1fr;
+  }
+}

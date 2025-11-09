@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  automaton-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "5555:5555"
+    environment:
+      - NODE_ENV=test
+      - REDIS_HOST=redis-test
+      - REDIS_PORT=6379
+    depends_on:
+      - redis-test
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5555/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  automaton-frontend:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    environment:
+      - VITE_API_URL=http://localhost:5555
+    depends_on:
+      - automaton-backend
+
+  redis-test:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-test-data:/data
+
+  artillery:
+    image: artilleryio/artillery:latest
+    depends_on:
+      - automaton-backend
+    volumes:
+      - ./tests/performance:/tests
+    command: run /tests/load-test.yml --target http://automaton-backend:5555
+
+volumes:
+  redis-test-data:

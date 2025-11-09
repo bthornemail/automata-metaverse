@@ -1,0 +1,71 @@
+# Backend API Dockerfile
+FROM node:18-alpine AS builder
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY tsconfig.json ./
+
+# Install all dependencies (including dev for build)
+RUN npm ci
+
+# Copy source code
+COPY *.ts ./
+COPY src/ ./src/
+COPY grok_files/ ./grok_files/
+
+# Build TypeScript
+RUN npm run build
+
+# Production stage
+FROM node:18-alpine AS production
+
+# Install additional tools
+RUN apk add --no-cache curl
+
+# Create app user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S automaton -u 1001
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files and install production dependencies only
+COPY package*.json ./
+RUN npm ci --only=production && npm cache clean --force
+
+# Copy built application and source
+COPY --from=builder /app/dist/*.js ./
+COPY --from=builder /app/dist/src/ ./src/
+COPY --from=builder /app/grok_files/ ./grok_files/
+# Copy all JSONL files
+COPY *.jsonl ./
+COPY automaton.canvas.space.jsonl ./
+COPY automaton-kernel.seed.jsonl ./
+COPY automaton-kernel.jsonl ./
+COPY generate.metaverse.jsonl ./
+COPY r5rs-functions-trie.jsonl ./
+
+# Create directories
+RUN mkdir -p logs && \
+    chown -R automaton:nodejs /app
+
+# Switch to non-root user
+USER automaton
+
+# Expose ports (use environment variable PORT, default 3000)
+EXPOSE 3000 3001
+
+# Add labels
+LABEL maintainer="Automaton Team"
+LABEL version="1.0.0"
+LABEL description="Self-Referencing Automaton Backend API"
+
+# Health check (use PORT env var)
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:${PORT:-3000}/api/status || exit 1
+
+# Start the application
+CMD ["node", "ui-server.js"]
