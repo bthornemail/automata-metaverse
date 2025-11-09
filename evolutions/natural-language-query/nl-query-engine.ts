@@ -55,20 +55,24 @@ export class NLQueryEngine {
   private parseIntent(question: string): QueryIntent {
     const lowerQuestion = question.toLowerCase();
     
-    // Agent queries
-    if (this.matchesPattern(lowerQuestion, ['agent', 'what agents', 'which agents', 'list agents'])) {
+    // Agent queries - check for agent names first
+    const agentName = this.extractAgentName(lowerQuestion);
+    if (agentName || lowerQuestion.includes('agent')) {
       const dimension = this.extractDimension(lowerQuestion);
-      const agentName = this.extractAgentName(lowerQuestion);
+      const extractedAgentName = agentName || this.extractEntity(lowerQuestion);
       
-      return {
-        type: 'agent',
-        entity: agentName,
-        question,
-        filters: {
-          dimension,
-          name: agentName
-        }
-      };
+      // If we found an agent name or the question mentions "agent", treat as agent query
+      if (extractedAgentName || lowerQuestion.includes('agent')) {
+        return {
+          type: 'agent',
+          entity: extractedAgentName,
+          question,
+          filters: {
+            dimension,
+            name: extractedAgentName
+          }
+        };
+      }
     }
     
     // Function queries
@@ -109,9 +113,25 @@ export class NLQueryEngine {
       };
     }
     
-    // Fact queries
-    if (this.matchesPattern(lowerQuestion, ['what is', 'what are', 'tell me about', 'explain'])) {
+    // Fact queries - but check if it's actually an agent query first
+    if (this.matchesPattern(lowerQuestion, ['what is', 'what are', 'tell me about', 'explain', 'more about'])) {
       const entity = this.extractEntity(lowerQuestion);
+      
+      // If entity contains "agent", treat as agent query instead
+      if (entity && entity.toLowerCase().includes('agent')) {
+        const dimension = this.extractDimension(lowerQuestion);
+        const agentName = this.extractAgentName(lowerQuestion) || entity;
+        
+        return {
+          type: 'agent',
+          entity: agentName,
+          question,
+          filters: {
+            dimension,
+            name: agentName
+          }
+        };
+      }
       
       return {
         type: 'fact',
@@ -380,10 +400,22 @@ export class NLQueryEngine {
    * Extract agent name from question
    */
   private extractAgentName(question: string): string | undefined {
-    // Look for patterns like "5D-Consensus-Agent" or "Consensus Agent"
-    const agentPattern = /(\d+d-[\w-]+-agent|[\w-]+-agent)/i;
-    const match = question.match(agentPattern);
-    return match ? match[1] : undefined;
+    // Look for patterns like "5D-Consensus-Agent" or "Consensus Agent" or "4D-Network-Agent"
+    const agentPatterns = [
+      /(\d+d-[\w-]+-agent)/i,  // "4D-Network-Agent"
+      /([\w-]+-agent)/i,        // "Network-Agent"
+      /(the\s+)?(\d+d\s+)?([\w\s]+)\s+agent/i  // "the 4D Network agent"
+    ];
+    
+    for (const pattern of agentPatterns) {
+      const match = question.match(pattern);
+      if (match) {
+        // Return the full match or the agent name part
+        return match[1] || match[3] || match[2] + match[3];
+      }
+    }
+    
+    return undefined;
   }
 
   /**
@@ -423,9 +455,21 @@ export class NLQueryEngine {
    * Extract entity name from question
    */
   private extractEntity(question: string): string | undefined {
-    // Look for "what is X" or "tell me about X"
-    const entityPattern = /(?:what is|tell me about|explain)\s+([\w\s-]+)/i;
-    const match = question.match(entityPattern);
-    return match ? match[1].trim() : undefined;
+    // Look for "what is X" or "tell me about X" or "more about X"
+    const entityPatterns = [
+      /(?:what is|tell me about|explain|more about)\s+(the\s+)?([\w\s-]+)/i,
+      /(?:what is|tell me about|explain|more about)\s+(the\s+)?(\d+d-[\w-]+-agent)/i
+    ];
+    
+    for (const pattern of entityPatterns) {
+      const match = question.match(pattern);
+      if (match) {
+        const entity = (match[2] || match[3] || match[1]).trim();
+        // Remove trailing question words
+        return entity.replace(/\s+(agent|function|rule|fact)?\s*$/i, '').trim();
+      }
+    }
+    
+    return undefined;
   }
 }

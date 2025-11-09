@@ -147,6 +147,27 @@ class UnifiedWebSocketService {
         this.eventBus.emit('error', errorMessage);
       });
 
+      // Chat events
+      this.socket.on('chat:broadcast', (message: any) => {
+        this.eventBus.emit('chat:broadcast', message);
+      });
+
+      this.socket.on('chat:direct', (message: any) => {
+        this.eventBus.emit('chat:direct', message);
+      });
+
+      this.socket.on('chat:agent', (message: any) => {
+        this.eventBus.emit('chat:agent', message);
+      });
+
+      this.socket.on('chat:participant-joined', (participant: any) => {
+        this.eventBus.emit('chat:participant-joined', participant);
+      });
+
+      this.socket.on('chat:participant-left', (participantId: string) => {
+        this.eventBus.emit('chat:participant-left', participantId);
+      });
+
     } catch (error) {
       console.error('Failed to create Socket.IO connection:', error);
       this.notifyConnectionHandlers(false);

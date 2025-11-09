@@ -3,9 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Brain, MessageSquare, Send, Bot, User, Zap, Play, Pause, RotateCcw, 
   Settings, Download, Upload, Lightbulb, TrendingUp, Cpu, Code, Sparkles, X,
-  FileText, BarChart3, Network, Cpu as CpuIcon, Maximize2, Minimize2
+  FileText, BarChart3, Network, Cpu as CpuIcon, Maximize2, Minimize2, Users
 } from 'lucide-react';
-import { AgentChat } from '@/types';
+import { AgentChat, ChatMessage } from '@/types';
 import { apiService } from '@/services/api';
 import { useAutomatonState } from '@/hooks/useAutomatonState';
 import { Modal } from '@/components/shared/Modal';
@@ -14,6 +14,8 @@ import { nlpService } from '@/services/nlp-service';
 import { tinyMLService } from '@/services/tinyml-service';
 import { databaseService } from '@/services/database-service';
 import { llmService, LLMProviderConfig } from '@/services/llm-service';
+import { nlQueryService } from '@/services/nl-query-service';
+import { chatService, ChatMessage as ChatServiceMessage, ChatParticipant } from '@/services/chat-service';
 import WebGLMetaverseEvolution, { dimensionConfig } from '@/components/AdvancedAnimations/WebGLMetaverseEvolution';
 import MetaverseCanvas3D from '@/components/MetaverseCanvas3D/MetaverseCanvas3D';
 import UnifiedEditor from '@/components/UnifiedEditor';
@@ -142,6 +144,18 @@ const AIPortal: React.FC = () => {
     tinyml: false
   });
 
+  // NL Query Integration
+  const [useNLQuery, setUseNLQuery] = useState(true); // Enable NL Query by default
+  const [nlQueryConversationId, setNLQueryConversationId] = useState<string | null>(null);
+
+  // Chat Messaging State
+  const [chatMode, setChatMode] = useState<'broadcast' | 'direct'>('broadcast');
+  const [selectedParticipant, setSelectedParticipant] = useState<string | null>(null);
+  const [chatParticipants, setChatParticipants] = useState<ChatParticipant[]>([]);
+  const [broadcastMessages, setBroadcastMessages] = useState<ChatServiceMessage[]>([]);
+  const [directMessages, setDirectMessages] = useState<Map<string, ChatServiceMessage[]>>(new Map());
+  const [showChatPanel, setShowChatPanel] = useState(true);
+
   // TinyML State
   const [tinyMLModels, setTinyMLModels] = useState<any[]>([]);
   const [patternPrediction, setPatternPrediction] = useState<any>(null);
@@ -183,6 +197,17 @@ const AIPortal: React.FC = () => {
     loadAvailableAgents();
     scrollToBottom();
     initializeLLMProvider();
+    
+    // Initialize NL Query conversation
+    if (useNLQuery) {
+      nlQueryService.createConversation().then(id => {
+        setNLQueryConversationId(id);
+        addEvolutionLog(`✓ NL Query conversation initialized: ${id}`);
+      }).catch(error => {
+        console.warn('Failed to initialize NL Query conversation:', error);
+        addEvolutionLog(`⚠ NL Query conversation initialization failed: ${error instanceof Error ? error.message : 'Unknown'}`);
+      });
+    }
   }, []);
 
   // Initialize LLM Provider when config changes
@@ -193,6 +218,42 @@ const AIPortal: React.FC = () => {
   useEffect(() => {
     scrollToBottom();
   }, [chat.messages]);
+
+  // Initialize Chat Service
+  useEffect(() => {
+    // Get initial participants
+    setChatParticipants(chatService.getParticipants());
+    
+    // Subscribe to participant changes
+    const unsubscribeParticipants = chatService.onParticipantsChange((participants) => {
+      setChatParticipants(participants);
+    });
+    
+    // Subscribe to broadcast messages
+    const unsubscribeBroadcast = chatService.onMessage('broadcast', null, (message) => {
+      setBroadcastMessages(prev => [...prev, message]);
+    });
+    
+    // Subscribe to direct messages
+    const unsubscribeDirect = chatService.onMessage('direct', null, (message) => {
+      const conversationId = message.to === chatService.getCurrentUserId()
+        ? `${message.from}-${chatService.getCurrentUserId()}`
+        : `${chatService.getCurrentUserId()}-${message.to}`;
+      
+      setDirectMessages(prev => {
+        const newMap = new Map(prev);
+        const messages = newMap.get(conversationId) || [];
+        newMap.set(conversationId, [...messages, message]);
+        return newMap;
+      });
+    });
+    
+    return () => {
+      unsubscribeParticipants();
+      unsubscribeBroadcast();
+      unsubscribeDirect();
+    };
+  }, []);
 
   // Update bridge status when automaton state changes
   useEffect(() => {
@@ -413,7 +474,62 @@ const AIPortal: React.FC = () => {
     setIsTyping(true);
 
     try {
-      // Step 1: NLP Processing
+      // Try NL Query Service first if enabled
+      if (useNLQuery && nlQueryConversationId) {
+        try {
+          addEvolutionLog(`NL Query: Processing question with knowledge base...`);
+          const queryStartTime = performance.now();
+          const nlResponse = await nlQueryService.ask(message, nlQueryConversationId);
+          const queryEndTime = performance.now();
+          const queryTime = queryEndTime - queryStartTime;
+          
+          if (nlResponse.confidence > 0.5) {
+            // Use NL Query response with full metadata
+            const agentMessage: ChatMessage = {
+              role: 'agent' as const,
+              content: nlResponse.answer,
+              timestamp: Date.now(),
+              citations: nlResponse.citations,
+              confidence: nlResponse.confidence,
+              followUpSuggestions: nlResponse.followUpSuggestions,
+              relatedEntities: nlResponse.relatedEntities,
+              performanceMetrics: {
+                responseTime: queryTime,
+                queryTime: queryTime,
+                processingTime: queryTime
+              }
+            };
+
+            setChat(prev => ({
+              ...prev,
+              messages: [...prev.messages, agentMessage]
+            }));
+
+            // Update suggestions with follow-ups
+            if (nlResponse.followUpSuggestions.length > 0) {
+              setChat(prev => ({
+                ...prev,
+                suggestions: nlResponse.followUpSuggestions.slice(0, 5)
+              }));
+            }
+
+            addEvolutionLog(`✓ NL Query: Response generated (confidence: ${(nlResponse.confidence * 100).toFixed(0)}%)`);
+            if (nlResponse.citations.length > 0) {
+              addEvolutionLog(`  Citations: ${nlResponse.citations.map(c => c.source).join(', ')}`);
+            }
+            
+            setIsTyping(false);
+            return;
+          } else {
+            addEvolutionLog(`⚠ NL Query: Low confidence (${(nlResponse.confidence * 100).toFixed(0)}%), falling back to LLM`);
+          }
+        } catch (nlError) {
+          console.warn('NL Query failed, falling back to LLM:', nlError);
+          addEvolutionLog(`⚠ NL Query failed: ${nlError instanceof Error ? nlError.message : 'Unknown'}, using LLM fallback`);
+        }
+      }
+
+      // Step 1: NLP Processing (fallback or when NL Query disabled)
       const nlpAnalysis = await nlpService.parseInput(message);
       addEvolutionLog(`NLP Analysis: ${nlpAnalysis.intent} (${(nlpAnalysis.confidence * 100).toFixed(0)}% confidence)`);
 
@@ -713,6 +829,79 @@ Generate a helpful, informative response:
   const handleSuggestionClick = (suggestion: string) => {
     setInputMessage(suggestion);
     setShowSuggestions(false);
+  };
+
+  // Chat Messaging Handlers
+  const handleSendChatMessage = async (content: string) => {
+    if (!content.trim()) return;
+
+    if (chatMode === 'broadcast') {
+      // Send broadcast message
+      chatService.sendBroadcast(content);
+      
+      // Also send via NL Query if enabled
+      if (useNLQuery && nlQueryConversationId) {
+        try {
+          const nlResponse = await nlQueryService.ask(content, nlQueryConversationId);
+          if (nlResponse.confidence > 0.5) {
+            // Broadcast agent response
+            chatService.sendBroadcast(nlResponse.answer, {
+              citations: nlResponse.citations,
+              confidence: nlResponse.confidence
+            });
+          }
+        } catch (error) {
+          console.warn('NL Query failed in broadcast:', error);
+        }
+      }
+    } else if (chatMode === 'direct' && selectedParticipant) {
+      // Send direct message
+      const participant = chatParticipants.find(p => p.id === selectedParticipant);
+      
+      if (participant?.type === 'agent') {
+        // Query agent via NL Query
+        if (useNLQuery && nlQueryConversationId) {
+          try {
+            const nlResponse = await nlQueryService.ask(content, nlQueryConversationId);
+            if (nlResponse.confidence > 0.5) {
+              chatService.sendAgentMessage(selectedParticipant, nlResponse.answer, {
+                citations: nlResponse.citations,
+                confidence: nlResponse.confidence
+              });
+            }
+          } catch (error) {
+            console.warn('Agent query failed:', error);
+          }
+        }
+      } else {
+        // Send direct message to human
+        chatService.sendDirectMessage(selectedParticipant, content);
+      }
+    }
+  };
+
+  const handleParticipantClick = (participantId: string) => {
+    setSelectedParticipant(participantId);
+    setChatMode('direct');
+    
+    // Load direct messages for this participant
+    const messages = chatService.getDirectMessages(participantId);
+    const conversationId = `${chatService.getCurrentUserId()}-${participantId}`;
+    setDirectMessages(prev => {
+      const newMap = new Map(prev);
+      newMap.set(conversationId, messages);
+      return newMap;
+    });
+  };
+
+  const getCurrentMessages = (): ChatServiceMessage[] => {
+    if (chatMode === 'broadcast') {
+      return broadcastMessages;
+    } else if (chatMode === 'direct' && selectedParticipant) {
+      const conversationId = `${chatService.getCurrentUserId()}-${selectedParticipant}`;
+      return directMessages.get(conversationId) || [];
+    }
+    return [];
   };
 
   const getAgentDescription = (agent: string): string => {
@@ -1034,7 +1223,67 @@ Generate a helpful, informative response:
                               ? 'bg-blue-600 text-white'
                               : 'bg-gray-700 text-gray-100'
                           }`}>
-                            {message.content}
+                            <div className="whitespace-pre-wrap">{message.content}</div>
+                            
+                            {/* Citations */}
+                            {message.role === 'agent' && message.citations && message.citations.length > 0 && (
+                              <div className="mt-3 pt-3 border-t border-gray-600">
+                                <div className="text-xs text-gray-400 mb-2 flex items-center gap-1">
+                                  <FileText className="w-3 h-3" />
+                                  Sources:
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                  {message.citations.map((citation, idx) => (
+                                    <a
+                                      key={idx}
+                                      href={citation.url || `#${citation.source}`}
+                                      target={citation.url ? '_blank' : undefined}
+                                      rel={citation.url ? 'noopener noreferrer' : undefined}
+                                      className="text-xs px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded text-blue-400 hover:text-blue-300 transition-colors"
+                                      title={citation.title || citation.source.split('/').pop()}
+                                    >
+                                      {citation.title || citation.source.split('/').pop()}
+                                      {citation.type && (
+                                        <span className="ml-1 text-gray-500">({citation.type})</span>
+                                      )}
+                                    </a>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            
+                            {/* Performance Metrics */}
+                            {message.role === 'agent' && message.performanceMetrics && (
+                              <div className="mt-2 text-xs text-gray-500">
+                                Response time: {message.performanceMetrics.responseTime.toFixed(0)}ms
+                                {message.confidence !== undefined && (
+                                  <span className="ml-2">
+                                    • Confidence: {(message.confidence * 100).toFixed(0)}%
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                            
+                            {/* Follow-up Suggestions */}
+                            {message.role === 'agent' && message.followUpSuggestions && message.followUpSuggestions.length > 0 && (
+                              <div className="mt-3 pt-3 border-t border-gray-600">
+                                <div className="text-xs text-gray-400 mb-2 flex items-center gap-1">
+                                  <Lightbulb className="w-3 h-3" />
+                                  Follow-up questions:
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                  {message.followUpSuggestions.slice(0, 3).map((suggestion, idx) => (
+                                    <button
+                                      key={idx}
+                                      onClick={() => handleSuggestionClick(suggestion)}
+                                      className="text-xs px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded text-gray-300 hover:text-white transition-colors"
+                                    >
+                                      {suggestion}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
                           </div>
                           
                           {message.role === 'user' && (
@@ -1065,6 +1314,138 @@ Generate a helpful, informative response:
                   )}
                 </div>
 
+                {/* Chat Mode Toggle */}
+                <div className="mb-4 flex gap-2">
+                  <button
+                    onClick={() => {
+                      setChatMode('broadcast');
+                      setSelectedParticipant(null);
+                    }}
+                    className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      chatMode === 'broadcast'
+                        ? 'bg-[#6366f1] text-white'
+                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    }`}
+                  >
+                    <MessageSquare className="w-4 h-4 inline mr-2" />
+                    Broadcast
+                  </button>
+                  <button
+                    onClick={() => setChatMode('direct')}
+                    className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      chatMode === 'direct'
+                        ? 'bg-[#6366f1] text-white'
+                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    }`}
+                  >
+                    <User className="w-4 h-4 inline mr-2" />
+                    Direct
+                  </button>
+                </div>
+
+                {/* Participant List (for Direct Mode) */}
+                {chatMode === 'direct' && (
+                  <div className="mb-4 p-3 bg-gray-900 rounded-lg border border-gray-700 max-h-48 overflow-y-auto">
+                    <div className="text-xs text-gray-400 mb-2 flex items-center gap-1">
+                      <Users className="w-3 h-3" />
+                      Participants ({chatParticipants.length})
+                    </div>
+                    <div className="space-y-1">
+                      {chatParticipants.map((participant) => (
+                        <button
+                          key={participant.id}
+                          onClick={() => handleParticipantClick(participant.id)}
+                          className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${
+                            selectedParticipant === participant.id
+                              ? 'bg-[#6366f1] text-white'
+                              : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            {participant.type === 'agent' ? (
+                              <Bot className={`w-3 h-3 ${participant.online ? 'text-green-400' : 'text-gray-500'}`} />
+                            ) : (
+                              <User className={`w-3 h-3 ${participant.online ? 'text-blue-400' : 'text-gray-500'}`} />
+                            )}
+                            <span className="flex-1 truncate">{participant.name}</span>
+                            {participant.dimension && (
+                              <span className="text-gray-500 text-[10px]">{participant.dimension}</span>
+                            )}
+                            {participant.online && (
+                              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                            )}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Chat Messages (Broadcast/Direct) */}
+                {showChatPanel && (
+                  <div className="mb-4 flex-1 bg-gray-900 rounded-lg p-4 overflow-y-auto min-h-0 border border-gray-700 max-h-64">
+                    {getCurrentMessages().length === 0 ? (
+                      <div className="text-center text-gray-400 py-4 text-xs">
+                        {chatMode === 'broadcast' 
+                          ? 'No broadcast messages yet. Start chatting!'
+                          : selectedParticipant 
+                            ? `No messages with ${chatParticipants.find(p => p.id === selectedParticipant)?.name || 'this participant'} yet.`
+                            : 'Select a participant to start a direct conversation.'}
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {getCurrentMessages().map((message) => {
+                          const sender = chatParticipants.find(p => p.id === message.from);
+                          const isFromMe = message.from === chatService.getCurrentUserId();
+                          
+                          return (
+                            <div
+                              key={message.id}
+                              className={`flex gap-2 ${isFromMe ? 'justify-end' : 'justify-start'}`}
+                            >
+                              {!isFromMe && (
+                                <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
+                                  sender?.type === 'agent' ? 'bg-[#6366f1]' : 'bg-blue-600'
+                                }`}>
+                                  {sender?.type === 'agent' ? (
+                                    <Bot className="w-3 h-3 text-white" />
+                                  ) : (
+                                    <User className="w-3 h-3 text-white" />
+                                  )}
+                                </div>
+                              )}
+                              
+                              <div className={`max-w-[75%] rounded-lg p-2 text-xs ${
+                                isFromMe
+                                  ? 'bg-blue-600 text-white'
+                                  : sender?.type === 'agent'
+                                    ? 'bg-gray-700 text-gray-100'
+                                    : 'bg-gray-800 text-gray-200'
+                              }`}>
+                                {!isFromMe && (
+                                  <div className="text-[10px] text-gray-400 mb-1">
+                                    {sender?.name || 'Unknown'}
+                                  </div>
+                                )}
+                                <div className="whitespace-pre-wrap">{message.content}</div>
+                                <div className="text-[10px] text-gray-400 mt-1">
+                                  {new Date(message.timestamp).toLocaleTimeString()}
+                                </div>
+                              </div>
+                              
+                              {isFromMe && (
+                                <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                                  <User className="w-3 h-3 text-white" />
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* Suggestions */}
                 {showSuggestions && chat.messages.length === 0 && (
                   <div className="mb-4">
@@ -1092,19 +1473,51 @@ Generate a helpful, informative response:
                     type="text"
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage(inputMessage)}
-                    placeholder={`Message ${chat.activeAgent.replace('-', ' ')}...`}
-                    disabled={isTyping}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        if (showChatPanel && chatMode) {
+                          handleSendChatMessage(inputMessage);
+                        } else {
+                          sendMessage(inputMessage);
+                        }
+                        setInputMessage('');
+                      }
+                    }}
+                    placeholder={
+                      showChatPanel && chatMode
+                        ? chatMode === 'broadcast'
+                          ? 'Broadcast message to all...'
+                          : selectedParticipant
+                            ? `Message ${chatParticipants.find(p => p.id === selectedParticipant)?.name || 'participant'}...`
+                            : 'Select a participant to message...'
+                        : `Message ${chat.activeAgent.replace('-', ' ')}...`
+                    }
+                    disabled={isTyping || (showChatPanel && chatMode === 'direct' && !selectedParticipant)}
                     className="flex-1 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm placeholder-gray-400 focus:outline-none focus:border-[#6366f1] disabled:opacity-50"
                   />
                   
                   <button
-                    onClick={() => sendMessage(inputMessage)}
-                    disabled={!inputMessage.trim() || isTyping}
+                    onClick={() => {
+                      if (showChatPanel && chatMode) {
+                        handleSendChatMessage(inputMessage);
+                      } else {
+                        sendMessage(inputMessage);
+                      }
+                      setInputMessage('');
+                    }}
+                    disabled={!inputMessage.trim() || isTyping || (showChatPanel && chatMode === 'direct' && !selectedParticipant)}
                     className="px-4 py-2 bg-[#6366f1] hover:bg-[#8b5cf6] text-white rounded-lg disabled:opacity-50 transition-colors"
                     aria-label="Send message"
                   >
                     <Send className="w-4 h-4" aria-hidden="true" />
+                  </button>
+                  
+                  <button
+                    onClick={() => setShowChatPanel(!showChatPanel)}
+                    className="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
+                    title={showChatPanel ? 'Hide Chat Panel' : 'Show Chat Panel'}
+                  >
+                    <MessageSquare className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -1173,7 +1586,67 @@ Generate a helpful, informative response:
                         ? 'bg-blue-600 text-white'
                         : 'bg-gray-700 text-gray-100'
                     }`}>
-                      {message.content}
+                      <div className="whitespace-pre-wrap">{message.content}</div>
+                      
+                      {/* Citations */}
+                      {message.role === 'agent' && message.citations && message.citations.length > 0 && (
+                        <div className="mt-3 pt-3 border-t border-gray-600">
+                          <div className="text-xs text-gray-400 mb-2 flex items-center gap-1">
+                            <FileText className="w-3 h-3" />
+                            Sources:
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            {message.citations.map((citation, idx) => (
+                              <a
+                                key={idx}
+                                href={citation.url || `#${citation.source}`}
+                                target={citation.url ? '_blank' : undefined}
+                                rel={citation.url ? 'noopener noreferrer' : undefined}
+                                className="text-xs px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded text-blue-400 hover:text-blue-300 transition-colors"
+                                title={citation.title || citation.source}
+                              >
+                                {citation.title || citation.source.split('/').pop()}
+                                {citation.type && (
+                                  <span className="ml-1 text-gray-500">({citation.type})</span>
+                                )}
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Performance Metrics */}
+                      {message.role === 'agent' && message.performanceMetrics && (
+                        <div className="mt-2 text-xs text-gray-500">
+                          Response time: {message.performanceMetrics.responseTime.toFixed(0)}ms
+                          {message.confidence !== undefined && (
+                            <span className="ml-2">
+                              • Confidence: {(message.confidence * 100).toFixed(0)}%
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      
+                      {/* Follow-up Suggestions */}
+                      {message.role === 'agent' && message.followUpSuggestions && message.followUpSuggestions.length > 0 && (
+                        <div className="mt-3 pt-3 border-t border-gray-600">
+                          <div className="text-xs text-gray-400 mb-2 flex items-center gap-1">
+                            <Lightbulb className="w-3 h-3" />
+                            Follow-up questions:
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            {message.followUpSuggestions.slice(0, 3).map((suggestion, idx) => (
+                              <button
+                                key={idx}
+                                onClick={() => handleSuggestionClick(suggestion)}
+                                className="text-xs px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded text-gray-300 hover:text-white transition-colors"
+                              >
+                                {suggestion}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                     
                     {message.role === 'user' && (
