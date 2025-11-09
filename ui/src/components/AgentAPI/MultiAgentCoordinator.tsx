@@ -16,9 +16,9 @@ export const MultiAgentCoordinator: React.FC = () => {
   const { agents } = useAgentAPI();
   const [coordinator] = useState(() => {
     const client = createAgentAPIClient({
-      baseURL: process.env.REACT_APP_AGENT_API_URL || 'http://localhost:3000/api',
-      apiKey: process.env.REACT_APP_AGENT_API_KEY,
-      useMock: process.env.REACT_APP_USE_MOCK_AGENT_API === 'true' || false
+      baseURL: import.meta.env.VITE_AGENT_API_URL || import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+      apiKey: import.meta.env.VITE_AGENT_API_KEY || import.meta.env.VITE_API_KEY,
+      useMock: import.meta.env.VITE_USE_MOCK_AGENT_API === 'true' || false
     });
     return new CoordinationEngine(client);
   });

@@ -28,9 +28,9 @@ export interface UseAgentAPIReturn {
 export const useAgentAPI = (config?: Partial<AgentAPIConfig>): UseAgentAPIReturn => {
   const [client] = useState(() => {
     const defaultConfig: AgentAPIConfig = {
-      baseURL: process.env.REACT_APP_AGENT_API_URL || 'http://localhost:3000/api',
-      apiKey: process.env.REACT_APP_AGENT_API_KEY,
-      useMock: process.env.REACT_APP_USE_MOCK_AGENT_API === 'true' || true, // Default to mock
+      baseURL: import.meta.env.VITE_AGENT_API_URL || import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+      apiKey: import.meta.env.VITE_AGENT_API_KEY || import.meta.env.VITE_API_KEY,
+      useMock: import.meta.env.VITE_USE_MOCK_AGENT_API === 'true' || true, // Default to mock
       timeout: 30000,
       ...config
     };

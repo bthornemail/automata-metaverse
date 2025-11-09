@@ -72,7 +72,7 @@ const SceneContent: React.FC<{
       <VirtualWorldTerrain config={config?.terrain} />
       
       {/* Zone visualization (debug) */}
-      {process.env.NODE_ENV === 'development' && (
+      {import.meta.env.DEV && (
         <ZoneVisualization />
       )}
       

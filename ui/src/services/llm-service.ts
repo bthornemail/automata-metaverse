@@ -3,10 +3,13 @@
  * 
  * Supports multiple LLM providers:
  * - WebLLM (browser-based)
- * - Ollama (local server)
+ * - Ollama (local server) - via AI SDK
  * - OpenAI (API)
- * - OpenCode SDK
+ * - OpenCode SDK - via AI SDK
  */
+
+import { OllamaProvider } from './ai-sdk/ollama-provider';
+import { OpenCodeProvider } from './ai-sdk/opencode-provider';
 
 export type LLMProvider = 'webllm' | 'ollama' | 'openai' | 'opencode';
 
@@ -201,103 +204,37 @@ class LLMServiceImpl implements LLMService {
     messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }>,
     config: LLMConfig
   ): Promise<LLMResponse> {
-    const ollamaUrl = config.ollamaUrl || 'http://localhost:11434';
+    // Use AI SDK Ollama Provider
+    const ollamaBaseUrl = config.ollamaUrl || 'http://localhost:11434';
+    // Ensure URL ends with /v1 for OpenAI-compatible API
+    const ollamaUrl = ollamaBaseUrl.endsWith('/v1') ? ollamaBaseUrl : `${ollamaBaseUrl}/v1`;
     
-    // Check if Ollama is available first
+    const ollama = new OllamaProvider({
+      baseURL: ollamaUrl,
+      model: config.model,
+      temperature: config.temperature,
+      maxTokens: config.maxTokens,
+      topP: config.topP || 0.9,
+    });
+
     try {
-      const healthCheck = await fetch(`${ollamaUrl}/api/tags`, { method: 'GET' });
-      if (!healthCheck.ok && healthCheck.status !== 404) {
-        throw new Error(`Ollama server not reachable at ${ollamaUrl}. Make sure Ollama is running.`);
-      }
+      // Convert messages to CoreMessage format
+      const coreMessages = messages.map(msg => ({
+        role: msg.role as 'system' | 'user' | 'assistant',
+        content: msg.content,
+      }));
+
+      const result = await ollama.generateText(coreMessages);
+      return {
+        content: result.text,
+        model: config.model,
+      };
     } catch (error) {
-      if (error instanceof TypeError && error.message.includes('fetch')) {
-        throw new Error(`Cannot connect to Ollama at ${ollamaUrl}. Is Ollama running? Start it with: ollama serve`);
+      if (error instanceof Error && error.message.includes('model')) {
+        throw new Error(`Ollama model "${config.model}" not found. Pull it with: ollama pull ${config.model}`);
       }
       throw error;
     }
-    
-    // Ollama supports chat API format (preferred)
-    const response = await fetch(`${ollamaUrl}/api/chat`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: config.model,
-        messages: messages.map(msg => ({
-          role: msg.role === 'assistant' ? 'assistant' : msg.role === 'system' ? 'system' : 'user',
-          content: msg.content
-        })),
-        stream: false,
-        options: {
-          temperature: config.temperature,
-          top_p: config.topP || 0.9,
-          num_predict: config.maxTokens
-        }
-      })
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      let errorData;
-      try {
-        errorData = JSON.parse(errorText);
-      } catch {
-        errorData = { error: errorText };
-      }
-      
-      // If model not found, provide helpful error
-      if (response.status === 404 || (errorData.error && errorData.error.includes('model'))) {
-        throw new Error(`Ollama model "${config.model}" not found. Pull it with: ollama pull ${config.model}`);
-      }
-      
-      // Fallback to generate API if chat API not available
-      const prompt = messages
-        .map(msg => {
-          if (msg.role === 'system') {
-            return `System: ${msg.content}`;
-          } else if (msg.role === 'user') {
-            return `User: ${msg.content}`;
-          } else {
-            return `Assistant: ${msg.content}`;
-          }
-        })
-        .join('\n\n') + '\n\nAssistant:';
-
-      const generateResponse = await fetch(`${ollamaUrl}/api/generate`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: config.model,
-          prompt: prompt,
-          stream: false,
-          options: {
-            temperature: config.temperature,
-            top_p: config.topP || 0.9,
-            num_predict: config.maxTokens
-          }
-        })
-      });
-
-      if (!generateResponse.ok) {
-        const genErrorText = await generateResponse.text();
-        throw new Error(`Ollama API error: ${generateResponse.statusText} - ${genErrorText}`);
-      }
-
-      const generateData = await generateResponse.json();
-      return {
-        content: generateData.response || '',
-        model: config.model
-      };
-    }
-
-    const data = await response.json();
-    return {
-      content: data.message?.content || data.response || '',
-      model: data.model || config.model
-    };
   }
 
   private async generateOpenAIResponse(
@@ -347,37 +284,32 @@ class LLMServiceImpl implements LLMService {
     messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }>,
     config: LLMConfig
   ): Promise<LLMResponse> {
-    const endpoint = config.opencodeEndpoint || 'http://localhost:3000/api/opencode';
-    
-    // Get the last user message
-    const userMessage = messages.filter(m => m.role === 'user').pop()?.content || '';
-    const systemMessage = messages.find(m => m.role === 'system')?.content || '';
-
-    const response = await fetch(`${endpoint}/chat`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: config.model,
-        messages: [
-          ...(systemMessage ? [{ role: 'system', content: systemMessage }] : []),
-          { role: 'user', content: userMessage }
-        ],
-        temperature: config.temperature,
-        max_tokens: config.maxTokens
-      })
+    // Use AI SDK OpenCode Provider
+    const opencode = new OpenCodeProvider({
+      baseURL: config.opencodeEndpoint || 'https://openrouter.ai/api/v1',
+      apiKey: config.openaiApiKey, // Reuse OpenAI API key field for OpenRouter/OpenCode
+      model: config.model,
+      agent: 'automaton-interface', // Default agent from opencode.jsonc
+      temperature: config.temperature,
+      maxTokens: config.maxTokens,
+      topP: config.topP || 0.9,
     });
 
-    if (!response.ok) {
-      throw new Error(`OpenCode API error: ${response.statusText}`);
-    }
+    try {
+      // Convert messages to CoreMessage format
+      const coreMessages = messages.map(msg => ({
+        role: msg.role as 'system' | 'user' | 'assistant',
+        content: msg.content,
+      }));
 
-    const data = await response.json();
-    return {
-      content: data.response || data.content || '',
-      model: config.model
-    };
+      const result = await opencode.generateText(coreMessages);
+      return {
+        content: result.text,
+        model: config.model,
+      };
+    } catch (error) {
+      throw new Error(`OpenCode API error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   }
 
   isAvailable(): boolean {

@@ -12,12 +12,15 @@ import {
 } from 'lucide-react';
 import { EnhancedVirtualWorld } from '@/components/VirtualWorld';
 import type { EnhancedVirtualWorldConfig } from '@/components/VirtualWorld';
+import type { AvatarConfig } from '@/components/VirtualWorld/EnhancedGLTFAvatar';
 import { nlpService } from '@/services/nlp-service';
 import { llmService } from '@/services/llm-service';
 import type { LLMProviderConfig } from '@/services/llm-service';
 import { tinyMLService } from '@/services/tinyml-service';
 import { worldService } from '@/services/world-service';
 import { cameraService } from '@/services/camera-service';
+import { useAgentAPI } from '@/hooks/useAgentAPI';
+import type { Agent } from '@/services/agent-api/types';
 import { GlassCard, ModernButton, ModernBadge, ModernTooltip } from '@/components/VirtualWorld/ModernUI';
 
 export interface MetaversePortalProps {

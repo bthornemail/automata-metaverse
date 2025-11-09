@@ -33,6 +33,8 @@ import { AgentSelectionModal } from './components/AgentSelectionModal';
 import { AIEvolutionModal } from './components/AIEvolutionModal';
 import { AgentAPIModal } from './components/AgentAPIModal';
 import { LegacyChatMessages } from './components/LegacyChatMessages';
+import { LLMProviderSettingsModal } from './components/LLMProviderSettingsModal';
+import { AgentList, AgentExecution, StatusDashboard, MultiAgentCoordinator } from '../AgentAPI';
 
 // AIMutation interface moved to MutationPanel component
 
@@ -166,12 +168,13 @@ const AIPortal: React.FC = () => {
 
   // Modal States
   const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [showLLMProviderModal, setShowLLMProviderModal] = useState(false);
   const [showMutationModal, setShowMutationModal] = useState(false);
   const [showAgentSelectModal, setShowAgentSelectModal] = useState(false);
   const [showBridgeModal, setShowBridgeModal] = useState(false);
   const [showAIEvolutionModal, setShowAIEvolutionModal] = useState(false);
   const [showAgentAPIModal, setShowAgentAPIModal] = useState(false);
-  const [activeAITab, setActiveAITab] = useState<'evolution' | 'metrics' | 'canvas'>('evolution');
+  const [activeAITab, setActiveAITab] = useState<'evolution' | 'metrics' | 'canvas' | 'llm-config' | 'agent-api'>('evolution');
   const [showCanvasEditor, setShowCanvasEditor] = useState(false);
   const [selectedJSONLFile, setSelectedJSONLFile] = useState<string>('automaton-kernel.jsonl');
   const [metaverseMode, setMetaverseMode] = useState<'abstract' | 'canvasl-3d' | 'unified'>('unified');
@@ -1009,14 +1012,17 @@ Generate a helpful, informative response:
         bridgeStatus={bridgeStatus}
         onBridgeStatusClick={() => setShowBridgeModal(true)}
         isWebLLMLoaded={isWebLLMLoaded}
-        onAgentAPIClick={() => setShowAgentAPIModal(true)}
+        onAgentAPIClick={() => {
+          setShowAIEvolutionModal(true);
+          setActiveAITab('agent-api');
+        }}
         onSettingsClick={() => setShowSettingsModal(true)}
       />
 
       {/* Main Layout: 3D Metaverse Portal with Chat Overlay */}
       <div className="flex-1 overflow-hidden relative" style={{ minHeight: '600px', height: '100%' }}>
         {/* Debug: Show mode */}
-        {process.env.NODE_ENV === 'development' && (
+        {import.meta.env.DEV && (
           <div className="absolute top-2 right-2 z-50 bg-yellow-500 text-black px-2 py-1 text-xs">
             Mode: {metaverseMode}
           </div>
@@ -1541,6 +1547,12 @@ Generate a helpful, informative response:
             showCitations: true,
             showPerformanceMetrics: true,
           }}
+          llmProviderConfig={llmProviderConfig}
+          onLLMProviderConfigChange={(newConfig) => {
+            // Create a new object reference to ensure React detects the change
+            setLlmProviderConfig({ ...newConfig });
+            initializeLLMProvider();
+          }}
           onConfigChange={(config) => {
             setLlmProviderConfig(prev => ({
               ...prev,
@@ -1549,6 +1561,10 @@ Generate a helpful, informative response:
               topP: config.webllm.topP,
               maxTokens: config.webllm.maxTokens,
             }));
+          }}
+          onLLMProviderSettingsClick={() => {
+            setShowSettingsModal(false);
+            setShowLLMProviderModal(true);
           }}
         />
       </Modal>
@@ -1816,10 +1832,36 @@ Generate a helpful, informative response:
                 Canvas Editor
               </div>
             </button>
+            <button
+              onClick={() => setActiveAITab('llm-config')}
+              className={`px-4 py-2 text-sm font-medium transition-colors ${
+                activeAITab === 'llm-config'
+                  ? 'text-white border-b-2 border-purple-500'
+                  : 'text-gray-400 hover:text-gray-300'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <Brain className="w-4 h-4" />
+                LLM Configuration
+              </div>
+            </button>
+            <button
+              onClick={() => setActiveAITab('agent-api')}
+              className={`px-4 py-2 text-sm font-medium transition-colors ${
+                activeAITab === 'agent-api'
+                  ? 'text-white border-b-2 border-purple-500'
+                  : 'text-gray-400 hover:text-gray-300'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <BotIcon className="w-4 h-4" />
+                Agent API
+              </div>
+            </button>
           </div>
 
           {/* Tab Content */}
-          <div className="min-h-[400px]">
+          <div className="min-h-[400px] max-h-[calc(90vh-200px)] overflow-y-auto pr-2">
             {/* Evolution Engine Tab */}
             {activeAITab === 'evolution' && (
               <div className="space-y-4">
@@ -2113,6 +2155,34 @@ Generate a helpful, informative response:
                 </div>
               </div>
             )}
+
+            {/* LLM Configuration Tab */}
+            {activeAITab === 'llm-config' && (
+              <div className="space-y-4">
+                <LLMProviderSettingsModal
+                  isOpen={true}
+                  onClose={() => setActiveAITab('evolution')}
+                  config={llmProviderConfig}
+                  onConfigChange={(newConfig) => {
+                    // Create a new object reference to ensure React detects the change
+                    setLlmProviderConfig({ ...newConfig });
+                    initializeLLMProvider();
+                  }}
+                />
+              </div>
+            )}
+
+            {/* Agent API Tab */}
+            {activeAITab === 'agent-api' && (
+              <div className="space-y-4 overflow-y-auto">
+                <div className="space-y-4">
+                  <AgentList />
+                  <AgentExecution />
+                  <StatusDashboard />
+                  <MultiAgentCoordinator />
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </Modal>
@@ -2121,6 +2191,18 @@ Generate a helpful, informative response:
       <AgentAPIModal
         isOpen={showAgentAPIModal}
         onClose={() => setShowAgentAPIModal(false)}
+      />
+
+      {/* LLM Provider Settings Modal */}
+      <LLMProviderSettingsModal
+        isOpen={showLLMProviderModal}
+        onClose={() => setShowLLMProviderModal(false)}
+        config={llmProviderConfig}
+        onConfigChange={(newConfig) => {
+          // Create a new object reference to ensure React detects the change
+          setLlmProviderConfig({ ...newConfig });
+          initializeLLMProvider();
+        }}
       />
     </div>
   );

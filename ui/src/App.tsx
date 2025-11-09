@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Activity, Eye, MessageSquare, History, Zap, Sparkles, Cog, Brain, Code } from 'lucide-react';
+import { Activity, Eye, MessageSquare, History, Zap, Sparkles, Cog, Brain, Code, Layers } from 'lucide-react';
 import { AutomatonProvider } from '@/contexts/AutomatonContext';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { ToastContainer } from '@/components/shared/Toast';
@@ -21,6 +21,7 @@ const AppContent: React.FC = () => {
     { id: 'overview', label: 'Overview', icon: Activity },
     { id: 'analysis', label: 'Self-Reference', icon: Eye },
     { id: 'ai-portal', label: 'AI Portal', icon: Brain },
+    { id: 'canvas-editor', label: 'Canvas Editor', icon: Layers },
     { id: 'code-editor', label: 'Code Editor', icon: Code },
     { id: 'config', label: 'Config', icon: Cog }
   ];
@@ -119,6 +120,21 @@ const AppContent: React.FC = () => {
             className="h-[calc(100vh-280px)] max-w-7xl mx-auto"
           >
             <AIPortal />
+          </motion.div>
+        )}
+
+        {/* Canvas Editor Tab - Dedicated Canvas Editor */}
+        {activeTab === 'canvas-editor' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="h-[calc(100vh-200px)] rounded-xl overflow-hidden shadow-xl"
+          >
+            <UnifiedEditor
+              filename="automaton.canvasl"
+              initialMode="canvas"
+              height="100%"
+            />
           </motion.div>
         )}
 

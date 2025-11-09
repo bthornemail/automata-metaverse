@@ -41,6 +41,7 @@
     "deploy:pm2:prod": "./deploy-pm2.sh production"
   },
   "dependencies": {
+    "@ai-sdk/openai-compatible": "^1.0.26",
     "@codemirror/commands": "^6.10.0",
     "@codemirror/lang-markdown": "^6.5.0",
     "@octokit/rest": "^20.0.0",

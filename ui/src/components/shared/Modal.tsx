@@ -71,11 +71,11 @@ export const Modal: React.FC<ModalProps> = ({
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className={`bg-gray-800 rounded-xl shadow-2xl ${sizes[size]} w-full pointer-events-auto`}
+              className={`bg-gray-800 rounded-xl shadow-2xl ${sizes[size]} w-full pointer-events-auto flex flex-col max-h-[90vh]`}
             >
               {/* Header */}
               {(title || onClose) && (
-                <div className="flex items-center justify-between p-6 border-b border-gray-700">
+                <div className="flex items-center justify-between p-6 border-b border-gray-700 flex-shrink-0">
                   {title && <h2 className="text-xl font-bold text-white">{title}</h2>}
                   {onClose && (
                     <Button
@@ -90,12 +90,12 @@ export const Modal: React.FC<ModalProps> = ({
                 </div>
               )}
 
-              {/* Content */}
-              <div className="p-6">{children}</div>
+              {/* Content - Scrollable */}
+              <div className="p-6 overflow-y-auto flex-1 min-h-0">{children}</div>
 
               {/* Footer */}
               {footer && (
-                <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-700">
+                <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-700 flex-shrink-0">
                   {footer}
                 </div>
               )}
