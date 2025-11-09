@@ -3,7 +3,7 @@
  * Handles raycasting for avatar hover and click detection with status display
  */
 
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
@@ -56,11 +56,25 @@ export const AvatarInteractionSystem: React.FC<AvatarInteractionSystemProps> = (
     }
   }, [avatars]);
 
+  // Update bounding spheres when avatars change
+  useEffect(() => {
+    avatarRefs.current.forEach((ref) => {
+      if (ref.group) {
+        const box = new THREE.Box3().setFromObject(ref.group);
+        const center = box.getCenter(new THREE.Vector3());
+        const size = box.getSize(new THREE.Vector3());
+        const radius = Math.max(size.x, size.y, size.z) * 0.6;
+        ref.boundingSphere.center.copy(center);
+        ref.boundingSphere.radius = radius;
+      }
+    });
+  }, [avatars]);
+
   // Raycast for hover detection
   useFrame(() => {
     if (!enableStatusDisplay && !onAvatarHover) return;
 
-    // Update mouse position
+    // Update mouse position from pointer (already normalized -1 to 1)
     mouse.current.x = pointer.x;
     mouse.current.y = pointer.y;
 

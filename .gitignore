@@ -51,9 +51,18 @@ coverage/
 # Archives/bundles
 *.tgz
 *.zip
+*.tar.gz
+
+# Helm binaries
+helm
+helm-*
 
 # Generated reports (keep committed canonical docs under docs/)
 cleaned-reports/
+
+# Large benchmark/test result files
+benchmark-results-*.jsonl
+**/benchmark-results-*.jsonl
 
 
 #Ignore vscode AI rules

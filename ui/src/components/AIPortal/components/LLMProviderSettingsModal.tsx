@@ -458,9 +458,9 @@ export const LLMProviderSettingsModal: React.FC<LLMProviderSettingsModalProps> =
                       onChange={(e) => handleConfigChange({ model: e.target.value })}
                       className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white"
                     >
-                      <option value="Llama-2-7b-chat-hf-q4f32_1">Llama 2 7B Chat</option>
-                      <option value="TinyLlama-1.1B-Chat-v0.4">TinyLlama 1.1B Chat</option>
-                      <option value="Phi-3-mini-4k-instruct-q4f32_1-MLC">Phi-3 Mini 4K</option>
+                      <option value="TinyLlama-1.1B-Chat-v0.4">TinyLlama 1.1B Chat (Recommended)</option>
+                      <option value="Phi-3-mini-4k-instruct-q4f32_1-MLC">Phi-3 Mini 4K Instruct</option>
+                      <option value="Llama-2-13b-chat-hf-q4f32_1">Llama 2 13B Chat (Q4) - Large</option>
                       <option value="Mistral-7B-Instruct-v0.2-q4f32_1-MLC">Mistral 7B Instruct</option>
                     </select>
                   </div>

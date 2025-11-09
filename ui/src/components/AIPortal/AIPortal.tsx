@@ -128,16 +128,63 @@ const AIPortal: React.FC = () => {
     presencePenalty: 0.1
   });
   
-  // LLM Provider Configuration
-  const [llmProviderConfig, setLlmProviderConfig] = useState<LLMProviderConfig>({
-    provider: 'webllm',
-    model: 'Llama-2-7b-chat-hf-q4f32_1',
-    temperature: 0.7,
-    maxTokens: 2048,
-    topP: 0.9,
-    ollamaUrl: 'http://localhost:11434',
-    opencodeEndpoint: 'http://localhost:3000/api/opencode'
-  });
+  // LLM Provider Configuration - Load from localStorage or use defaults
+  const loadLLMConfig = (): LLMProviderConfig => {
+    // Valid WebLLM models
+    const validWebLLMModels = [
+      'TinyLlama-1.1B-Chat-v0.4',
+      'Phi-3-mini-4k-instruct-q4f32_1-MLC',
+      'Llama-2-13b-chat-hf-q4f32_1',
+      'Mistral-7B-Instruct-v0.2-q4f32_1-MLC'
+    ];
+    
+    try {
+      const saved = localStorage.getItem('llmProviderConfig');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Validate model - if it's the old non-existent one or invalid, use default
+        let model = parsed.model || 'TinyLlama-1.1B-Chat-v0.4';
+        if (parsed.provider === 'webllm' && !validWebLLMModels.includes(model)) {
+          console.warn(`Invalid WebLLM model "${model}" found in localStorage, using default`);
+          model = 'TinyLlama-1.1B-Chat-v0.4';
+        }
+        
+        // Validate and use saved config, but ensure model exists
+        return {
+          provider: parsed.provider || 'webllm',
+          model,
+          temperature: parsed.temperature ?? 0.7,
+          maxTokens: parsed.maxTokens ?? 2048,
+          topP: parsed.topP ?? 0.9,
+          ollamaUrl: parsed.ollamaUrl || 'http://localhost:11434',
+          opencodeEndpoint: parsed.opencodeEndpoint || 'http://localhost:3000/api/opencode'
+        };
+      }
+    } catch (e) {
+      console.warn('Failed to load LLM config from localStorage:', e);
+    }
+    // Default config with a model that actually exists
+    return {
+      provider: 'webllm',
+      model: 'TinyLlama-1.1B-Chat-v0.4',
+      temperature: 0.7,
+      maxTokens: 2048,
+      topP: 0.9,
+      ollamaUrl: 'http://localhost:11434',
+      opencodeEndpoint: 'http://localhost:3000/api/opencode'
+    };
+  };
+
+  const [llmProviderConfig, setLlmProviderConfig] = useState<LLMProviderConfig>(loadLLMConfig());
+
+  // Save config to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('llmProviderConfig', JSON.stringify(llmProviderConfig));
+    } catch (e) {
+      console.warn('Failed to save LLM config to localStorage:', e);
+    }
+  }, [llmProviderConfig]);
   
   const [evolutionLog, setEvolutionLog] = useState<string[]>([]);
   const webLLMRef = useRef<any>(null);
@@ -440,20 +487,48 @@ const AIPortal: React.FC = () => {
       setIsWebLLMLoaded(false);
       setBridgeStatus(prev => ({ ...prev, webllm: false }));
       
-      // Try alternative model if current one fails
-      if (config.model !== 'Llama-2-7b-chat-hf-q4f32_1') {
-        addEvolutionLog('Trying alternative model: Llama-2-7b-chat-hf-q4f32_1');
+      // Try fallback models if current one fails
+      const fallbackModels = [
+        'TinyLlama-1.1B-Chat-v0.4',
+        'Phi-3-mini-4k-instruct-q4f32_1-MLC'
+      ];
+      
+      const currentModelIndex = fallbackModels.indexOf(config.model);
+      if (currentModelIndex >= 0 && currentModelIndex < fallbackModels.length - 1) {
+        const nextModel = fallbackModels[currentModelIndex + 1];
+        addEvolutionLog(`Trying fallback model: ${nextModel}`);
         try {
           const { CreateMLCEngine } = await import('@mlc-ai/web-llm');
-          const engine = await CreateMLCEngine('Llama-2-7b-chat-hf-q4f32_1', { 
-            initProgressCallback: (p: any) => addEvolutionLog(`Loading alt model: ${Math.round(p.progress * 100)}%`)
+          const engine = await CreateMLCEngine(nextModel, { 
+            initProgressCallback: (p: any) => addEvolutionLog(`Loading fallback model: ${Math.round(p.progress * 100)}%`)
           });
           webLLMRef.current = engine;
           setIsWebLLMLoaded(true);
           setBridgeStatus(prev => ({ ...prev, webllm: true }));
-          addEvolutionLog('✓ Alternative WebLLM model loaded successfully');
+          // Update config to use the fallback model
+          setLlmProviderConfig(prev => ({ ...prev, model: nextModel }));
+          addEvolutionLog(`✓ Fallback WebLLM model (${nextModel}) loaded successfully`);
         } catch (altError) {
-          console.error('Alternative model also failed:', altError);
+          console.error('Fallback model also failed:', altError);
+          addEvolutionLog('✗ All WebLLM models failed to load');
+        }
+      } else if (currentModelIndex < 0) {
+        // Current model is not in fallback list, try first fallback
+        const firstFallback = fallbackModels[0];
+        addEvolutionLog(`Trying fallback model: ${firstFallback}`);
+        try {
+          const { CreateMLCEngine } = await import('@mlc-ai/web-llm');
+          const engine = await CreateMLCEngine(firstFallback, { 
+            initProgressCallback: (p: any) => addEvolutionLog(`Loading fallback model: ${Math.round(p.progress * 100)}%`)
+          });
+          webLLMRef.current = engine;
+          setIsWebLLMLoaded(true);
+          setBridgeStatus(prev => ({ ...prev, webllm: true }));
+          // Update config to use the fallback model
+          setLlmProviderConfig(prev => ({ ...prev, model: firstFallback }));
+          addEvolutionLog(`✓ Fallback WebLLM model (${firstFallback}) loaded successfully`);
+        } catch (altError) {
+          console.error('Fallback model also failed:', altError);
           addEvolutionLog('✗ All WebLLM models failed to load');
         }
       }
@@ -1590,7 +1665,7 @@ Generate a helpful, informative response:
                       model: provider === 'ollama' ? 'llama2' :
                              provider === 'openai' ? 'gpt-3.5-turbo' :
                              provider === 'opencode' ? 'default' :
-                             'Llama-2-7b-chat-hf-q4f32_1'
+                             'TinyLlama-1.1B-Chat-v0.4'
                     }));
                   }}
                   className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
@@ -1673,10 +1748,9 @@ Generate a helpful, informative response:
                     onChange={(e) => setLlmProviderConfig(prev => ({ ...prev, model: e.target.value }))}
                     className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
                   >
-                    <option value="Llama-2-7b-chat-hf-q4f32_1">Llama 2 7B Chat (Q4)</option>
-                    <option value="Llama-2-13b-chat-hf-q4f32_1">Llama 2 13B Chat (Q4)</option>
-                    <option value="TinyLlama-1.1B-Chat-v0.4">TinyLlama 1.1B Chat</option>
+                    <option value="TinyLlama-1.1B-Chat-v0.4">TinyLlama 1.1B Chat (Recommended)</option>
                     <option value="Phi-3-mini-4k-instruct-q4f32_1-MLC">Phi-3 Mini 4K Instruct</option>
+                    <option value="Llama-2-13b-chat-hf-q4f32_1">Llama 2 13B Chat (Q4) - Large</option>
                   </select>
                 </div>
               )}

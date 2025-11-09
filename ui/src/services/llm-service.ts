@@ -87,8 +87,7 @@ class LLMServiceImpl implements LLMService {
       // Try fallback models if primary model fails
       const fallbackModels = [
         'TinyLlama-1.1B-Chat-v0.4',
-        'Phi-3-mini-4k-instruct-q4f32_1-MLC',
-        'Llama-2-7b-chat-hf-q4f32_1'
+        'Phi-3-mini-4k-instruct-q4f32_1-MLC'
       ];
       
       if (fallbackModels.includes(config.model)) {
