@@ -34,11 +34,8 @@ class SchemeREPLServiceImpl implements SchemeREPLService {
         const text = await response.text();
         // Ensure text is a string before splitting
         if (typeof text !== 'string') {
-          console.error('evaluate: text is not a string:', typeof text, text);
-          return {
-            success: false,
-            error: `Expected string input, got ${typeof text}`
-          };
+          console.error('loadR5RSFunctions: text is not a string:', typeof text, text);
+          return;
         }
         const lines = text.trim().split('\n').filter(l => l.trim());
         
@@ -421,11 +418,12 @@ class SchemeREPLServiceImpl implements SchemeREPLService {
           results.push(result.result);
         } else if (result.error) {
           // Safely convert error to string
-          const errorMsg = typeof result.error === 'string' 
-            ? result.error 
-            : (result.error instanceof Error 
-              ? result.error.message 
-              : String(result.error));
+          const error = result.error;
+          const errorMsg = typeof error === 'string' 
+            ? error 
+            : (error && typeof error === 'object' && 'message' in error
+              ? String((error as any).message)
+              : String(error));
           errors.push(`Line ${i + 1}: ${errorMsg}`);
         }
       } catch (error) {

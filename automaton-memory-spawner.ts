@@ -212,9 +212,13 @@ function monitorMemory(): void {
     // Warn if memory is growing rapidly
     if (memoryHistory.length >= 10) {
       const recent = memoryHistory.slice(-10);
-      const memGrowth = (recent[recent.length - 1].heapUsed - recent[0].heapUsed) / 1024 / 1024;
-      if (memGrowth > 10) {
-        console.log(`   ⚠️  Rapid memory growth detected: +${memGrowth.toFixed(2)}MB in last 10 samples`);
+      const first = recent[0];
+      const last = recent[recent.length - 1];
+      if (first !== undefined && last !== undefined) {
+        const memGrowth = (last.heapUsed - first.heapUsed) / 1024 / 1024;
+        if (memGrowth > 10) {
+          console.log(`   ⚠️  Rapid memory growth detected: +${memGrowth.toFixed(2)}MB in last 10 samples`);
+        }
       }
     }
   }

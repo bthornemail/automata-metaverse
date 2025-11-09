@@ -346,4 +346,4 @@ export function detectLanguageFromContent(content: string): keyof typeof LANGUAG
 /**
  * Export configuration for use in different platforms
  */
-export type { UnifiedEditorConfig };
+export type UnifiedEditorConfig = IUnifiedEditorConfig;

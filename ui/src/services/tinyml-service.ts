@@ -125,7 +125,7 @@ class TinyMLService {
         return false;
       }
       try {
-        const parts = safeSplit(p.pattern, '→');
+        const parts = (p.pattern as string).split('→');
         if (parts.length === 0) return false;
         const [from] = parts.map(s => parseInt(s.replace('D', '')));
         return !isNaN(from) && from === currentDimension;

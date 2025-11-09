@@ -40,7 +40,7 @@ export const GraphView: React.FC<GraphViewProps> = ({
   height = 600,
   onNodeClick
 }) => {
-  const graphRef = useRef<any>();
+  const graphRef = useRef<any>(null);
 
   if (!nodes || nodes.length === 0) {
     return <div className="graph-empty">No graph data to display</div>;

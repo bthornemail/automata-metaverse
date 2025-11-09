@@ -7,6 +7,7 @@
 import React, { useState } from 'react';
 import { useAgentAPI } from '../../hooks/useAgentAPI';
 import { AgentRequest, AgentResponse } from '../../services/agent-api/types';
+import { ResultViewer } from './ResultViewer';
 import './AgentExecution.css';
 
 export const AgentExecution: React.FC = () => {

@@ -18,7 +18,7 @@ import { markdownWithFrontMatter } from '../../extensions/markdown-frontmatter';
 import { canvaslLanguage } from '../../extensions/canvasl-language';
 import { prologLanguage } from '../../extensions/prolog-language';
 import { datalogLanguage } from '../../extensions/datalog-language';
-import { createUnifiedExtensions } from '../../../../../src/shared/codemirror-config';
+import { createUnifiedExtensions } from '../../extensions/unified-codemirror-config';
 
 interface AnalysisResult {
   patterns: string[];

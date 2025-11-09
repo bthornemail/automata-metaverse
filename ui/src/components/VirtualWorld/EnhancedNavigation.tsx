@@ -61,7 +61,8 @@ export const EnhancedNavigation: React.FC<EnhancedNavigationProps> = ({
       id: landmark.id,
       name: landmark.name,
       position: landmark.position,
-      type: landmark.type,
+      // Convert 'monument' and 'sign' to 'landmark' for Waypoint compatibility
+      type: (landmark.type === 'monument' || landmark.type === 'sign') ? 'landmark' : landmark.type,
       zoneId: landmark.zoneId
     }));
     return [...layoutWaypoints, ...waypoints];

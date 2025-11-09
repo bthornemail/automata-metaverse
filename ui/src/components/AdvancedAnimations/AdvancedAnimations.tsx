@@ -27,7 +27,7 @@ interface AdvancedAnimationsProps {
 
 const AdvancedAnimations: React.FC<AdvancedAnimationsProps> = ({ className = '' }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | undefined>(undefined);
   const [particles, setParticles] = useState<Particle[]>([]);
   const [isAnimating, setIsAnimating] = useState(true);
   const [showTransitions, setShowTransitions] = useState(true);

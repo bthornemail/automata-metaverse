@@ -42,7 +42,7 @@ export interface EnhancedVirtualWorldConfig {
   worldSize?: number;
 }
 
-interface EnhancedVirtualWorldProps {
+export interface EnhancedVirtualWorldProps {
   config?: EnhancedVirtualWorldConfig;
   onAvatarClick?: (avatar: AvatarConfig) => void;
   onBuildingClick?: (building: BuildingConfig) => void;
@@ -167,8 +167,7 @@ const EnhancedVirtualWorldContent: React.FC<EnhancedVirtualWorldProps> = ({
         <MiniMap
           config={{
             ...config.minimap,
-            currentPosition: selectedAvatar?.position,
-            worldSize
+            currentPosition: selectedAvatar?.position
           }}
           worldSize={worldSize}
         />

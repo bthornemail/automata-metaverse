@@ -12,20 +12,35 @@ import { GestureType } from './AvatarGestureSystem';
  * Convert Symbol (from UnifiedMetaverseView) to EnhancedAvatarConfigV2
  */
 export const symbolToAvatarConfig = (symbol: Symbol): EnhancedAvatarConfigV2 => {
+  const metadata = symbol.metadata || {};
+  
+  // Convert dimension number to string if needed
+  let dimension: string | undefined;
+  if (metadata.dimension !== undefined) {
+    dimension = typeof metadata.dimension === 'number' ? `${metadata.dimension}D` : String(metadata.dimension);
+  }
+  
+  // Ensure status is one of the valid values
+  const statusValue = metadata.status as string;
+  const status: 'online' | 'offline' | 'away' = 
+    (statusValue === 'online' || statusValue === 'offline' || statusValue === 'away') 
+      ? statusValue 
+      : 'online';
+  
   return {
     id: symbol.id,
     name: symbol.name,
     position: symbol.position || [0, 0, 0],
-    gltfUrl: symbol.metadata?.gltfModel,
-    dimension: symbol.metadata?.dimension,
-    status: symbol.metadata?.status || 'online',
-    animationState: symbol.metadata?.animationState || 'idle',
-    color: symbol.metadata?.color || '#6366f1',
-    scale: symbol.metadata?.scale || 1,
+    gltfUrl: metadata.gltfModel as string | undefined,
+    dimension,
+    status,
+    animationState: (metadata.animationState as 'idle' | 'walking' | 'running' | 'jumping' | 'sitting' | 'dancing' | 'gesturing') || 'idle',
+    color: (metadata.color as string) || '#6366f1',
+    scale: typeof metadata.scale === 'number' ? metadata.scale : 1,
     showNameTag: true,
     showStatusIndicator: true,
-    customization: symbol.metadata?.customization,
-    metadata: symbol.metadata?.avatarMetadata
+    customization: metadata.customization as any,
+    metadata: metadata.avatarMetadata as any
   };
 };
 

@@ -26,7 +26,7 @@ interface VirtualWorldSkyboxProps {
 export const VirtualWorldSkybox: React.FC<VirtualWorldSkyboxProps> = ({
   config = {}
 }) => {
-  const skyRef = useRef<THREE.Mesh>(null);
+  const skyRef = useRef<any>(null); // Sky component from drei has its own ref type
   
   const {
     type = 'procedural',

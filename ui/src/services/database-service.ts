@@ -124,7 +124,7 @@ class DatabaseServiceImpl implements DatabaseService {
         }
         // Handle case where API returns wrapped data
         if (response.data && typeof response.data === 'object' && 'data' in response.data) {
-          const wrappedData = response.data.data;
+          const wrappedData = (response.data as any).data;
           if (Array.isArray(wrappedData)) {
             const validated = wrappedData.filter((item): item is any => {
               if (item === null || item === undefined) return false;

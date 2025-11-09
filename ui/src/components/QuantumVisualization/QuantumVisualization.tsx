@@ -19,11 +19,11 @@ interface QuantumVisualizationProps {
 
 const QuantumVisualization: React.FC<QuantumVisualizationProps> = ({ className = '' }) => {
   const mountRef = useRef<HTMLDivElement>(null);
-  const sceneRef = useRef<THREE.Scene>();
-  const rendererRef = useRef<THREE.WebGLRenderer>();
-  const cameraRef = useRef<THREE.PerspectiveCamera>();
+  const sceneRef = useRef<THREE.Scene | null>(null);
+  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   // const controlsRef = useRef<OrbitControls>();
-  const frameRef = useRef<number>();
+  const frameRef = useRef<number | undefined>(undefined);
   
   const [qubits, setQubits] = useState<QubitState[]>([
     { id: 'q0', theta: Math.PI / 4, phi: 0, amplitude: { real: 0.707, imag: 0 }, probability: 0.5, label: '|0⟩' },

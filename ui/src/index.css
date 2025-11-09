@@ -1,6 +1,43 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* Theme configuration for Tailwind CSS v4 */
+@theme {
+  --font-family-mono: 'JetBrains Mono', monospace;
+  
+  --color-automaton-50: #f0f9ff;
+  --color-automaton-100: #e0f2fe;
+  --color-automaton-200: #bae6fd;
+  --color-automaton-300: #7dd3fc;
+  --color-automaton-400: #38bdf8;
+  --color-automaton-500: #0ea5e9;
+  --color-automaton-600: #0284c7;
+  --color-automaton-700: #0369a1;
+  --color-automaton-800: #075985;
+  --color-automaton-900: #0c4a6e;
+  
+  --color-dimensions-0d: #6366f1;
+  --color-dimensions-1d: #8b5cf6;
+  --color-dimensions-2d: #ec4899;
+  --color-dimensions-3d: #f59e0b;
+  --color-dimensions-4d: #10b981;
+  --color-dimensions-5d: #06b6d4;
+  --color-dimensions-6d: #3b82f6;
+  --color-dimensions-7d: #a855f7;
+  
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-glow: glow 2s ease-in-out infinite alternate;
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  @keyframes glow {
+    0% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+    100% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.8); }
+  }
+}
 
 /* Import unified design system */
 @import './styles/design-system.css';
@@ -17,11 +54,12 @@
   }
   
   .quantum-sphere {
-    @apply animate-float;
+    animation: float 6s ease-in-out infinite;
   }
   
   .self-reference-line {
-    @apply stroke-[#6366f1] stroke-2 animate-pulse-slow;
+    @apply stroke-[#6366f1] stroke-2;
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
   
   .control-button {

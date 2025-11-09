@@ -5,7 +5,7 @@
  */
 
 import * as Sentry from '@sentry/node';
-import { ProfilingIntegration } from '@sentry/profiling-node';
+import { nodeProfilingIntegration } from '@sentry/profiling-node';
 
 /**
  * Initialize Sentry
@@ -31,13 +31,10 @@ export function initSentry(): void {
     
     integrations: [
       // Profiling integration
-      new ProfilingIntegration(),
+      nodeProfilingIntegration(),
       
-      // HTTP integration
-      new Sentry.Integrations.Http({ tracing: true }),
-      
-      // Express integration
-      new Sentry.Integrations.Express({ app: undefined as any }),
+      // HTTP integration (automatically included in v10)
+      // Express integration (automatically included in v10)
     ],
 
     // Release tracking

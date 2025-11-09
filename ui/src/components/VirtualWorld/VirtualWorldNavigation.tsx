@@ -13,7 +13,7 @@ export interface Waypoint {
   id: string;
   name: string;
   position: [number, number, number];
-  type?: 'spawn' | 'portal' | 'landmark';
+  type?: 'spawn' | 'portal' | 'landmark' | 'monument' | 'sign';
   zoneId?: string;
 }
 
@@ -47,7 +47,8 @@ export const VirtualWorldNavigation: React.FC<VirtualWorldNavigationProps> = ({
       id: landmark.id,
       name: landmark.name,
       position: landmark.position,
-      type: landmark.type,
+      // Convert 'monument' and 'sign' to 'landmark' for Waypoint compatibility
+      type: (landmark.type === 'monument' || landmark.type === 'sign') ? 'landmark' : landmark.type,
       zoneId: landmark.zoneId
     }));
     return [...layoutWaypoints, ...waypoints];

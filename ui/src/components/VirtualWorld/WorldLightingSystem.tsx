@@ -154,9 +154,7 @@ export const SkyLighting: React.FC<{
 }> = ({ skyColor = '#87ceeb', groundColor = '#4a5568', intensity = 0.5 }) => {
   return (
     <hemisphereLight
-      skyColor={skyColor}
-      groundColor={groundColor}
-      intensity={intensity}
+      args={[skyColor, groundColor, intensity]}
     />
   );
 };

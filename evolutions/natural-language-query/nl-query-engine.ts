@@ -263,6 +263,7 @@ export class NLQueryEngine {
     
     if (agents.length === 1) {
       const agent = agents[0];
+      if (!agent) return 'No agent found.';
       let answer = `**${agent.name}**\n\n`;
       answer += `**Purpose:** ${agent.purpose}\n\n`;
       
@@ -270,11 +271,11 @@ export class NLQueryEngine {
         answer += `**Dimension:** ${agent.dimension}\n\n`;
       }
       
-      if (agent.capabilities.length > 0) {
+      if (agent.capabilities && agent.capabilities.length > 0) {
         answer += `**Capabilities:**\n${agent.capabilities.map(c => `- ${c}`).join('\n')}\n\n`;
       }
       
-      if (agent.dependencies.length > 0) {
+      if (agent.dependencies && agent.dependencies.length > 0) {
         answer += `**Dependencies:** ${agent.dependencies.join(', ')}\n\n`;
       }
       
@@ -287,6 +288,7 @@ export class NLQueryEngine {
     
     let answer = `Found ${agents.length} agents:\n\n`;
     agents.forEach(agent => {
+      if (!agent) return;
       answer += `- **${agent.name}**`;
       if (agent.dimension) answer += ` (${agent.dimension})`;
       answer += `: ${agent.purpose}\n`;
@@ -303,6 +305,7 @@ export class NLQueryEngine {
     
     if (functions.length === 1) {
       const func = functions[0];
+      if (!func) return 'No function found.';
       let answer = `**${func.name}**\n\n`;
       answer += `**Description:** ${func.description}\n\n`;
       
@@ -314,7 +317,7 @@ export class NLQueryEngine {
         answer += `**Module:** ${func.module}\n\n`;
       }
       
-      if (func.examples.length > 0) {
+      if (func.examples && func.examples.length > 0) {
         answer += `**Examples:**\n\`\`\`\n${func.examples[0]}\n\`\`\`\n\n`;
       }
       
@@ -337,11 +340,13 @@ export class NLQueryEngine {
     
     if (rules.length === 1) {
       const rule = rules[0];
+      if (!rule) return 'No rule found.';
       return `**${rule.rfc2119Keyword}** ${rule.statement}\n\n*Source: ${rule.source}*`;
     }
     
     let answer = `Found ${rules.length} rules:\n\n`;
     rules.forEach(rule => {
+      if (!rule) return;
       answer += `- **${rule.rfc2119Keyword}**: ${rule.statement}\n`;
     });
     
@@ -355,6 +360,7 @@ export class NLQueryEngine {
     if (examples.length === 0) return 'No examples found.';
     
     const example = examples[0];
+    if (!example) return 'No example found.';
     const language = example.metadata?.language || 'text';
     
     return `**Example:**\n\n\`\`\`${language}\n${example.content}\n\`\`\`\n\n*Source: ${example.source}*`;
@@ -367,6 +373,7 @@ export class NLQueryEngine {
     if (facts.length === 0) return 'No information found.';
     
     const fact = facts[0];
+    if (!fact) return 'No information found.';
     return `${fact.content}\n\n*Source: ${fact.source}*`;
   }
 
@@ -393,7 +400,7 @@ export class NLQueryEngine {
    */
   private extractDimension(question: string): string | undefined {
     const match = question.match(/(\d+d)/i);
-    return match ? match[1].toUpperCase() : undefined;
+    return match && match[1] ? match[1].toUpperCase() : undefined;
   }
 
   /**
@@ -411,7 +418,9 @@ export class NLQueryEngine {
       const match = question.match(pattern);
       if (match) {
         // Return the full match or the agent name part
-        return match[1] || match[3] || match[2] + match[3];
+        if (match[1]) return match[1];
+        if (match[3]) return match[3];
+        if (match[2] && match[3]) return match[2] + match[3];
       }
     }
     
@@ -448,7 +457,7 @@ export class NLQueryEngine {
     // Simple context extraction - look for keywords after "for" or "about"
     const contextPattern = /(?:for|about)\s+([\w\s]+)/i;
     const match = question.match(contextPattern);
-    return match ? match[1].trim() : undefined;
+    return match && match[1] ? match[1].trim() : undefined;
   }
 
   /**
@@ -464,7 +473,8 @@ export class NLQueryEngine {
     for (const pattern of entityPatterns) {
       const match = question.match(pattern);
       if (match) {
-        const entity = (match[2] || match[3] || match[1]).trim();
+        const entity = (match[2] || match[3] || match[1] || '').trim();
+        if (!entity) continue;
         // Remove trailing question words
         return entity.replace(/\s+(agent|function|rule|fact)?\s*$/i, '').trim();
       }

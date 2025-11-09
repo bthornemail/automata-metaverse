@@ -127,7 +127,9 @@ export const WorldPersistence: React.FC<WorldPersistenceProps> = ({
             variant="primary"
             size="sm"
             icon={<Save className="w-4 h-4" />}
-          />
+          >
+            {/* Icon-only button */}
+          </ModernButton>
         </ModernTooltip>
 
         <ModernTooltip content="Load from localStorage" position="top">
@@ -137,7 +139,9 @@ export const WorldPersistence: React.FC<WorldPersistenceProps> = ({
             variant="secondary"
             size="sm"
             icon={<Upload className="w-4 h-4" />}
-          />
+          >
+            {/* Icon-only button */}
+          </ModernButton>
         </ModernTooltip>
 
         <ModernTooltip content="Download as file" position="top">
@@ -146,7 +150,9 @@ export const WorldPersistence: React.FC<WorldPersistenceProps> = ({
             variant="secondary"
             size="sm"
             icon={<Download className="w-4 h-4" />}
-          />
+          >
+            {/* Icon-only button */}
+          </ModernButton>
         </ModernTooltip>
 
         <ModernTooltip content="Upload from file" position="top">
@@ -161,7 +167,9 @@ export const WorldPersistence: React.FC<WorldPersistenceProps> = ({
               variant="secondary"
               size="sm"
               icon={<Upload className="w-4 h-4" />}
-            />
+            >
+              {/* Icon-only button */}
+            </ModernButton>
           </label>
         </ModernTooltip>
 
@@ -171,7 +179,9 @@ export const WorldPersistence: React.FC<WorldPersistenceProps> = ({
             variant="danger"
             size="sm"
             icon={<Trash2 className="w-4 h-4" />}
-          />
+          >
+            {/* Icon-only button */}
+          </ModernButton>
         </ModernTooltip>
       </div>
 

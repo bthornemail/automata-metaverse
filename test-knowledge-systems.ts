@@ -84,22 +84,22 @@ async function main() {
   console.log('');
   
   console.log('Extracted Agents:');
-  kb.agents.forEach(agent => {
+  kb.agents.forEach((agent: any) => {
     console.log(`   - ${agent.name} (${agent.dimension || 'no dimension'})`);
   });
   console.log('');
   
   // Check coverage
-  const extractedAgentNames = kb.agents.map(a => a.name);
-  const foundAgents = expectedAgents.filter(name => 
-    extractedAgentNames.some(extracted => 
+  const extractedAgentNames = kb.agents.map((a: any) => a.name);
+  const foundAgents = expectedAgents.filter((name: string) => 
+    extractedAgentNames.some((extracted: string) => 
       extracted.toLowerCase().includes(name.toLowerCase()) ||
       name.toLowerCase().includes(extracted.toLowerCase())
     )
   );
   
   console.log(`✅ Coverage: ${foundAgents.length}/${expectedAgents.length} agents found`);
-  console.log(`   Missing: ${expectedAgents.filter(a => !foundAgents.includes(a)).join(', ')}\n`);
+  console.log(`   Missing: ${expectedAgents.filter((a: string) => !foundAgents.includes(a)).join(', ')}\n`);
   
   // Test RFC2119 rules
   console.log('📋 Testing RFC2119 Rule Extraction\n');
@@ -113,7 +113,7 @@ async function main() {
   
   if (mustRules.length > 0) {
     console.log('Sample MUST rules:');
-    mustRules.slice(0, 3).forEach(rule => {
+    mustRules.slice(0, 3).forEach((rule: any) => {
       console.log(`   - ${rule.statement.substring(0, 100)}...`);
       console.log(`     Source: ${rule.source}`);
     });
@@ -122,7 +122,7 @@ async function main() {
   
   // Test function extraction
   console.log('🔧 Testing Function Extraction\n');
-  const r5rsFunctions = kb.functions.filter(f => f.name.startsWith('r5rs:'));
+  const r5rsFunctions = kb.functions.filter((f: any) => f.name.startsWith('r5rs:'));
   console.log(`   R5RS functions found: ${r5rsFunctions.length}`);
   
   const expectedFunctions = [
@@ -135,17 +135,17 @@ async function main() {
   ];
   
   console.log('Expected R5RS functions:');
-  expectedFunctions.forEach(func => console.log(`   - ${func}`));
+  expectedFunctions.forEach((func: string) => console.log(`   - ${func}`));
   console.log('');
   
   console.log('Extracted R5RS functions (sample):');
-  r5rsFunctions.slice(0, 10).forEach(func => {
+  r5rsFunctions.slice(0, 10).forEach((func: any) => {
     console.log(`   - ${func.name}`);
   });
   console.log('');
   
-  const foundFunctions = expectedFunctions.filter(name =>
-    r5rsFunctions.some(f => f.name === name)
+  const foundFunctions = expectedFunctions.filter((name: string) =>
+    r5rsFunctions.some((f: any) => f.name === name)
   );
   console.log(`✅ Coverage: ${foundFunctions.length}/${expectedFunctions.length} functions found`);
   

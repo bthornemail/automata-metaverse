@@ -7,7 +7,8 @@
 
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 import { generateText, streamText } from 'ai';
-import type { CoreMessage, CoreTool } from 'ai';
+import type { CoreMessage } from 'ai';
+import type { ToolSet } from 'ai';
 
 export interface OllamaProviderConfig {
   baseURL?: string;
@@ -34,6 +35,7 @@ export class OllamaProvider {
 
     // Use createOpenAICompatible for proper OpenAI-compatible provider support
     const ollama = createOpenAICompatible({
+      name: 'ollama',
       baseURL: this.config.baseURL,
       apiKey: this.config.apiKey,
     });
@@ -50,7 +52,7 @@ export class OllamaProvider {
       temperature?: number;
       maxTokens?: number;
       topP?: number;
-      tools?: CoreTool[];
+      tools?: ToolSet;
     }
   ): Promise<{ text: string }> {
     const result = await generateText({
@@ -60,7 +62,7 @@ export class OllamaProvider {
       maxTokens: options?.maxTokens ?? this.config.maxTokens,
       topP: options?.topP ?? this.config.topP,
       tools: options?.tools,
-    });
+    } as any);
 
     return { text: result.text };
   }
@@ -68,23 +70,23 @@ export class OllamaProvider {
   /**
    * Stream text completion
    */
-  streamText(
+  async streamText(
     messages: CoreMessage[],
     options?: {
       temperature?: number;
       maxTokens?: number;
       topP?: number;
-      tools?: CoreTool[];
+      tools?: ToolSet;
     }
-  ): AsyncIterable<string> {
-    const result = streamText({
+  ): Promise<AsyncIterable<string>> {
+    const result = await streamText({
       model: this.model,
       messages,
       temperature: options?.temperature ?? this.config.temperature,
       maxTokens: options?.maxTokens ?? this.config.maxTokens,
       topP: options?.topP ?? this.config.topP,
       tools: options?.tools,
-    });
+    } as any);
 
     return result.textStream;
   }

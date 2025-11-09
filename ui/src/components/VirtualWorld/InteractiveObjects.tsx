@@ -21,10 +21,10 @@ export type InteractiveObjectType =
   | 'vending_machine'
   | 'atm';
 
-export interface InteractiveObjectConfig extends EnvironmentalObject {
+export interface InteractiveObjectConfig extends Omit<EnvironmentalObject, 'type'> {
   type: InteractiveObjectType;
   interactive?: boolean;
-  state?: 'on' | 'off' | 'open' | 'closed' | 'idle' | 'active';
+  state?: 'on' | 'off' | 'open' | 'closed' | 'idle' | 'active' | 'occupied';
   onClick?: () => void;
   onInteract?: (objectId: string) => void;
   metadata?: {

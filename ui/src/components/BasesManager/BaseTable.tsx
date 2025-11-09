@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { ArrowUpDown, ArrowUp, ArrowDown, Download, Filter } from 'lucide-react';
 import { BaseFile, BaseRow, BaseFilter, BaseSort } from '../../services/bases-service';
 
-interface BaseTableProps {
+export interface BaseTableProps {
   base: BaseFile;
   filters?: BaseFilter[];
   sort?: BaseSort[];
@@ -15,6 +15,7 @@ interface BaseTableProps {
   onFiltersChange?: (filters: BaseFilter[]) => void;
   onSortChange?: (sort: BaseSort[]) => void;
   onSearchChange?: (query: string) => void;
+  onExport?: (format: 'jsonl' | 'json' | 'csv') => Promise<void>;
 }
 
 export const BaseTable: React.FC<BaseTableProps> = ({
@@ -28,7 +29,8 @@ export const BaseTable: React.FC<BaseTableProps> = ({
   editable = false,
   onFiltersChange,
   onSortChange,
-  onSearchChange
+  onSearchChange,
+  onExport
 }) => {
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
@@ -143,7 +145,12 @@ export const BaseTable: React.FC<BaseTableProps> = ({
       : <ArrowDown size={14} />;
   };
 
-  const handleExport = (format: 'csv' | 'json' | 'jsonl') => {
+  const handleExport = async (format: 'csv' | 'json' | 'jsonl') => {
+    if (onExport) {
+      await onExport(format);
+      return;
+    }
+
     const data = paginatedRows.map(row => {
       const entry: any = {};
       fieldsToShow.forEach(field => {

@@ -6,23 +6,13 @@
 
 import React from 'react';
 import { Modal } from '@/components/shared/Modal';
+import type { LLMProviderConfig } from '@/services/llm-service';
 
 interface BridgeStatus {
   nlp: boolean;
   metaverse: boolean;
   webllm: boolean;
   tinyml: boolean;
-}
-
-interface LLMProviderConfig {
-  provider: 'webllm' | 'ollama' | 'openai' | 'opencode';
-  model: string;
-  temperature: number;
-  maxTokens: number;
-  topP: number;
-  ollamaUrl?: string;
-  openaiApiKey?: string;
-  opencodeEndpoint?: string;
 }
 
 interface BridgeStatusModalProps {

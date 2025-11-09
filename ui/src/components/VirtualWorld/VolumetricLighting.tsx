@@ -127,7 +127,8 @@ const LightProbe: React.FC<{
   const probe = useMemo(() => {
     const lightProbe = new THREE.LightProbe();
     // Initialize with default spherical harmonics
-    lightProbe.sh = new Float32Array(9 * 3);
+    const sh = new THREE.SphericalHarmonics3();
+    lightProbe.sh = sh;
     return lightProbe;
   }, []);
 

@@ -9,7 +9,8 @@
 
 import { LRLanguage, LanguageSupport } from '@codemirror/language';
 import { styleTags, tags as t } from '@lezer/highlight';
-import { parser } from '@lezer/common';
+import { Parser } from '@lezer/common';
+import { EditorView } from '@codemirror/view';
 import { markdown } from '@codemirror/lang-markdown';
 
 /**

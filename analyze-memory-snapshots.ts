@@ -54,19 +54,24 @@ function analyzeMemoryPatterns(snapshots: MemorySnapshot[]): void {
 
   const first = snapshots[0];
   const last = snapshots[snapshots.length - 1];
+  if (!first || !last) {
+    console.log('⚠️  Invalid snapshot data');
+    return;
+  }
   const totalTime = (last.timestamp - first.timestamp) / 1000; // seconds
   
   console.log(`\n📊 Overview:`);
   console.log(`   Snapshots: ${snapshots.length}`);
   console.log(`   Time Span: ${totalTime.toFixed(3)} seconds (${(totalTime/1000).toFixed(3)}ms)`);
-  console.log(`   Interval: ${(totalTime / (snapshots.length - 1)).toFixed(3)}ms average`);
+  const interval = snapshots.length > 1 ? (totalTime / (snapshots.length - 1)).toFixed(3) : '0';
+  console.log(`   Interval: ${interval}ms average`);
   
   console.log(`\n💾 Memory Analysis:`);
   const memStartMB = first.memory.heapUsed / 1024 / 1024;
   const memEndMB = last.memory.heapUsed / 1024 / 1024;
   // Use reduce instead of spread operator to avoid stack overflow with large arrays
-  const memPeakMB = snapshots.reduce((max, s) => Math.max(max, s.memory.heapUsed), snapshots[0].memory.heapUsed) / 1024 / 1024;
-  const memMinMB = snapshots.reduce((min, s) => Math.min(min, s.memory.heapUsed), snapshots[0].memory.heapUsed) / 1024 / 1024;
+  const memPeakMB = snapshots.reduce((max, s) => Math.max(max, s.memory.heapUsed), first.memory.heapUsed) / 1024 / 1024;
+  const memMinMB = snapshots.reduce((min, s) => Math.min(min, s.memory.heapUsed), first.memory.heapUsed) / 1024 / 1024;
   
   console.log(`   Start Memory: ${memStartMB.toFixed(2)}MB`);
   console.log(`   End Memory: ${memEndMB.toFixed(2)}MB`);
@@ -89,37 +94,44 @@ function analyzeMemoryPatterns(snapshots: MemorySnapshot[]): void {
   });
   
   console.log(`\n📈 State Changes:`);
-  const objectDelta = last.automatonState.objectCount - first.automatonState.objectCount;
-  const modificationDelta = last.automatonState.selfModificationCount - first.automatonState.selfModificationCount;
-  
-  console.log(`   Objects: ${first.automatonState.objectCount} → ${last.automatonState.objectCount} (${objectDelta > 0 ? '+' : ''}${objectDelta})`);
-  console.log(`   Modifications: ${first.automatonState.selfModificationCount} → ${last.automatonState.selfModificationCount} (${modificationDelta > 0 ? '+' : ''}${modificationDelta})`);
+  if (first && last) {
+    const objectDelta = last.automatonState.objectCount - first.automatonState.objectCount;
+    const modificationDelta = last.automatonState.selfModificationCount - first.automatonState.selfModificationCount;
+    
+    console.log(`   Objects: ${first.automatonState.objectCount} → ${last.automatonState.objectCount} (${objectDelta > 0 ? '+' : ''}${objectDelta})`);
+    console.log(`   Modifications: ${first.automatonState.selfModificationCount} → ${last.automatonState.selfModificationCount} (${modificationDelta > 0 ? '+' : ''}${modificationDelta})`);
+  }
   
   // Calculate rates
-  const objectsPerSecond = objectDelta / totalTime;
-  const memoryPerSecond = (memEndMB - memStartMB) / totalTime;
-  const objectsPerMB = (memEndMB !== memStartMB) ? objectDelta / (memEndMB - memStartMB) : 0;
-  
-  console.log(`\n⚡ Performance Rates:`);
-  console.log(`   Objects/Second: ${objectsPerSecond.toFixed(3)}`);
-  console.log(`   Memory/Second: ${memoryPerSecond.toFixed(3)}MB/sec`);
-  console.log(`   Objects/MB: ${objectsPerMB.toFixed(1)}`);
+  if (first && last && totalTime > 0) {
+    const objectDelta = last.automatonState.objectCount - first.automatonState.objectCount;
+    const objectsPerSecond = objectDelta / totalTime;
+    const memoryPerSecond = (memEndMB - memStartMB) / totalTime;
+    const objectsPerMB = (memEndMB !== memStartMB) ? objectDelta / (memEndMB - memStartMB) : 0;
+    
+    console.log(`\n⚡ Performance Rates:`);
+    console.log(`   Objects/Second: ${objectsPerSecond.toFixed(3)}`);
+    console.log(`   Memory/Second: ${memoryPerSecond.toFixed(3)}MB/sec`);
+    console.log(`   Objects/MB: ${objectsPerMB.toFixed(1)}`);
+  }
   
   // Memory efficiency
   const avgMemoryPerObject = snapshots.reduce((sum, s) => 
-    sum + (s.memory.heapUsed / s.automatonState.objectCount), 0) / snapshots.length;
+    sum + (s.memory.heapUsed / Math.max(s.automatonState.objectCount, 1)), 0) / snapshots.length;
   
   console.log(`\n💡 Memory Efficiency:`);
   console.log(`   Average Memory/Object: ${(avgMemoryPerObject / 1024).toFixed(2)}KB`);
   
   // Memory stability
-  const memoryDeltas = snapshots.slice(1).map((s, i) => 
-    s.memory.heapUsed - snapshots[i].memory.heapUsed
-  );
-  const avgMemoryDelta = memoryDeltas.reduce((a, b) => a + b, 0) / memoryDeltas.length;
-  const memoryVolatility = Math.sqrt(
+  const memoryDeltas = snapshots.slice(1).map((s, i) => {
+    const prev = snapshots[i];
+    if (!prev) return 0;
+    return s.memory.heapUsed - prev.memory.heapUsed;
+  });
+  const avgMemoryDelta = memoryDeltas.length > 0 ? memoryDeltas.reduce((a, b) => a + b, 0) / memoryDeltas.length : 0;
+  const memoryVolatility = memoryDeltas.length > 0 ? Math.sqrt(
     memoryDeltas.reduce((sum, d) => sum + Math.pow(d - avgMemoryDelta, 2), 0) / memoryDeltas.length
-  ) / 1024 / 1024; // MB
+  ) / 1024 / 1024 : 0; // MB
   
   console.log(`   Memory Volatility: ${memoryVolatility.toFixed(2)}MB (std dev)`);
   console.log(`   Memory Stability: ${memoryVolatility < 10 ? '🟢 Stable' : memoryVolatility < 50 ? '🟡 Moderate' : '🔴 Volatile'}`);
@@ -134,11 +146,12 @@ function analyzeMemoryPatterns(snapshots: MemorySnapshot[]): void {
   ).length;
   
   console.log(`\n🧠 Reasoning Quality:`);
-  console.log(`   Active Snapshots: ${activeSnapshots}/${snapshots.length - 1}`);
+  const activeDenom = Math.max(snapshots.length - 1, 1);
+  console.log(`   Active Snapshots: ${activeSnapshots}/${activeDenom}`);
   console.log(`   Memory-Efficient Periods: ${memoryEfficientSnapshots}/${snapshots.length} (${(memoryEfficientSnapshots/snapshots.length*100).toFixed(1)}%)`);
   
   const qualityScore = (
-    (activeSnapshots / (snapshots.length - 1)) * 0.4 +
+    (activeSnapshots / activeDenom) * 0.4 +
     (memoryEfficientSnapshots / snapshots.length) * 0.3 +
     (memoryVolatility < 50 ? 1 : 0) * 0.3
   ) * 100;
@@ -147,7 +160,7 @@ function analyzeMemoryPatterns(snapshots: MemorySnapshot[]): void {
   console.log(`   Status: ${qualityScore >= 80 ? '🟢 Excellent' : qualityScore >= 60 ? '🟡 Good' : qualityScore >= 40 ? '🟠 Fair' : '🔴 Poor'}`);
   
   // Memory leak detection
-  const memoryTrend = (memEndMB - memStartMB) / totalTime;
+  const memoryTrend = totalTime > 0 ? (memEndMB - memStartMB) / totalTime : 0;
   if (memoryTrend > 1) {
     console.log(`\n⚠️  Potential Memory Leak Detected:`);
     console.log(`   Memory growing at ${memoryTrend.toFixed(2)}MB/sec`);

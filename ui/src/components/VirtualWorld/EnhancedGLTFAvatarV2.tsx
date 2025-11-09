@@ -12,7 +12,7 @@ import { AvatarAnimationController } from './AvatarAnimationController';
 import { GestureAnimationController, useAvatarGestures, GestureType } from './AvatarGestureSystem';
 import { avatarService, AvatarState } from '../../services/avatar-service';
 
-export interface EnhancedAvatarConfigV2 extends AvatarConfig {
+export interface EnhancedAvatarConfigV2 extends Omit<AvatarConfig, 'animationState'> {
   // Expanded animation states
   animationState?: 'idle' | 'walking' | 'running' | 'jumping' | 'sitting' | 'dancing' | 'gesturing';
   // Gesture support
@@ -78,7 +78,7 @@ export const EnhancedGLTFAvatarV2: React.FC<EnhancedGLTFAvatarV2Props> = ({
     if (!enableServiceSync) return;
 
     // Register with service
-    avatarService.addAvatar(config);
+    avatarService.addAvatar(config as any);
 
     // Listen for updates
     const handleUpdate = (updatedAvatar: AvatarState) => {

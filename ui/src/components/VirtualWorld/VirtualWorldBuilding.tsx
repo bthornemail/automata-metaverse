@@ -175,7 +175,7 @@ const ProceduralBuilding: React.FC<{
               position={[-width / 2 + (j + 0.5) * 2, -height / 2 + (i + 1) * 3, depth / 2 + 0.01]}
             >
               <planeGeometry args={[1.5, 1.5]} />
-              <meshBasicMaterial color="#87ceeb" emissive="#1e3a8a" emissiveIntensity={0.5} />
+              <meshStandardMaterial color="#87ceeb" emissive="#1e3a8a" emissiveIntensity={0.5} />
             </mesh>
           ))}
           
@@ -186,7 +186,7 @@ const ProceduralBuilding: React.FC<{
               position={[-width / 2 + (j + 0.5) * 2, -height / 2 + (i + 1) * 3, -depth / 2 - 0.01]}
             >
               <planeGeometry args={[1.5, 1.5]} />
-              <meshBasicMaterial color="#87ceeb" emissive="#1e3a8a" emissiveIntensity={0.5} />
+              <meshStandardMaterial color="#87ceeb" emissive="#1e3a8a" emissiveIntensity={0.5} />
             </mesh>
           ))}
         </group>

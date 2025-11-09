@@ -8,7 +8,7 @@ import { createServer } from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import express from 'express';
 import * as Sentry from '@sentry/node';
-import { AdvancedSelfReferencingAutomaton } from '../../advanced-automaton';
+import { AdvancedSelfReferencingAutomaton } from '../../evolutions/advanced-automaton/advanced-automaton';
 import { serverConfig } from './config';
 import { setupMiddleware } from './middleware';
 import { setupRoutes } from './routes';
@@ -39,10 +39,7 @@ export async function startServer(): Promise<ServerInstance> {
   const app = express();
 
   // Sentry request handler must be the first middleware
-  app.use(Sentry.Handlers.requestHandler());
-  
-  // Tracing handler
-  app.use(Sentry.Handlers.tracingHandler());
+  // Note: Sentry v10 automatically instruments Express, no manual handlers needed
 
   // Setup middleware
   setupMiddleware(app);
@@ -106,7 +103,7 @@ export async function startServer(): Promise<ServerInstance> {
   setupLegacyApiHandler(app, automatonController, wordNet);
 
   // Sentry error handler must be after all routes
-  app.use(Sentry.Handlers.errorHandler());
+  Sentry.setupExpressErrorHandler(app);
 
   // Start server
   httpServer.listen(serverConfig.port, () => {

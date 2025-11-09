@@ -13,8 +13,15 @@ import { cameraService, CameraState } from '../../services/camera-service';
 
 export type EnhancedCameraMode = CameraMode | 'cinematic' | 'follow' | 'free-look' | 'top-down';
 
-export interface EnhancedCameraConfig extends CameraConfig {
+export interface EnhancedCameraConfig {
   mode?: EnhancedCameraMode;
+  // Include all CameraConfig properties except mode
+  target?: [number, number, number];
+  distance?: number;
+  height?: number;
+  fov?: number;
+  enableControls?: boolean;
+  smoothTransition?: boolean;
   // Cinematic mode
   cinematicPath?: {
     points: [number, number, number][];
@@ -353,7 +360,7 @@ const FirstPersonControls: React.FC<{
     camera.position.y = height;
 
     euler.current.set(mouseState.current.y, mouseState.current.x, 0);
-    camera.rotation.setFromEuler(euler.current);
+    camera.rotation.copy(euler.current);
   });
 
   return null;

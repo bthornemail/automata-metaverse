@@ -178,21 +178,24 @@ function generateVariantFile(
         const dim = obj.dimensionalLevel || 0;
         const bestPatterns = learnedPatterns.getBestPatterns(dim, 1);
         if (bestPatterns.length > 0) {
-          obj.metadata.learnedPattern = bestPatterns[0].pattern.id;
-          obj.metadata.patternConfidence = bestPatterns[0].confidence;
+          const best = bestPatterns[0];
+          if (best && best.pattern) {
+            obj.metadata.learnedPattern = best.pattern.id;
+            obj.metadata.patternConfidence = best.confidence;
+          }
         }
       }
       
       // Add knowledge base facts if available
       if (knowledgeBase && obj.type === 'text') {
         const facts = knowledgeBase.queryFacts('definition');
-        const relevantFacts = facts.filter(f => 
-          variant.focus.some(focus => 
+        const relevantFacts = facts.filter((f: any) => 
+          variant.focus.some((focus: string) => 
             f.content.toLowerCase().includes(focus.toLowerCase())
           )
         );
         if (relevantFacts.length > 0) {
-          obj.metadata.relevantFacts = relevantFacts.slice(0, 3).map(f => f.id);
+          obj.metadata.relevantFacts = relevantFacts.slice(0, 3).map((f: any) => f.id);
         }
       }
       
@@ -226,7 +229,9 @@ function generateVariantFile(
     for (let dim = 0; dim <= 7; dim++) {
       const bestPatterns = learnedPatterns.getBestPatterns(dim, 1);
       if (bestPatterns.length > 0 && variant.customizations.dimensionFocus?.includes(dim)) {
-        const pattern = bestPatterns[0].pattern;
+        const best = bestPatterns[0];
+        if (!best || !best.pattern) continue;
+        const pattern = best.pattern;
         variantSpecificEntries.push(JSON.stringify({
           id: `${variant.name}-pattern-${dim}D`,
           type: 'text',
@@ -235,7 +240,7 @@ function generateVariantFile(
           width: 250,
           height: 120,
           color: '5',
-          text: `# Learned Pattern (${dim}D)\n\n**Type:** ${pattern.patternType}\n**Success Rate:** ${((pattern.successCount / (pattern.successCount + pattern.failureCount)) * 100).toFixed(1)}%\n**Confidence:** ${(bestPatterns[0].confidence * 100).toFixed(1)}%`,
+          text: `# Learned Pattern (${dim}D)\n\n**Type:** ${pattern.patternType}\n**Success Rate:** ${((pattern.successCount / (pattern.successCount + pattern.failureCount)) * 100).toFixed(1)}%\n**Confidence:** ${(best.confidence * 100).toFixed(1)}%`,
           metadata: {
             patternId: pattern.id,
             dimension: dim,

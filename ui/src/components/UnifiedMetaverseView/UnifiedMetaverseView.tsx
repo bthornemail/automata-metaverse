@@ -9,6 +9,7 @@ import { UnifiedMetaverseViewProps, UnifiedViewState, EnvironmentType, Symbol, M
 import { modeManager } from './utils/mode-manager';
 import { ModeSwitcher } from './components/ModeSwitcher';
 import { EnvironmentRenderer } from './components/EnvironmentRenderer';
+import UnifiedEditor from '../UnifiedEditor';
 import { canvasl3DService } from '../../services/canvasl-3d-service';
 import { databaseService } from '../../services/database-service';
 import { jsonlCanvasService } from '../../services/jsonl-canvas-service';
@@ -52,7 +53,10 @@ export const UnifiedMetaverseView: React.FC<UnifiedMetaverseViewProps> = ({
       }
     });
 
-    return unsubscribe;
+    return () => {
+      unsubscribe();
+      return undefined;
+    };
   }, [initialMajorMode, initialMinorMode, onModeChange]);
 
   // Load symbols from CanvasL files

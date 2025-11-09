@@ -110,8 +110,8 @@ export const useAISDK = (config: UseAISDKConfig): UseAISDKReturn => {
       setError(null);
 
       try {
-        const result = currentProvider.streamText(messages);
-        for await (const chunk of result.textStream) {
+        const result = await currentProvider.streamText(messages);
+        for await (const chunk of result) {
           onChunk(chunk);
         }
       } catch (err) {

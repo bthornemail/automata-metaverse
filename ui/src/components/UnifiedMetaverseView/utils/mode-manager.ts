@@ -121,9 +121,11 @@ export class ModeManager {
   /**
    * Subscribe to mode changes
    */
-  subscribe(listener: (major: MajorMode, minor: MinorMode) => void) {
+  subscribe(listener: (major: MajorMode, minor: MinorMode) => void): () => void {
     this.listeners.add(listener);
-    return () => this.listeners.delete(listener);
+    return () => {
+      this.listeners.delete(listener);
+    };
   }
 
   private notifyListeners() {

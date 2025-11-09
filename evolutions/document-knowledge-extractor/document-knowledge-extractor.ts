@@ -116,7 +116,7 @@ export class DocumentKnowledgeExtractor {
     if (frontmatterMatch) {
       try {
         const frontmatterYaml = frontmatterMatch[1];
-        const body = frontmatterMatch[2];
+        const body = frontmatterMatch[2] || '';
         
         // Debug: Check YAML parsing for AGENTS.md (only if needed)
         // if (filePath.includes('AGENTS.md')) {
@@ -126,9 +126,12 @@ export class DocumentKnowledgeExtractor {
         
         let frontmatter: any;
         try {
+          if (!frontmatterYaml) {
+            return { frontmatter: null, body: content, filePath };
+          }
           frontmatter = yaml.load(frontmatterYaml, {
             schema: yaml.DEFAULT_SCHEMA,
-            onWarning: (warning) => {
+            onWarning: (warning: any) => {
               if (filePath.includes('AGENTS.md')) {
                 console.warn(`⚠️  YAML warning in ${filePath}:`, warning);
               }
@@ -136,7 +139,7 @@ export class DocumentKnowledgeExtractor {
           }) as any;
           
           // Workaround: If agentTypes is missing but should be there, try parsing it separately
-          if (filePath.includes('AGENTS.md') && !frontmatter?.agentTypes && frontmatterYaml.includes('agentTypes:')) {
+          if (filePath.includes('AGENTS.md') && !frontmatter?.agentTypes && frontmatterYaml && frontmatterYaml.includes('agentTypes:')) {
             console.log(`⚠️  agentTypes missing from parsed frontmatter, attempting workaround...`);
             // Extract agentTypes section manually by finding the section and parsing it
             const lines = frontmatterYaml.split('\n');
@@ -145,7 +148,9 @@ export class DocumentKnowledgeExtractor {
             
             // Find where agentTypes starts
             for (let i = 0; i < lines.length; i++) {
-              if (lines[i].trim() === 'agentTypes:' || lines[i].trim().startsWith('agentTypes:')) {
+              const line = lines[i];
+              if (!line) continue;
+              if (line.trim() === 'agentTypes:' || line.trim().startsWith('agentTypes:')) {
                 agentTypesStart = i;
                 break;
               }
@@ -155,6 +160,7 @@ export class DocumentKnowledgeExtractor {
             if (agentTypesStart >= 0) {
               for (let i = agentTypesStart + 1; i < lines.length; i++) {
                 const line = lines[i];
+                if (!line) continue;
                 // Check if this is a root-level key (no indentation or same level as agentTypes)
                 if (line.trim() && !line.startsWith(' ') && line.includes(':')) {
                   agentTypesEnd = i;
@@ -185,6 +191,9 @@ export class DocumentKnowledgeExtractor {
           }
           
           // Try parsing just the first part (before the error)
+          if (!frontmatterYaml) {
+            return { frontmatter: null, body: content, filePath };
+          }
           const lines = frontmatterYaml.split('\n');
           const errorLine = parseError.mark?.line || lines.length;
           
@@ -386,6 +395,7 @@ export class DocumentKnowledgeExtractor {
       
       for (let i = lineIndex + 1; i < Math.min(lineIndex + 20, lines.length); i++) {
         const line = lines[i];
+        if (!line) continue;
         
         if (line.match(/^#{1,4}\s/)) break; // Stop at next heading
         
@@ -405,9 +415,10 @@ export class DocumentKnowledgeExtractor {
       }
       
       // Extract dimension from agent name
-      const dimensionMatch = agentName.match(/^(\d+D)/);
+      const dimensionMatch = agentName?.match(/^(\d+D)/);
       const dimension = dimensionMatch ? dimensionMatch[1] : undefined;
       
+      if (!agentName) return;
       this.knowledgeBase.addAgent({
         name: agentName,
         dimension,
@@ -432,7 +443,9 @@ export class DocumentKnowledgeExtractor {
     
     const functions = new Set<string>();
     matches.forEach(match => {
-      functions.add(match[1]);
+      if (match[1]) {
+        functions.add(match[1]);
+      }
     });
     
     functions.forEach(funcName => {
@@ -477,6 +490,7 @@ export class DocumentKnowledgeExtractor {
       sigMatches.forEach(match => {
         const funcName = match[1];
         const signature = match[0];
+        if (!funcName || !signature) return;
         
         this.knowledgeBase.addFunction({
           name: funcName,
@@ -522,9 +536,12 @@ export class DocumentKnowledgeExtractor {
     const matches = Array.from(content.matchAll(codeBlockPattern));
     
     matches.forEach(match => {
+      const language = match[1] || 'text';
+      const code = match[2];
+      if (!code) return;
       blocks.push({
-        language: match[1] || 'text',
-        code: match[2]
+        language,
+        code
       });
     });
     

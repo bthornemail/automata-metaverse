@@ -15,7 +15,7 @@ import * as path from 'path';
 import { KnowledgeBaseManager } from '../document-knowledge-extractor/knowledge-base';
 import { NLQueryEngine } from './nl-query-engine';
 import { ConversationContextManager } from './conversation-context-manager';
-import { EnhancedIntentParser } from './enhanced-intent-parser';
+import { EnhancedIntentParser, ParsedIntent } from './enhanced-intent-parser';
 import { DialogueHandler, Response } from './dialogue-handler';
 import { AgentRouter } from './agent-router';
 import { EnhancedResponseGenerator, FormattedResponse } from './enhanced-response-generator';
@@ -90,7 +90,7 @@ export class EnhancedConversationInterface {
 
     // Coordinate agent responses only if we have good routes
     let coordinatedResponse;
-    if (routes.length > 0 && routes[0].confidence > 0.5) {
+    if (routes.length > 0 && routes[0] && routes[0].confidence > 0.5) {
       try {
         coordinatedResponse = await this.agentRouter.coordinateResponse(
           routes,
@@ -103,12 +103,32 @@ export class EnhancedConversationInterface {
       }
     }
 
+    // Convert QueryIntent to ParsedIntent if needed
+    const parsedIntent: ParsedIntent = lastTurn?.intent 
+      ? {
+          ...lastTurn.intent,
+          originalQuestion: lastTurn.intent.question || question,
+          resolvedQuestion: lastTurn.intent.question || question,
+          entities: [],
+          confidence: 0.8,
+          requiresClarification: false
+        }
+      : {
+          type: 'unknown',
+          question,
+          originalQuestion: question,
+          resolvedQuestion: question,
+          entities: [],
+          confidence: 0.5,
+          requiresClarification: false
+        };
+
     // If agent routing didn't work or confidence is low, use direct query result
     if (!coordinatedResponse || coordinatedResponse.confidence < 0.5) {
       // Use direct query result instead
       return this.responseGenerator.generateResponse(
         queryResult,
-        lastTurn?.intent || { type: 'unknown', question },
+        parsedIntent,
         undefined,
         context
       );
@@ -117,7 +137,7 @@ export class EnhancedConversationInterface {
     // Generate formatted response with coordinated response
     const formattedResponse = this.responseGenerator.generateResponse(
       queryResult,
-      lastTurn?.intent || { type: 'unknown', question },
+      parsedIntent,
       coordinatedResponse,
       context
     );

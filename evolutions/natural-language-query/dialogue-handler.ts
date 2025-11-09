@@ -293,7 +293,10 @@ export class DialogueHandler {
    */
   private formatClarificationRequest(parsedIntent: ParsedIntent): string {
     if (parsedIntent.clarificationQuestions && parsedIntent.clarificationQuestions.length > 0) {
-      return parsedIntent.clarificationQuestions[0];
+      const question = parsedIntent.clarificationQuestions[0];
+      if (question) {
+        return question;
+      }
     }
 
     return 'Could you provide more details about what you\'re looking for?';

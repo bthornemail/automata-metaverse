@@ -52,9 +52,12 @@ class GPUAccelerationImpl implements GPUAcceleration {
     }
     
     try {
-      const kernel = this.gpu.createKernel(function(data: number[]) {
+      const self = this;
+      const kernel = self.gpu.createKernel(function(data: number[]) {
         // Church encoding: λf.λx.x (identity)
-        return data[this.thread.x];
+        // @ts-ignore - GPU.js kernel context
+        const idx = (this as any).thread.x;
+        return data[idx];
       }).setOutput([data.length]);
       
       return kernel(data) as number[];
@@ -71,9 +74,12 @@ class GPUAccelerationImpl implements GPUAcceleration {
     }
     
     try {
-      const kernel = this.gpu.createKernel(function(m: number[], n: number[]) {
+      const self = this;
+      const kernel = self.gpu.createKernel(function(m: number[], n: number[]) {
         // Church addition: λm.λn.λf.λx.mf(nfx)
-        return m[this.thread.x] + n[this.thread.x];
+        // @ts-ignore - GPU.js kernel context
+        const idx = (this as any).thread.x;
+        return (m[idx] || 0) + (n[idx] || 0);
       }).setOutput([m.length]);
       
       return kernel(m, n) as number[];
@@ -90,9 +96,12 @@ class GPUAccelerationImpl implements GPUAcceleration {
     }
     
     try {
-      const kernel = this.gpu.createKernel(function(m: number[], n: number[]) {
+      const self = this;
+      const kernel = self.gpu.createKernel(function(m: number[], n: number[]) {
         // Church multiplication: λm.λn.λf.m(nf)
-        return m[this.thread.x] * n[this.thread.x];
+        // @ts-ignore - GPU.js kernel context
+        const idx = (this as any).thread.x;
+        return (m[idx] || 0) * (n[idx] || 1);
       }).setOutput([m.length]);
       
       return kernel(m, n) as number[];
@@ -110,11 +119,15 @@ class GPUAccelerationImpl implements GPUAcceleration {
     
     try {
       // GPU pattern matching (simplified - would need more complex kernel)
-      const kernel = this.gpu.createKernel(function(data: string[], patterns: string[]) {
-        const dataStr = data[this.thread.x] || '';
+      const self = this;
+      const kernel = self.gpu.createKernel(function(data: string[], patterns: string[]) {
+        // @ts-ignore - GPU.js kernel context
+        const idx = (this as any).thread.x;
+        const dataStr = data[idx] || '';
         let match = 0;
         for (let i = 0; i < patterns.length; i++) {
-          if (dataStr.includes(patterns[i])) {
+          const pattern = patterns[i];
+          if (pattern && dataStr.includes(pattern)) {
             match = 1;
             break;
           }

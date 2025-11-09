@@ -328,11 +328,12 @@ class IntegrityService {
         
         if (result?.error) {
           // Safely convert error to string
-          const errorMsg = typeof result.error === 'string' 
-            ? result.error 
-            : (result.error instanceof Error 
-              ? result.error.message 
-              : String(result.error));
+          const error = result.error;
+          const errorMsg = typeof error === 'string' 
+            ? error 
+            : (error && typeof error === 'object' && 'message' in error
+              ? String((error as any).message)
+              : String(error));
           errorDetails.push(`Error: ${errorMsg}`);
         }
         
@@ -487,11 +488,12 @@ class IntegrityService {
         
         if (result?.error) {
           // Safely convert error to string
-          const errorMsg = typeof result.error === 'string' 
-            ? result.error 
-            : (result.error instanceof Error 
-              ? result.error.message 
-              : String(result.error));
+          const error = result.error;
+          const errorMsg = typeof error === 'string' 
+            ? error 
+            : (error && typeof error === 'object' && 'message' in error
+              ? String((error as any).message)
+              : String(error));
           errorDetails.push(`Error: ${errorMsg}`);
         }
         

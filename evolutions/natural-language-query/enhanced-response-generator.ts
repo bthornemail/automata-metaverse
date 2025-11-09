@@ -223,7 +223,9 @@ export class EnhancedResponseGenerator {
     // Add entity-based suggestions
     if (parsedIntent.entities.length > 0) {
       const entity = parsedIntent.entities[0];
-      suggestions.push(`What are the relationships of ${entity.name}?`);
+      if (entity) {
+        suggestions.push(`What are the relationships of ${entity.name}?`);
+      }
     }
 
     return suggestions.slice(0, 5); // Limit to 5 suggestions

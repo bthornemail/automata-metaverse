@@ -4,7 +4,7 @@
  * Analysis functions for automaton state and history
  */
 
-import { AdvancedSelfReferencingAutomaton } from '../../advanced-automaton';
+import { AdvancedSelfReferencingAutomaton } from '../../evolutions/advanced-automaton/advanced-automaton';
 
 export interface ActionFrequency {
   action: string;

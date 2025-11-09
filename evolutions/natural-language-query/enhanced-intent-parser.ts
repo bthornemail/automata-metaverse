@@ -187,7 +187,7 @@ export class EnhancedIntentParser {
 
     // Extract dimension references (0D-7D)
     const dimensionMatch = question.match(/(\d+d)/i);
-    if (dimensionMatch) {
+    if (dimensionMatch && dimensionMatch[1]) {
       entities.push({
         id: `dimension-${dimensionMatch[1]}`,
         type: 'concept',
@@ -201,7 +201,7 @@ export class EnhancedIntentParser {
 
     // Extract agent names
     const agentMatch = question.match(/(\d+d-[\w-]+-agent|[\w-]+-agent)/i);
-    if (agentMatch) {
+    if (agentMatch && agentMatch[1]) {
       entities.push({
         id: `agent-${agentMatch[1]}`,
         type: 'agent',
@@ -215,7 +215,7 @@ export class EnhancedIntentParser {
 
     // Extract function names
     const functionMatch = question.match(/(r5rs:[\w-]+|[\w-]+\(\))/i);
-    if (functionMatch) {
+    if (functionMatch && functionMatch[1]) {
       entities.push({
         id: `function-${functionMatch[1]}`,
         type: 'function',
@@ -273,9 +273,12 @@ export class EnhancedIntentParser {
 
     if (options.length === 1) {
       // Single match - use it
-      intent.entity = options[0].name;
-      intent.filters = intent.filters || {};
-      intent.filters.name = options[0].name;
+      const option = options[0];
+      if (option) {
+        intent.entity = option.name;
+        intent.filters = intent.filters || {};
+        intent.filters.name = option.name;
+      }
       return intent;
     }
 

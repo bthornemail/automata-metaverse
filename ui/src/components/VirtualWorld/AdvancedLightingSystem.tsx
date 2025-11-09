@@ -44,8 +44,8 @@ export const AdvancedLightingSystem: React.FC<AdvancedLightingSystemProps> = ({
     weather,
     postProcessing,
     dynamicLights = [],
-    cascadedShadows = false,
-    softShadows = true,
+    cascadedShadows,
+    softShadows,
     shadowBias = -0.0001,
     enableServiceSync = true,
     ...lightingConfig
@@ -153,7 +153,7 @@ export const AdvancedLightingSystem: React.FC<AdvancedLightingSystemProps> = ({
 // Dynamic light component
 const DynamicLightComponent: React.FC<{
   light: DynamicLight;
-  softShadows: boolean;
+  softShadows?: SoftShadowConfig;
   shadowBias: number;
 }> = ({ light, softShadows, shadowBias }) => {
   const lightRef = useRef<THREE.Light>(null);

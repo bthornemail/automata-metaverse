@@ -266,7 +266,7 @@ export const GestureAnimationController: React.FC<{
     }
 
     // Create and play new action
-    const action = mixer.clipAction(clip);
+    const action = mixer.clipAction(clip, scene);
     action.setLoop(gesture.loop ? THREE.LoopRepeat : THREE.LoopOnce);
     action.reset();
     action.fadeIn(0.2);

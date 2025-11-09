@@ -35,12 +35,13 @@ export const NavigationUI: React.FC<NavigationUIProps> = ({
   const [showWaypoints, setShowWaypoints] = useState(false);
   const [showTeleport, setShowTeleport] = useState(false);
 
-  const allWaypoints = [
+  const allWaypoints: Waypoint[] = [
     ...layout.landmarks.map(l => ({
       id: l.id,
       name: l.name,
       position: l.position,
-      type: l.type,
+      // Convert 'monument' and 'sign' to 'landmark' for Waypoint compatibility
+      type: (l.type === 'monument' || l.type === 'sign') ? 'landmark' : l.type,
       zoneId: l.zoneId
     })),
     ...waypoints
@@ -246,7 +247,9 @@ const TeleportMenu: React.FC<{
           variant="secondary"
           size="md"
           icon={<Zap className="w-4 h-4" />}
-        />
+        >
+          {/* Icon-only button */}
+        </ModernButton>
       </ModernTooltip>
 
       <AnimatePresence>

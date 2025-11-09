@@ -206,8 +206,8 @@ export const useAutomatonStore = create<UnifiedAutomatonState & AutomatonActions
             safeMessage = '';
           } else if (typeof notification.message === 'string') {
             safeMessage = notification.message;
-          } else if (notification.message instanceof Error) {
-            safeMessage = notification.message.message || String(notification.message);
+          } else if (notification.message && typeof notification.message === 'object' && 'message' in notification.message) {
+            safeMessage = String((notification.message as any).message) || String(notification.message);
           } else {
             try {
               safeMessage = String(notification.message);

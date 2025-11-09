@@ -202,8 +202,8 @@ class WorldService {
       ...this.state,
       avatars: avatarService.getAllAvatars().map(a => a.config),
       buildings: buildingService.getAllBuildings().map(b => b.building),
-      paths: pathService.getPaths(),
-      lighting: lightingService.getLightingState(),
+      paths: pathService.getAllPaths(),
+      lighting: lightingService.getLightingConfig(),
       camera: cameraService.getCameraState()
     };
 
@@ -241,8 +241,8 @@ class WorldService {
     
     // Update service states
     avatarService.getAllAvatars().forEach(avatar => {
-      if (!state.avatars.find(a => a.id === avatar.id)) {
-        state.avatars.push(avatar);
+      if (!state.avatars.find(a => a.id === avatar.config.id)) {
+        state.avatars.push(avatar.config);
       }
     });
 

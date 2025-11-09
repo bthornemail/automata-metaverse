@@ -18,7 +18,7 @@ export interface LLMConfig {
   model: string;
   temperature: number;
   maxTokens: number;
-  topP?: number;
+  topP: number; // Made required with default value 0.9
   // Provider-specific config
   ollamaUrl?: string;
   openaiApiKey?: string;

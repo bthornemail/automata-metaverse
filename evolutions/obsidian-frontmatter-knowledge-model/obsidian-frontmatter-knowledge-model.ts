@@ -147,7 +147,7 @@ export class ObsidianFrontmatterKnowledgeModel {
   /**
    * Parse frontmatter from markdown file
    */
-  private parseFrontmatter(filePath: string): { frontmatter: DocumentFrontmatter; body: string } | null {
+  private parseFrontmatter(filePath: string): { frontmatter: DocumentFrontmatter | null; body: string } | null {
     try {
       const content = fs.readFileSync(filePath, 'utf-8');
       const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
@@ -159,9 +159,13 @@ export class ObsidianFrontmatterKnowledgeModel {
       const frontmatterYaml = frontmatterMatch[1];
       const body = frontmatterMatch[2];
 
+      if (!frontmatterYaml) {
+        return { frontmatter: null, body: content };
+      }
       const frontmatter = yaml.load(frontmatterYaml) as DocumentFrontmatter;
+      const bodyContent = body || '';
       
-      return { frontmatter, body };
+      return { frontmatter, body: bodyContent };
     } catch (error) {
       console.warn(`Failed to parse frontmatter from ${filePath}:`, error);
       return null;
@@ -258,7 +262,7 @@ export class ObsidianFrontmatterKnowledgeModel {
     
     for (const file of files) {
       const parsed = this.parseFrontmatter(file);
-      if (parsed?.frontmatter.id) {
+      if (parsed?.frontmatter?.id) {
         allIds.add(parsed.frontmatter.id);
       }
     }
@@ -266,7 +270,7 @@ export class ObsidianFrontmatterKnowledgeModel {
     // Second pass: build knowledge nodes
     for (const file of files) {
       const parsed = this.parseFrontmatter(file);
-      if (!parsed || !parsed.frontmatter.id) {
+      if (!parsed || !parsed.frontmatter || !parsed.frontmatter.id) {
         continue;
       }
 

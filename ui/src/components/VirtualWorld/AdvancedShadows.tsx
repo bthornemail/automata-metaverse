@@ -3,7 +3,7 @@
  * Cascaded shadows, soft shadows, and shadow optimization
  */
 
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useEffect } from 'react';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 

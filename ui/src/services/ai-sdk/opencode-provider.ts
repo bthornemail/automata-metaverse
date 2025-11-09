@@ -8,7 +8,8 @@
 
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 import { generateText, streamText } from 'ai';
-import type { CoreMessage, CoreTool } from 'ai';
+import type { CoreMessage } from 'ai';
+import type { ToolSet } from 'ai';
 
 export interface OpenCodeProviderConfig {
   baseURL?: string;
@@ -39,6 +40,7 @@ export class OpenCodeProvider {
 
     // Use createOpenAICompatible for proper OpenAI-compatible provider support
     const opencode = createOpenAICompatible({
+      name: 'opencode',
       baseURL: this.config.baseURL,
       apiKey: this.config.apiKey,
     });
@@ -55,7 +57,7 @@ export class OpenCodeProvider {
       temperature?: number;
       maxTokens?: number;
       topP?: number;
-      tools?: CoreTool[];
+      tools?: ToolSet;
     }
   ): Promise<{ text: string }> {
     // If agent is specified, prepend agent prompt
@@ -76,7 +78,7 @@ export class OpenCodeProvider {
       maxTokens: options?.maxTokens ?? this.config.maxTokens,
       topP: options?.topP ?? this.config.topP,
       tools: options?.tools,
-    });
+    } as any);
 
     return { text: result.text };
   }
@@ -84,15 +86,15 @@ export class OpenCodeProvider {
   /**
    * Stream text completion
    */
-  streamText(
+  async streamText(
     messages: CoreMessage[],
     options?: {
       temperature?: number;
       maxTokens?: number;
       topP?: number;
-      tools?: CoreTool[];
+      tools?: ToolSet;
     }
-  ): AsyncIterable<string> {
+  ): Promise<AsyncIterable<string>> {
     // If agent is specified, prepend agent prompt
     const finalMessages = this.config.agent
       ? [
@@ -104,14 +106,14 @@ export class OpenCodeProvider {
         ]
       : messages;
 
-    const result = streamText({
+    const result = await streamText({
       model: this.model,
       messages: finalMessages,
       temperature: options?.temperature ?? this.config.temperature,
       maxTokens: options?.maxTokens ?? this.config.maxTokens,
       topP: options?.topP ?? this.config.topP,
       tools: options?.tools,
-    });
+    } as any);
 
     return result.textStream;
   }

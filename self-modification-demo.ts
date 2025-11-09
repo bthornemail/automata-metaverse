@@ -1,4 +1,4 @@
-import { AdvancedSelfReferencingAutomaton } from './advanced-automaton';
+import { AdvancedSelfReferencingAutomaton } from './evolutions/advanced-automaton/advanced-automaton';
 
 async function demonstrateSelfModification() {
   console.log('=== Self-Modification Demonstration ===');

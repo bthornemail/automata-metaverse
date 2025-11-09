@@ -132,19 +132,22 @@ export class KnowledgeBaseManager {
     
     if (existingIndex >= 0) {
       // Merge with existing agent
-      this.knowledgeBase.agents[existingIndex] = {
-        ...this.knowledgeBase.agents[existingIndex],
-        ...agent,
-        capabilities: [...new Set([...this.knowledgeBase.agents[existingIndex].capabilities, ...agent.capabilities])],
-        dependencies: [...new Set([...this.knowledgeBase.agents[existingIndex].dependencies, ...agent.dependencies])]
-      };
-      return this.knowledgeBase.agents[existingIndex];
-    } else {
-      const newAgent: AgentDefinition = { ...agent, id };
-      this.knowledgeBase.agents.push(newAgent);
-      this.updateMetadata();
-      return newAgent;
+      const existing = this.knowledgeBase.agents[existingIndex];
+      if (existing) {
+        this.knowledgeBase.agents[existingIndex] = {
+          ...existing,
+          ...agent,
+          id: existing.id, // Preserve existing id
+          capabilities: [...new Set([...existing.capabilities, ...agent.capabilities])],
+          dependencies: [...new Set([...existing.dependencies, ...agent.dependencies])]
+        };
+        return this.knowledgeBase.agents[existingIndex];
+      }
     }
+    const newAgent: AgentDefinition = { ...agent, id };
+    this.knowledgeBase.agents.push(newAgent);
+    this.updateMetadata();
+    return newAgent;
   }
 
   /**
@@ -156,18 +159,21 @@ export class KnowledgeBaseManager {
     
     if (existingIndex >= 0) {
       // Merge with existing function
-      this.knowledgeBase.functions[existingIndex] = {
-        ...this.knowledgeBase.functions[existingIndex],
-        ...func,
-        examples: [...new Set([...this.knowledgeBase.functions[existingIndex].examples, ...func.examples])]
-      };
-      return this.knowledgeBase.functions[existingIndex];
-    } else {
-      const newFunc: FunctionDefinition = { ...func, id };
-      this.knowledgeBase.functions.push(newFunc);
-      this.updateMetadata();
-      return newFunc;
+      const existing = this.knowledgeBase.functions[existingIndex];
+      if (existing) {
+        this.knowledgeBase.functions[existingIndex] = {
+          ...existing,
+          ...func,
+          id: existing.id, // Preserve existing id
+          examples: [...new Set([...existing.examples, ...func.examples])]
+        };
+        return this.knowledgeBase.functions[existingIndex];
+      }
     }
+    const newFunc: FunctionDefinition = { ...func, id };
+    this.knowledgeBase.functions.push(newFunc);
+    this.updateMetadata();
+    return newFunc;
   }
 
   /**
@@ -281,12 +287,14 @@ export class KnowledgeBaseManager {
     
     // Export functions
     this.knowledgeBase.functions.forEach(func => {
-      lines.push(JSON.stringify({ type: 'function', ...func }));
+      const { type, ...funcWithoutType } = func as any;
+      lines.push(JSON.stringify({ type: 'function', ...funcWithoutType }));
     });
     
     // Export relationships
     this.knowledgeBase.relationships.forEach(rel => {
-      lines.push(JSON.stringify({ type: 'relationship', ...rel }));
+      const { type, ...relWithoutType } = rel as any;
+      lines.push(JSON.stringify({ type: 'relationship', ...relWithoutType }));
     });
     
     return lines.join('\n');

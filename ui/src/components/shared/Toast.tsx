@@ -26,16 +26,7 @@ export const Toast: React.FC<{ notification: Notification }> = ({ notification }
   // Safely convert message to string - prevent "entry.split" errors
   const safeMessage = React.useMemo(() => {
     if (!notification.message) return '';
-    if (typeof notification.message === 'string') return notification.message;
-    if (notification.message instanceof Error) {
-      return notification.message.message || String(notification.message);
-    }
-    try {
-      return String(notification.message);
-    } catch (e) {
-      console.error('Failed to convert notification message to string:', e);
-      return 'Error message could not be displayed';
-    }
+    return String(notification.message);
   }, [notification.message]);
 
   return (

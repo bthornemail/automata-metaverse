@@ -3,7 +3,7 @@
  */
 
 export { VirtualWorld } from './VirtualWorld';
-export type { VirtualWorldConfig, VirtualWorldProps } from './VirtualWorld';
+export type { VirtualWorldConfig } from './VirtualWorld';
 
 export { VirtualWorldTerrain } from './VirtualWorldTerrain';
 export type { TerrainConfig } from './VirtualWorldTerrain';
@@ -104,7 +104,7 @@ export { WorldDebug } from './WorldDebug';
 export type { WorldDebugProps } from './WorldDebug';
 
 export { EnhancedVirtualWorld } from './EnhancedVirtualWorld';
-export type { EnhancedVirtualWorldConfig, EnhancedVirtualWorldProps } from './EnhancedVirtualWorld';
+export type { EnhancedVirtualWorldConfig } from './EnhancedVirtualWorld';
 
 export { GlassCard, ModernButton, ModernPanel, ModernInput, ModernToggle, ModernBadge, ModernTooltip } from './ModernUI';
 

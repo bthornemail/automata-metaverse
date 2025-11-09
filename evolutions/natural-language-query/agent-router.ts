@@ -104,6 +104,9 @@ export class AgentRouter {
 
     // Select primary agent (highest confidence)
     const primaryRoute = routes[0];
+    if (!primaryRoute) {
+      throw new Error('No primary route available');
+    }
     const primaryResponse = await this.queryAgent(primaryRoute, intent, conversationId);
 
     // Select additional agents if needed
@@ -129,7 +132,7 @@ export class AgentRouter {
       additionalResponses,
       mergedAnswer,
       confidence,
-      agentsUsed: [primaryRoute.agentName, ...additionalResponses.map(r => r.agentName)]
+      agentsUsed: [primaryRoute?.agentName || 'unknown', ...additionalResponses.map(r => r.agentName)]
     };
   }
 

@@ -13,7 +13,7 @@ import { Card } from '@/components/shared/Card';
 import { nlpService } from '@/services/nlp-service';
 import { tinyMLService } from '@/services/tinyml-service';
 import { databaseService } from '@/services/database-service';
-import { llmService, LLMProviderConfig } from '@/services/llm-service';
+import { llmService, type LLMProviderConfig } from '@/services/llm-service';
 import { nlQueryService } from '@/services/nl-query-service';
 import { chatService, ChatMessage as ChatServiceMessage, ChatParticipant } from '@/services/chat-service';
 import UnifiedEditor from '@/components/UnifiedEditor';
@@ -47,17 +47,7 @@ interface WebLLMConfig {
   presencePenalty: number;
 }
 
-interface LLMProviderConfig {
-  provider: 'webllm' | 'ollama' | 'openai' | 'opencode';
-  model: string;
-  temperature: number;
-  maxTokens: number;
-  topP: number;
-  // Provider-specific
-  ollamaUrl?: string;
-  openaiApiKey?: string;
-  opencodeEndpoint?: string;
-}
+// LLMProviderConfig is imported from @/services/llm-service
 
 interface EvolutionMetrics {
   totalMutations: number;
@@ -453,11 +443,7 @@ const AIPortal: React.FC = () => {
       
       addEvolutionLog(`Loading model: ${config.model}`);
       const engine = await CreateMLCEngine(config.model, { 
-        initProgressCallback,
-        // Use a smaller model if the default fails
-        model: config.model,
-        // Enable verbose logging for debugging
-        verbose: true
+        initProgressCallback
       });
       
       webLLMRef.current = engine;
@@ -1625,7 +1611,10 @@ Generate a helpful, informative response:
           llmProviderConfig={llmProviderConfig}
           onLLMProviderConfigChange={(newConfig) => {
             // Create a new object reference to ensure React detects the change
-            setLlmProviderConfig({ ...newConfig });
+            setLlmProviderConfig({ 
+              ...newConfig,
+              topP: newConfig.topP ?? 0.9 // Ensure topP is provided
+            });
             initializeLLMProvider();
           }}
           onConfigChange={(config) => {
@@ -1661,6 +1650,7 @@ Generate a helpful, informative response:
                     setLlmProviderConfig(prev => ({
                       ...prev,
                       provider,
+                      topP: prev.topP ?? 0.9, // Ensure topP is provided
                       // Set default models for each provider
                       model: provider === 'ollama' ? 'llama2' :
                              provider === 'openai' ? 'gpt-3.5-turbo' :
@@ -2239,7 +2229,10 @@ Generate a helpful, informative response:
                   config={llmProviderConfig}
                   onConfigChange={(newConfig) => {
                     // Create a new object reference to ensure React detects the change
-                    setLlmProviderConfig({ ...newConfig });
+                    setLlmProviderConfig({ 
+                      ...newConfig,
+                      topP: newConfig.topP ?? 0.9 // Ensure topP is provided
+                    });
                     initializeLLMProvider();
                   }}
                 />
@@ -2274,7 +2267,10 @@ Generate a helpful, informative response:
         config={llmProviderConfig}
         onConfigChange={(newConfig) => {
           // Create a new object reference to ensure React detects the change
-          setLlmProviderConfig({ ...newConfig });
+          setLlmProviderConfig({ 
+            ...newConfig,
+            topP: newConfig.topP ?? 0.9 // Ensure topP is provided
+          });
           initializeLLMProvider();
         }}
       />

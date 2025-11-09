@@ -54,12 +54,17 @@ function analyzeReasoningQuality(snapshots: Snapshot[]): void {
 
   const first = snapshots[0];
   const last = snapshots[snapshots.length - 1];
+  if (!first || !last) {
+    console.log('⚠️  Invalid snapshot data');
+    return;
+  }
   const totalTime = (last.timestamp - first.timestamp) / 1000; // seconds
   
   console.log(`\n📊 Overview:`);
   console.log(`   Snapshots: ${snapshots.length}`);
   console.log(`   Time Span: ${totalTime.toFixed(1)} seconds`);
-  console.log(`   Interval: ${(totalTime / (snapshots.length - 1)).toFixed(1)} seconds average`);
+  const interval = snapshots.length > 1 ? (totalTime / (snapshots.length - 1)).toFixed(1) : '0';
+  console.log(`   Interval: ${interval} seconds average`);
   
   console.log(`\n📈 State Changes:`);
   const objectDelta = last.automatonState.objectCount - first.automatonState.objectCount;
@@ -79,9 +84,9 @@ function analyzeReasoningQuality(snapshots: Snapshot[]): void {
   console.log(`   Lines: ${first.fileStats.lineCount} → ${last.fileStats.lineCount} (${lineDelta > 0 ? '+' : ''}${lineDelta})`);
   
   // Calculate rates
-  const objectsPerSecond = objectDelta / totalTime;
-  const modificationsPerSecond = modificationDelta / totalTime;
-  const linesPerSecond = lineDelta / totalTime;
+  const objectsPerSecond = totalTime > 0 ? objectDelta / totalTime : 0;
+  const modificationsPerSecond = totalTime > 0 ? modificationDelta / totalTime : 0;
+  const linesPerSecond = totalTime > 0 ? lineDelta / totalTime : 0;
   
   console.log(`\n⚡ Activity Rates:`);
   console.log(`   Objects/Second: ${objectsPerSecond.toFixed(3)}`);
@@ -91,16 +96,18 @@ function analyzeReasoningQuality(snapshots: Snapshot[]): void {
   // Analyze reasoning patterns
   console.log(`\n🧠 Reasoning Patterns:`);
   
-  const dimensionProgressions = snapshots.filter((s, i) => 
-    i > 0 && s.automatonState.currentDimension > snapshots[i - 1].automatonState.currentDimension
-  ).length;
+  const dimensionProgressions = snapshots.filter((s, i) => {
+    if (i === 0) return false;
+    const prev = snapshots[i - 1];
+    return prev && s.automatonState.currentDimension > prev.automatonState.currentDimension;
+  }).length;
   
   const consistentPatterns = snapshots.filter(s => 
     s.reasoning.patternConsistency === 'expanding' || s.reasoning.patternConsistency === 'evolving'
   ).length;
   
   const activeSnapshots = snapshots.filter((s, i) => 
-    i > 0 && (s.reasoning.newObjects > 0 || s.reasoning.newModifications > 0)
+    i > 0 && (s.reasoning?.newObjects > 0 || s.reasoning?.newModifications > 0)
   ).length;
   
   console.log(`   Dimension Progressions: ${dimensionProgressions}`);
@@ -130,19 +137,21 @@ function analyzeReasoningQuality(snapshots: Snapshot[]): void {
   }
   
   // Detailed comparison
-  console.log(`\n📋 Detailed Comparison (First vs Last):`);
-  console.log(`   Time: ${first.isoTime} → ${last.isoTime}`);
-  console.log(`   Objects: ${first.automatonState.objectCount} → ${last.automatonState.objectCount}`);
-  console.log(`   Modifications: ${first.automatonState.selfModificationCount} → ${last.automatonState.selfModificationCount}`);
-  console.log(`   Dimension: ${first.automatonState.currentDimension}D → ${last.automatonState.currentDimension}D`);
-  
-  // Show progression timeline
-  if (snapshots.length > 2) {
-    console.log(`\n📅 Progression Timeline:`);
-    snapshots.forEach((snapshot, idx) => {
-      const timeFromStart = ((snapshot.timestamp - first.timestamp) / 1000).toFixed(1);
-      console.log(`   ${idx + 1}. [${timeFromStart}s] Objects: ${snapshot.automatonState.objectCount}, Mods: ${snapshot.automatonState.selfModificationCount}, Dim: ${snapshot.automatonState.currentDimension}D`);
-    });
+  if (first && last) {
+    console.log(`\n📋 Detailed Comparison (First vs Last):`);
+    console.log(`   Time: ${first.isoTime} → ${last.isoTime}`);
+    console.log(`   Objects: ${first.automatonState.objectCount} → ${last.automatonState.objectCount}`);
+    console.log(`   Modifications: ${first.automatonState.selfModificationCount} → ${last.automatonState.selfModificationCount}`);
+    console.log(`   Dimension: ${first.automatonState.currentDimension}D → ${last.automatonState.currentDimension}D`);
+    
+    // Show progression timeline
+    if (snapshots.length > 2) {
+      console.log(`\n📅 Progression Timeline:`);
+      snapshots.forEach((snapshot, idx) => {
+        const timeFromStart = ((snapshot.timestamp - first.timestamp) / 1000).toFixed(1);
+        console.log(`   ${idx + 1}. [${timeFromStart}s] Objects: ${snapshot.automatonState.objectCount}, Mods: ${snapshot.automatonState.selfModificationCount}, Dim: ${snapshot.automatonState.currentDimension}D`);
+      });
+    }
   }
   
   console.log('\n' + '='.repeat(80));

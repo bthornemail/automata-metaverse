@@ -6,8 +6,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { MessageSquare, Send, Users, X } from 'lucide-react';
-import { ChatMessage, ChatParticipant } from '@/types';
-import { chatService } from '@/services/chat-service';
+import { chatService, ChatMessage as ChatServiceMessage, ChatParticipant } from '@/services/chat-service';
+import type { ChatMessage } from '@/types';
 
 interface ChatPanelProps {
   onClose?: () => void;
@@ -22,19 +22,32 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ onClose, className = '' })
   const [directMessages, setDirectMessages] = useState<Map<string, ChatMessage[]>>(new Map());
   const [inputMessage, setInputMessage] = useState('');
 
+  // Helper function to convert ChatServiceMessage to ChatMessage
+  const convertToChatMessage = (msg: ChatServiceMessage): ChatMessage => {
+    return {
+      role: msg.type === 'agent' ? 'agent' : 'user',
+      content: msg.content,
+      timestamp: msg.timestamp,
+      citations: msg.metadata?.citations,
+      confidence: msg.metadata?.confidence,
+    };
+  };
+
   useEffect(() => {
     // Initialize chat participants
     const participants = chatService.getParticipants();
     setChatParticipants(participants);
     
-    // Initialize messages
-    setBroadcastMessages(chatService.getBroadcastMessages());
+    // Initialize messages - convert from ChatServiceMessage to ChatMessage
+    const serviceMessages = chatService.getBroadcastMessages();
+    setBroadcastMessages(serviceMessages.map(convertToChatMessage));
+    
     const allDirectMessages = new Map<string, ChatMessage[]>();
     participants.forEach(participant => {
       const messages = chatService.getDirectMessages(participant.id);
       if (messages.length > 0) {
         const conversationId = `${chatService.getCurrentUserId()}-${participant.id}`;
-        allDirectMessages.set(conversationId, messages);
+        allDirectMessages.set(conversationId, messages.map(convertToChatMessage));
       }
     });
     setDirectMessages(allDirectMessages);
@@ -46,7 +59,8 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ onClose, className = '' })
     
     // Subscribe to broadcast messages
     const unsubscribeBroadcast = chatService.onMessage('broadcast', null, (message) => {
-      setBroadcastMessages(chatService.getBroadcastMessages());
+      const serviceMessages = chatService.getBroadcastMessages();
+      setBroadcastMessages(serviceMessages.map(convertToChatMessage));
     });
     
     // Subscribe to direct messages
@@ -58,7 +72,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ onClose, className = '' })
       setDirectMessages(prev => {
         const newMap = new Map(prev);
         const messages = newMap.get(conversationId) || [];
-        newMap.set(conversationId, [...messages, message]);
+        newMap.set(conversationId, [...messages, convertToChatMessage(message)]);
         return newMap;
       });
     });
@@ -190,26 +204,14 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ onClose, className = '' })
             {message.citations && message.citations.length > 0 && (
               <div className="mt-2 text-xs">
                 <div className="text-gray-400 mb-1">Sources:</div>
-                {message.citations.map((citation, i) => (
+                {message.citations.map((citation, i: number) => (
                   <a
                     key={i}
                     href={citation.url || '#'}
                     className="text-blue-400 hover:underline block"
                   >
-                    {citation.title || citation.source} ({citation.type})
+                    {citation.title || citation.source} ({citation.type || 'unknown'})
                   </a>
-                ))}
-              </div>
-            )}
-            {message.followUpSuggestions && message.followUpSuggestions.length > 0 && (
-              <div className="mt-2 flex flex-wrap gap-1">
-                {message.followUpSuggestions.map((suggestion, i) => (
-                  <button
-                    key={i}
-                    className="text-xs px-2 py-1 bg-gray-700 rounded hover:bg-gray-600 text-gray-300"
-                  >
-                    {suggestion}
-                  </button>
                 ))}
               </div>
             )}

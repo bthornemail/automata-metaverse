@@ -30,7 +30,7 @@ export interface VirtualWorldConfig {
   showEnvironment?: boolean;
 }
 
-interface VirtualWorldProps {
+export interface VirtualWorldProps {
   config?: VirtualWorldConfig;
   onAvatarClick?: (avatar: AvatarConfig) => void;
   onBuildingClick?: (building: BuildingConfig) => void;

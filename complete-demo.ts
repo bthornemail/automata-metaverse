@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { AdvancedSelfReferencingAutomaton } from './advanced-automaton';
+import { AdvancedSelfReferencingAutomaton } from './evolutions/advanced-automaton/advanced-automaton';
 import { readFileSync } from 'fs';
 
 console.log('🔄 Self-Referencing JSONL Automaton - Complete Demonstration');

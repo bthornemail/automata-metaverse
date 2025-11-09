@@ -35,7 +35,7 @@ export const GlassCard: React.FC<{
 
 // Modern button component
 export const ModernButton: React.FC<{
-  children: React.ReactNode;
+  children?: React.ReactNode;
   onClick?: () => void;
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
@@ -43,7 +43,7 @@ export const ModernButton: React.FC<{
   disabled?: boolean;
   className?: string;
 }> = ({ 
-  children, 
+  children = null, 
   onClick, 
   variant = 'primary', 
   size = 'md',

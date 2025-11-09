@@ -230,12 +230,17 @@ const LightningEffect: React.FC<{
   const flashRef = useRef<THREE.Mesh>(null);
 
   useFrame((state) => {
-    if (flashRef.current) {
-      // Random lightning flashes
-      if (Math.random() < 0.01 * intensity) {
-        flashRef.current.material.opacity = 0.3;
-      } else {
-        flashRef.current.material.opacity = Math.max(0, flashRef.current.material.opacity - 0.1);
+    if (flashRef.current && flashRef.current.material) {
+      const material = Array.isArray(flashRef.current.material) 
+        ? flashRef.current.material[0] 
+        : flashRef.current.material;
+      if (material && 'opacity' in material) {
+        // Random lightning flashes
+        if (Math.random() < 0.01 * intensity) {
+          material.opacity = 0.3;
+        } else {
+          material.opacity = Math.max(0, (material.opacity as number) - 0.1);
+        }
       }
     }
   });

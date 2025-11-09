@@ -3,7 +3,7 @@
  */
 
 import { AutomatonController } from '../../../src/server/automaton-controller';
-import { AdvancedSelfReferencingAutomaton } from '../../../advanced-automaton';
+import { AdvancedSelfReferencingAutomaton } from '../../../evolutions/advanced-automaton/advanced-automaton';
 import { Server as SocketIOServer } from 'socket.io';
 
 // Mock automaton - use any to avoid type issues

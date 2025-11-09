@@ -4,7 +4,7 @@
  * Handles automaton control functions (start, stop, execute actions, etc.)
  */
 
-import { AdvancedSelfReferencingAutomaton } from '../../advanced-automaton';
+import { AdvancedSelfReferencingAutomaton } from '../../evolutions/advanced-automaton/advanced-automaton';
 import { Server as SocketIOServer } from 'socket.io';
 
 export interface AutomatonState {
@@ -169,8 +169,6 @@ export class AutomatonController {
       let errorMessage: string;
       try {
         errorMessage = error instanceof Error ? error.message : String(error);
-      } catch (e) {
-        errorMessage = String(error);
       } catch (e) {
         errorMessage = 'Unknown error occurred';
       }

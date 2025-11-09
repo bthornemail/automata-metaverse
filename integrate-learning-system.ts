@@ -10,10 +10,12 @@
  */
 
 import { DocumentKnowledgeExtractor } from './evolutions/document-knowledge-extractor/document-knowledge-extractor';
-import { KnowledgeBaseStorage } from './evolutions/document-knowledge-extractor/knowledge-base';
+import { KnowledgeBaseManager } from './evolutions/document-knowledge-extractor/knowledge-base';
 import { NLQueryEngine } from './evolutions/natural-language-query/nl-query-engine';
 import { ConversationInterface } from './evolutions/natural-language-query/conversation-interface';
-import { generateVariant, VARIANT_CONFIGS } from './generate-variant-automaton-files';
+// Note: generate-variant-automaton-files.ts doesn't export generateVariant or VARIANT_CONFIGS
+// This import is commented out - the file can be run directly instead
+// import * as variantGenerator from './generate-variant-automaton-files';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -32,23 +34,12 @@ async function integrateSystems(): Promise<void> {
   if (!fs.existsSync(knowledgeBasePath)) {
     console.log('   Knowledge base not found, extracting from docs...');
     const extractor = new DocumentKnowledgeExtractor(docsPath);
-    const result = await extractor.extractKnowledge();
+    await extractor.extractAll();
+    const knowledgeBase = extractor.getKnowledgeBase();
     
-    const knowledgeBase: KnowledgeBaseStorage['knowledgeBase'] = {
-      facts: result.facts,
-      rules: result.rules,
-      agents: result.agents,
-      functions: result.functions,
-      codeExamples: result.codeExamples,
-      metadata: {
-        version: '1.0',
-        generated: new Date().toISOString(),
-        source: docsPath
-      }
-    };
-    
-    const storage = new KnowledgeBaseStorage(knowledgeBase);
-    storage.saveToFile(knowledgeBasePath);
+    // Save to JSONL file
+    const jsonl = knowledgeBase.exportToJSONL();
+    fs.writeFileSync(knowledgeBasePath, jsonl);
     console.log(`   ✅ Knowledge base created: ${knowledgeBasePath}`);
   } else {
     console.log(`   ✅ Knowledge base already exists: ${knowledgeBasePath}`);
@@ -56,30 +47,39 @@ async function integrateSystems(): Promise<void> {
   
   // Step 2: Generate variant-specific automaton files
   console.log('\n🔨 Step 2: Generating variant-specific automaton files...\n');
-  
-  for (const config of VARIANT_CONFIGS) {
-    try {
-      await generateVariant(config);
-    } catch (error) {
-      console.warn(`   ⚠️  Failed to generate ${config.name}: ${error}`);
-    }
-  }
-  
-  console.log('\n   ✅ Variant files generated');
+  console.log('   Note: Run generate-variant-automaton-files.ts separately to generate variants');
+  console.log('   Command: tsx generate-variant-automaton-files.ts');
+  console.log('\n   ✅ Variant generation skipped (run separately)');
   
   // Step 3: Show knowledge base statistics
   console.log('\n📊 Step 3: Knowledge Base Statistics\n');
   
-  const knowledgeBase = KnowledgeBaseStorage.loadFromFile(knowledgeBasePath);
-  const stats = knowledgeBase.getStatistics();
+    const jsonl = fs.readFileSync(knowledgeBasePath, 'utf-8');
+    const knowledgeBase = new KnowledgeBaseManager();
+    knowledgeBase.loadFromJSONL(jsonl);
+    const kb = knowledgeBase.getKnowledgeBase();
   
-  console.log(`   Total Facts: ${stats.totalFacts}`);
-  console.log(`   Total Rules: ${stats.totalRules}`);
-  console.log(`   Total Agents: ${stats.totalAgents}`);
-  console.log(`   Total Functions: ${stats.totalFunctions}`);
-  console.log(`   Total Examples: ${stats.totalExamples}`);
-  console.log(`   Rules by Keyword:`, stats.rulesByKeyword);
-  console.log(`   Agents by Dimension:`, stats.agentsByDimension);
+    console.log(`   Total Facts: ${kb.facts.length}`);
+    console.log(`   Total Rules: ${kb.rules.length}`);
+    console.log(`   Total Agents: ${kb.agents.length}`);
+    console.log(`   Total Functions: ${kb.functions.length}`);
+    const examples = kb.facts.filter(f => f.type === 'example');
+    console.log(`   Total Examples: ${examples.length}`);
+    
+    // Calculate rules by keyword
+    const rulesByKeyword: Record<string, number> = {};
+    kb.rules.forEach(r => {
+      rulesByKeyword[r.rfc2119Keyword] = (rulesByKeyword[r.rfc2119Keyword] || 0) + 1;
+    });
+    console.log(`   Rules by Keyword:`, rulesByKeyword);
+    
+    // Calculate agents by dimension
+    const agentsByDimension: Record<string, number> = {};
+    kb.agents.forEach(a => {
+      const dim = a.dimension || 'no-dimension';
+      agentsByDimension[dim] = (agentsByDimension[dim] || 0) + 1;
+    });
+    console.log(`   Agents by Dimension:`, agentsByDimension);
   
   // Step 4: Demonstrate NL query
   console.log('\n💬 Step 4: Natural Language Query Demo\n');
@@ -121,17 +121,39 @@ if (require.main === module) {
       process.exit(1);
     }
     
-    const knowledgeBase = KnowledgeBaseStorage.loadFromFile(knowledgeBasePath);
+    const jsonl = fs.readFileSync(knowledgeBasePath, 'utf-8');
+    const knowledgeBase = new KnowledgeBaseManager();
+    knowledgeBase.loadFromJSONL(jsonl);
     const queryEngine = new NLQueryEngine(knowledgeBase);
-    const conversation = new ConversationInterface(queryEngine);
+    const conversation = new ConversationInterface(knowledgeBase);
     
-    conversation.start().catch(error => {
-      console.error('❌ Error:', error);
-      process.exit(1);
+    // Start interactive conversation
+    console.log('💬 Interactive Conversation Interface');
+    console.log('Type your questions (or "exit" to quit)\n');
+    
+    const readline = require('readline');
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
     });
+    
+    const askQuestion = () => {
+      rl.question('Q: ', (question: string) => {
+        if (question.toLowerCase() === 'exit' || question.toLowerCase() === 'quit') {
+          rl.close();
+          return;
+        }
+        
+        const answer = conversation.ask(question);
+        console.log(`A: ${answer}\n`);
+        askQuestion();
+      });
+    };
+    
+    askQuestion();
   } else {
     // Run full integration
-    integrateSystems().catch(error => {
+    integrateSystems().catch((error: any) => {
       console.error('❌ Integration error:', error);
       process.exit(1);
     });

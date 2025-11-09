@@ -126,6 +126,16 @@ export interface AgentChat {
   suggestions: string[];
 }
 
+// Chat Participant (exported from chat-service)
+export interface ChatParticipant {
+  id: string;
+  name: string;
+  type: 'human' | 'agent';
+  online: boolean;
+  avatar?: string;
+  dimension?: string;
+}
+
 // Quantum State
 export interface QuantumState {
   qubits: Array<{ id: number; state: Complex[]; probability: number }>;

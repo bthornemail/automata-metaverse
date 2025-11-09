@@ -144,7 +144,8 @@ export class PatternTracker {
     const bestPatterns = this.getBestPatterns(dimension, 1);
     if (bestPatterns.length === 0) return null;
     
-    return bestPatterns[0].pattern;
+    const best = bestPatterns[0];
+    return best ? best.pattern : null;
   }
 
   /**

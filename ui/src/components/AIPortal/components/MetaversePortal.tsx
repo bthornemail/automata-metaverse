@@ -132,8 +132,8 @@ export const MetaversePortal: React.FC<MetaversePortalProps> = ({
     },
     lighting: { 
       enableShadows: true,
-      ambientIntensity: 0.6,
-      directionalIntensity: 1
+      ambientIntensity: 0.6
+      // Note: directionalIntensity is not part of AdvancedLightingConfig
     },
     camera: { 
       mode: 'orbital', 
@@ -480,13 +480,17 @@ export const MetaversePortal: React.FC<MetaversePortalProps> = ({
                   variant="ghost"
                   size="sm"
                   icon={<Minimize2 className="w-4 h-4" />}
-                />
+                >
+                  {/* Icon-only button */}
+                </ModernButton>
                 <ModernButton
                   onClick={() => setIsFullscreen(!isFullscreen)}
                   variant="ghost"
                   size="sm"
                   icon={isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-                />
+                >
+                  {/* Icon-only button */}
+                </ModernButton>
               </div>
             </div>
 
@@ -570,7 +574,9 @@ export const MetaversePortal: React.FC<MetaversePortalProps> = ({
                 size="md"
                 icon={<Mic className="w-4 h-4" />}
                 disabled
-              />
+              >
+                {/* Icon-only button */}
+              </ModernButton>
             </ModernTooltip>
           </div>
 

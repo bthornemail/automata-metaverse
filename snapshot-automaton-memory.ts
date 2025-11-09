@@ -9,10 +9,7 @@ import * as path from 'path';
 import { spawn, ChildProcess } from 'child_process';
 import * as os from 'os';
 
-// Type declaration for global.gc (requires --expose-gc flag)
-declare global {
-  var gc: (() => void) | undefined;
-}
+// Note: global.gc is already declared by @types/node as NodeJS.GCFunction | undefined
 
 interface MemorySnapshot {
   timestamp: number;
@@ -143,7 +140,7 @@ function getSystemMemory(): { total: number; free: number } {
   return { total, free };
 }
 
-function assessMemoryPressure(memory: NodeJS.MemoryUsage): 'low' | 'medium' | 'high' | 'critical' {
+function assessMemoryPressure(memory: MemorySnapshot['memory']): 'low' | 'medium' | 'high' | 'critical' {
   const heapUsed = memory.heapUsed;
   
   if (heapUsed < MEMORY_THRESHOLD_LOW) return 'low';
@@ -316,7 +313,7 @@ async function takeSnapshot(): Promise<MemorySnapshot> {
   snapshot.isoTime = isoTime;
   snapshot.memory.heapUsed = memory.heapUsed;
   snapshot.memory.heapTotal = memory.heapTotal;
-  snapshot.memory.external = memory.external;
+  snapshot.memory.external = memory.external || 0;
   snapshot.memory.rss = memory.rss;
   snapshot.memory.systemTotal = systemMem.total;
   snapshot.memory.systemFree = systemMem.free;
@@ -329,7 +326,7 @@ async function takeSnapshot(): Promise<MemorySnapshot> {
   snapshot.fileStats.lineCount = lineCount;
   snapshot.performance.cpuUsage = cpuUsage;
   snapshot.performance.uptime = process.uptime();
-  snapshot.reasoning.memoryPressure = assessMemoryPressure(memory);
+  snapshot.reasoning.memoryPressure = assessMemoryPressure(snapshot.memory);
 
   // Analyze reasoning compared to previous
   snapshot.reasoning = analyzeReasoning(snapshot, previousSnapshot);
@@ -466,7 +463,7 @@ function printSnapshot(snapshot: MemorySnapshot): void {
 
 async function main() {
   console.log('🔍 Starting Memory-Aware Automaton Snapshot Monitor');
-  console.log(`   Interval: ${SNAPSHOT_INTERVAL}ms`);
+  console.log(`   Base Interval: ${BASE_SNAPSHOT_INTERVAL}ms`);
   console.log(`   File: ${AUTOMATON_FILE}`);
   console.log(`   Snapshots will be saved to: ${SNAPSHOT_DIR}\n`);
   console.log(`   Memory Thresholds:`);
@@ -488,16 +485,20 @@ async function main() {
   const cleanupInterval = setInterval(() => {
     cleanupOldSnapshots();
     // Trigger GC if available (Node.js with --expose-gc flag)
-    if (global.gc) {
-      global.gc();
+    if (typeof gc !== 'undefined' && gc) {
+      gc();
     }
   }, CLEANUP_INTERVAL);
 
   // Handle graceful shutdown
   process.on('SIGINT', () => {
     console.log('\n\n🛑 Stopping memory-aware snapshot monitor...');
-    clearInterval(interval);
-    clearInterval(cleanupInterval);
+    if (snapshotIntervalHandle) {
+      clearInterval(snapshotIntervalHandle);
+    }
+    if (cleanupInterval) {
+      clearInterval(cleanupInterval);
+    }
     
     // Final cleanup
     cleanupOldSnapshots();
@@ -526,6 +527,9 @@ async function main() {
   console.log(`   Activity threshold: ${MIN_ACTIVITY_THRESHOLD} objects/modifications`);
   console.log(`   Idle threshold: ${IDLE_DURATION_THRESHOLD}ms`);
   console.log('   Press Ctrl+C to stop\n');
+  
+  // Keep reference to cleanup interval for proper cleanup
+  (global as any).cleanupInterval = cleanupInterval;
 }
 
 if (require.main === module) {

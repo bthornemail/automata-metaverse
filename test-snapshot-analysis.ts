@@ -77,14 +77,16 @@ function analyzeSnapshotProgression(snapshots: MemorySnapshot[]): void {
   
   for (const point of samplePoints) {
     const s = snapshots[point.index];
+    if (!s) continue;
     const memMB = s.memory.heapUsed / 1024 / 1024;
+    const pressure = s.reasoning.memoryPressure || 'unknown';
     console.log(
       point.label.padEnd(15) +
       memMB.toFixed(2).padEnd(15) +
       s.automatonState.objectCount.toString().padEnd(12) +
       s.automatonState.selfModificationCount.toString().padEnd(12) +
       s.automatonState.currentDimension.toString().padEnd(12) +
-      s.reasoning.memoryPressure.toUpperCase()
+      pressure.toUpperCase()
     );
   }
   
@@ -96,15 +98,20 @@ function analyzeSnapshotProgression(snapshots: MemorySnapshot[]): void {
   for (let i = 0; i < 4; i++) {
     const startIdx = i * phaseSize;
     const endIdx = Math.min((i + 1) * phaseSize, snapshots.length - 1);
-    const startMem = snapshots[startIdx].memory.heapUsed / 1024 / 1024;
-    const endMem = snapshots[endIdx].memory.heapUsed / 1024 / 1024;
+    const startSnapshot = snapshots[startIdx];
+    const endSnapshot = snapshots[endIdx];
+    if (!startSnapshot || !endSnapshot) continue;
+    
+    const startMem = startSnapshot.memory.heapUsed / 1024 / 1024;
+    const endMem = endSnapshot.memory.heapUsed / 1024 / 1024;
     const growth = endMem - startMem;
-    const growthRate = growth / ((snapshots[endIdx].timestamp - snapshots[startIdx].timestamp) / 1000);
+    const timeDiff = (endSnapshot.timestamp - startSnapshot.timestamp) / 1000;
+    const growthRate = timeDiff > 0 ? growth / timeDiff : 0;
     
     console.log(`Phase ${i + 1} (${startIdx} → ${endIdx}):`);
     console.log(`  Memory: ${startMem.toFixed(2)}MB → ${endMem.toFixed(2)}MB (${growth > 0 ? '+' : ''}${growth.toFixed(2)}MB)`);
     console.log(`  Growth Rate: ${growthRate.toFixed(4)}MB/sec`);
-    console.log(`  Objects: ${snapshots[startIdx].automatonState.objectCount} → ${snapshots[endIdx].automatonState.objectCount}`);
+    console.log(`  Objects: ${startSnapshot.automatonState.objectCount} → ${endSnapshot.automatonState.objectCount}`);
     console.log();
   }
   
@@ -128,10 +135,17 @@ function analyzeSnapshotProgression(snapshots: MemorySnapshot[]): void {
   console.log('\n💾 Memory Pressure Timeline:');
   console.log('─'.repeat(80));
   const pressureTransitions: Array<{ from: string; to: string; at: number }> = [];
-  let lastPressure = snapshots[0].reasoning.memoryPressure;
+  const firstSnapshot = snapshots[0];
+  if (!firstSnapshot) {
+    console.log('No snapshots available');
+    return;
+  }
+  let lastPressure = firstSnapshot.reasoning.memoryPressure || 'unknown';
   
   for (let i = 1; i < snapshots.length; i++) {
-    const currentPressure = snapshots[i].reasoning.memoryPressure;
+    const snapshot = snapshots[i];
+    if (!snapshot) continue;
+    const currentPressure = snapshot.reasoning.memoryPressure || 'unknown';
     if (currentPressure !== lastPressure) {
       pressureTransitions.push({
         from: lastPressure,

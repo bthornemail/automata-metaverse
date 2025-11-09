@@ -95,7 +95,7 @@ router.post('/ask', async (req, res) => {
     // Ask question
     const response = await conversation.ask(question);
 
-    res.json({
+    return res.json({
       success: true,
       data: {
         answer: response.answer,
@@ -109,7 +109,7 @@ router.post('/ask', async (req, res) => {
     });
   } catch (error) {
     console.error('Error in /api/nl-query/ask:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
       timestamp: Date.now()
@@ -138,14 +138,14 @@ router.get('/history/:conversationId', async (req, res) => {
 
     const history = conversation.getHistory();
 
-    res.json({
+    return res.json({
       success: true,
       data: history,
       timestamp: Date.now()
     });
   } catch (error) {
     console.error('Error in /api/nl-query/history:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
       timestamp: Date.now()
@@ -165,7 +165,7 @@ router.post('/conversation', async (req, res) => {
 
     conversationInterfaces.set(conversationId, conversation);
 
-    res.json({
+    return res.json({
       success: true,
       data: {
         conversationId,
@@ -175,7 +175,7 @@ router.post('/conversation', async (req, res) => {
     });
   } catch (error) {
     console.error('Error in /api/nl-query/conversation:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
       timestamp: Date.now()
@@ -195,14 +195,14 @@ router.delete('/conversation/:conversationId', async (req, res) => {
       conversationInterfaces.delete(conversationId);
     }
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Conversation deleted',
       timestamp: Date.now()
     });
   } catch (error) {
     console.error('Error in /api/nl-query/conversation DELETE:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
       timestamp: Date.now()
@@ -231,14 +231,14 @@ router.post('/conversation/:conversationId/clear', async (req, res) => {
 
     conversation.clearHistory();
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Conversation history cleared',
       timestamp: Date.now()
     });
   } catch (error) {
     console.error('Error in /api/nl-query/conversation/clear:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
       timestamp: Date.now()

@@ -95,7 +95,12 @@ export const WorldSettings: React.FC<WorldSettingsProps> = ({
                         <ModernInput
                           label="Max Avatars"
                           value={settings.maxAvatars ?? 50}
-                          onChange={(v) => updateSetting('maxAvatars', v)}
+                          onChange={(v) => {
+                            const numValue = typeof v === 'string' ? parseInt(v, 10) : v;
+                            if (!isNaN(numValue)) {
+                              updateSetting('maxAvatars', numValue);
+                            }
+                          }}
                           type="number"
                           min={1}
                           max={200}
@@ -103,7 +108,12 @@ export const WorldSettings: React.FC<WorldSettingsProps> = ({
                         <ModernInput
                           label="Max Buildings"
                           value={settings.maxBuildings ?? 100}
-                          onChange={(v) => updateSetting('maxBuildings', v)}
+                          onChange={(v) => {
+                            const numValue = typeof v === 'string' ? parseInt(v, 10) : v;
+                            if (!isNaN(numValue)) {
+                              updateSetting('maxBuildings', numValue);
+                            }
+                          }}
                           type="number"
                           min={1}
                           max={500}
@@ -148,7 +158,12 @@ export const WorldSettings: React.FC<WorldSettingsProps> = ({
                         <ModernInput
                           label="Particle Count"
                           value={settings.particleCount ?? 1000}
-                          onChange={(v) => updateSetting('particleCount', v)}
+                          onChange={(v) => {
+                            const numValue = typeof v === 'string' ? parseInt(v, 10) : v;
+                            if (!isNaN(numValue)) {
+                              updateSetting('particleCount', numValue);
+                            }
+                          }}
                           type="range"
                           min={0}
                           max={10000}
@@ -168,7 +183,12 @@ export const WorldSettings: React.FC<WorldSettingsProps> = ({
                         <ModernInput
                           label="World Size"
                           value={settings.worldSize ?? 200}
-                          onChange={(v) => updateSetting('worldSize', v)}
+                          onChange={(v) => {
+                            const numValue = typeof v === 'string' ? parseInt(v, 10) : v;
+                            if (!isNaN(numValue)) {
+                              updateSetting('worldSize', numValue);
+                            }
+                          }}
                           type="range"
                           min={50}
                           max={1000}
@@ -177,7 +197,12 @@ export const WorldSettings: React.FC<WorldSettingsProps> = ({
                         <ModernInput
                           label="Zone Count"
                           value={settings.zoneCount ?? 5}
-                          onChange={(v) => updateSetting('zoneCount', v)}
+                          onChange={(v) => {
+                            const numValue = typeof v === 'string' ? parseInt(v, 10) : v;
+                            if (!isNaN(numValue)) {
+                              updateSetting('zoneCount', numValue);
+                            }
+                          }}
                           type="number"
                           min={1}
                           max={20}
@@ -208,7 +233,12 @@ export const WorldSettings: React.FC<WorldSettingsProps> = ({
                         <ModernInput
                           label="Sync Interval (ms)"
                           value={settings.syncInterval ?? 100}
-                          onChange={(v) => updateSetting('syncInterval', v)}
+                          onChange={(v) => {
+                            const numValue = typeof v === 'string' ? parseInt(v, 10) : v;
+                            if (!isNaN(numValue)) {
+                              updateSetting('syncInterval', numValue);
+                            }
+                          }}
                           type="range"
                           min={10}
                           max={1000}

@@ -37,7 +37,7 @@ export const AvatarAnimationController: React.FC<AvatarAnimationControllerProps>
 
     // Create actions for each animation
     gltf.animations.forEach((clip: THREE.AnimationClip) => {
-      const action = mixer.clipAction(clip);
+      const action = mixer.clipAction(clip, scene);
       action.setLoop(THREE.LoopRepeat);
       actionsRef.current.set(clip.name, action);
     });

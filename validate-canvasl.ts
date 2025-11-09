@@ -50,7 +50,9 @@ function validateCanvasLFile(filePath: string): ValidationResult {
   let hasBlankAfterDirectives = false;
 
   for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim();
+    const rawLine = lines[i];
+    if (!rawLine) continue;
+    const line = rawLine.trim();
     const lineNum = i + 1;
 
     // Skip empty lines
@@ -71,14 +73,20 @@ function validateCanvasLFile(filePath: string): ValidationResult {
         
         // Validate directive format
         const directiveMatch = line.match(/^@([a-zA-Z_][a-zA-Z0-9_-]*):\s*(.+)$/);
-        if (!directiveMatch) {
+        if (!directiveMatch || directiveMatch.length < 3) {
           result.errors.push(`Line ${lineNum}: Invalid directive format: ${line}`);
           result.valid = false;
         } else {
-          const [, name, value] = directiveMatch;
+          const name = directiveMatch[1];
+          const value = directiveMatch[2];
+          if (!name || value === undefined) {
+            result.errors.push(`Line ${lineNum}: Invalid directive format: ${line}`);
+            result.valid = false;
+            continue;
+          }
           // Check for standard directives
           if (['version', 'schema', 'r5rs-engine', 'dimension'].includes(name)) {
-            // Valid standard directive
+            // Valid standard directive (value is available but not currently validated)
           } else {
             result.warnings.push(`Line ${lineNum}: Custom directive: @${name}`);
           }

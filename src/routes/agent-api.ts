@@ -48,14 +48,22 @@ router.get(
   rateLimiters.general,
   async (req: AuthenticatedRequest, res: Response) => {
     try {
-      const agent = await agentService.getAgent(req.params.id);
-      res.json({
+      const agentId = req.params.id;
+      if (!agentId) {
+        return res.status(400).json({
+          success: false,
+          error: 'Agent ID is required',
+          timestamp: Date.now()
+        });
+      }
+      const agent = await agentService.getAgent(agentId);
+      return res.json({
         success: true,
         data: agent,
         timestamp: Date.now()
       });
     } catch (error) {
-      res.status(404).json({
+      return res.status(404).json({
         success: false,
         error: error instanceof Error ? error.message : 'Agent not found',
         timestamp: Date.now()
@@ -91,7 +99,7 @@ router.post(
         timeout
       });
 
-      res.json({
+      return res.json({
         success: result.success,
         data: result.result,
         error: result.error,
@@ -101,7 +109,7 @@ router.post(
         timestamp: Date.now()
       });
     } catch (error) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         error: error instanceof Error ? error.message : 'Execution failed',
         timestamp: Date.now()
@@ -120,14 +128,22 @@ router.get(
   rateLimiters.general,
   async (req: AuthenticatedRequest, res: Response) => {
     try {
-      const status = await agentService.getAgentStatus(req.params.id);
-      res.json({
+      const agentId = req.params.id;
+      if (!agentId) {
+        return res.status(400).json({
+          success: false,
+          error: 'Agent ID is required',
+          timestamp: Date.now()
+        });
+      }
+      const status = await agentService.getAgentStatus(agentId);
+      return res.json({
         success: true,
         data: { status },
         timestamp: Date.now()
       });
     } catch (error) {
-      res.status(404).json({
+      return res.status(404).json({
         success: false,
         error: error instanceof Error ? error.message : 'Agent not found',
         timestamp: Date.now()
