@@ -38,6 +38,15 @@ tmp/
 # Test artifacts
 test-results/
 playwright-report/
+**/.playwright-artifacts-*/
+**/test-results/**/*.png
+**/test-results/**/*.webm
+**/test-results/**/*.zip
+**/test-results/**/*.trace
+**/test-results/**/*.md
+coverage/
+*.lcov
+.nyc_output/
 
 # Archives/bundles
 *.tgz

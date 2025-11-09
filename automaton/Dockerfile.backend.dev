@@ -1,0 +1,34 @@
+# Development Dockerfile for Backend
+FROM node:18-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Install development tools
+RUN apk add --no-cache curl
+
+# Copy package files
+COPY package*.json ./
+COPY tsconfig.json ./
+
+# Install all dependencies (including dev)
+RUN npm install
+
+# Copy source code
+COPY *.ts ./
+COPY grok_files/ ./grok_files/
+
+# Expose ports
+EXPOSE 5555 9001 9229
+
+# Add labels
+LABEL maintainer="Automaton Team"
+LABEL version="1.0.0"
+LABEL description="Self-Referencing Automaton Backend API - Development"
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:5555/api/status || exit 1
+
+# Start development server with debugging
+CMD ["npm", "run", "dev"]
