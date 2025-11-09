@@ -2,6 +2,8 @@
 
 A native npm package providing common plugin infrastructure that can be `npm link`ed into both OpenCode and Obsidian plugins. This package provides a unified interface for plugin lifecycle management, hooks, and integration utilities.
 
+**Related Documentation**: See `docs/08-Meta-Log-Plugin/` for complete implementation documentation and `docs/17-Automaton-User-Interactions/` for user interaction specifications.
+
 ## Overview
 
 The Meta-Log Plugin package (`meta-log-plugin`) provides:
@@ -205,6 +207,65 @@ plugin/meta-log-plugin/
 ## Peer Dependencies
 
 - `@opencode-ai/plugin` - OpenCode plugin API (optional)
+
+## Related Documentation
+
+### Core Documentation
+
+- **`docs/08-Meta-Log-Plugin/README.md`**: Complete implementation progress and status
+- **`docs/06-Meta-Log-Adapters/02-Meta-Log-Plugin/`**: Adapter architecture and design
+- **`docs/05-Meta-Log/MULTIVERSE-CANVAS-RFC2119-SPEC.md`**: Multiverse canvas specification
+
+### User Interactions
+
+- **`docs/17-Automaton-User-Interactions/AUTOMATON-USER-INTERACTIONS-RFC2119-SPEC.md`**: RFC2119 specification for user interactions
+- **`docs/17-Automaton-User-Interactions/INTEGRATION_GUIDE.md`**: Integration guide for natural language interface
+- **`docs/17-Automaton-User-Interactions/API_DOCUMENTATION.md`**: REST API documentation
+
+### Integration Examples
+
+- **`evolutions/natural-language-query/API.md`**: Complete API reference
+- **`evolutions/natural-language-query/EXAMPLES.md`**: Usage examples
+
+## Architecture
+
+The Meta-Log Plugin package integrates with:
+
+- **Meta-Log Database** (`meta-log-db`): Core database functionality for ProLog, DataLog, and R5RS operations
+- **Natural Language Interface**: User interaction system for querying the knowledge base
+- **Multi-Agent System**: Agent coordination and routing (see `AGENTS.md`)
+
+## Integration with User Interactions
+
+The plugin can be extended to support natural language user interactions:
+
+```typescript
+import { OpenCodeMetaLogPlugin } from 'meta-log-plugin';
+import { EnhancedConversationInterface } from '@/evolutions/natural-language-query';
+
+class NLIPlugin extends OpenCodeMetaLogPlugin {
+  private nli: EnhancedConversationInterface;
+  
+  async onLoad() {
+    await super.onLoad();
+    this.nli = new EnhancedConversationInterface(this.getDb());
+  }
+  
+  getTools() {
+    return [
+      ...super.getTools(),
+      {
+        name: 'ask',
+        description: 'Ask a natural language question',
+        handler: async (question: string) => {
+          const response = await this.nli.ask(question);
+          return response.answer;
+        }
+      }
+    ];
+  }
+}
+```
 
 ## License
 

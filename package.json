@@ -14,6 +14,7 @@
     "test:e2e": "CI=true playwright test --reporter=list --fully-parallel ",
     "test:e2e:headless": "CI=true playwright test tests/e2e/headless.spec.ts --reporter=list",
     "test:e2e:jsonl": "CI=true playwright test tests/e2e/jsonl-data-components.spec.ts --reporter=list",
+    "test:e2e:metaverse": "CI=true playwright test tests/e2e/metaverse-portal-interface.spec.ts --reporter=list",
     "test:e2e:headed": "playwright test",
     "test:e2e:ui": "xvfb-run -a playwright test --ui",
     "test:e2e:debug": "xvfb-run -a playwright test --debug",

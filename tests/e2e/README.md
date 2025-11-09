@@ -25,11 +25,20 @@ npm run test:e2e
 
 ### Data Propagation & Messaging Tests
 - `data-propagation.spec.ts` - Comprehensive data flow through Zustand store
-- `websocket-messaging.spec.ts` - WebSocket connection and real-time messaging
+- `websocket-messaging.spec.ts` - WebSocket connection and real-time messaging (general WebSocket tests)
 - `agent-communication.spec.ts` - Agent interface and communication testing
 - `state-synchronization.spec.ts` - State consistency and synchronization
 - `realtime-updates.spec.ts` - Real-time update handling and performance
 - `cross-component-dataflow.spec.ts` - Cross-component data flow and integration
+
+### Metaverse Portal Interface Tests
+- `metaverse-portal-interface.spec.ts` - Comprehensive tests for Metaverse Portal Interface
+  - **Chat Messaging**: Broadcast (pub/sub), direct messaging (P2P and agents), click interactions
+  - **WebSocket Backend**: Chat event handling (chat:join, chat:broadcast, chat:direct, chat:agent)
+  - **Avatar System**: WebGL GLTF models analysis, SVG avatars analysis, technology stack verification
+  - **Integration Guide**: Chat service, WebSocket backend, NL Query integration
+  - **Documentation Coverage**: Tests align with `docs/18-Metaverse-Portal-Interface/`
+  - Run with: `npm run test:e2e:metaverse`
 
 ### Headless Testing
 - `headless.spec.ts` - Comprehensive headless browser testing suite

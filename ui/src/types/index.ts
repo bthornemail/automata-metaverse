@@ -92,9 +92,35 @@ export interface ExecutionData {
   performanceMetrics: { avgExecutionTime: number; successRate: number };
 }
 
+// Agent Chat Message
+export interface ChatMessage {
+  role: 'user' | 'agent';
+  content: string;
+  timestamp: number;
+  citations?: Array<{
+    source: string;
+    type: 'document' | 'agent' | 'function' | 'rule';
+    title?: string;
+    lineNumber?: number;
+    url?: string;
+  }>;
+  confidence?: number;
+  followUpSuggestions?: string[];
+  relatedEntities?: Array<{
+    id: string;
+    type: string;
+    name: string;
+  }>;
+  performanceMetrics?: {
+    responseTime: number;
+    queryTime: number;
+    processingTime: number;
+  };
+}
+
 // Agent Chat
 export interface AgentChat {
-  messages: Array<{ role: 'user' | 'agent'; content: string; timestamp: number }>;
+  messages: ChatMessage[];
   availableAgents: string[];
   activeAgent: string;
   suggestions: string[];

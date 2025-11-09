@@ -1,5 +1,13 @@
 import { test, expect } from '@playwright/test';
 
+/**
+ * WebSocket Messaging Tests
+ * 
+ * Tests for general WebSocket functionality and real-time messaging.
+ * For chat-specific tests, see metaverse-portal-interface.spec.ts
+ * 
+ * @deprecated Some tests may be outdated - see metaverse-portal-interface.spec.ts for updated chat tests
+ */
 test.describe('Automaton UI - WebSocket Messaging Tests', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');

@@ -129,12 +129,36 @@ try {
   process.exit(1);
 }
 
+// NL Query handler (imported from routes)
+let nlQueryRouter: any = null;
+async function initializeNLQueryRouter() {
+  if (!nlQueryRouter) {
+    try {
+      const nlQueryModule = await import('./src/routes/nl-query');
+      nlQueryRouter = nlQueryModule.default;
+      console.log('✅ NL Query router initialized');
+    } catch (error) {
+      console.warn('⚠️  Failed to initialize NL Query router:', error);
+    }
+  }
+  return nlQueryRouter;
+}
+
 // API Request Handler
 async function handleAPIRequest(path: string, req: any, res: any) {
     const apiPath = path.replace('/api/', '') || '';
   
   try {
     let response: any = { success: true, timestamp: Date.now() };
+
+    // Handle NL Query endpoints
+    if (apiPath.startsWith('nl-query/')) {
+      const { handleNLQueryRequest } = await import('./src/routes/nl-query-simple');
+      const handled = await handleNLQueryRequest(apiPath, req, res);
+      if (handled) {
+        return;
+      }
+    }
 
     // Handle JSONL endpoints first (before switch)
     if (apiPath.startsWith('jsonl/')) {
@@ -913,6 +937,9 @@ function parseRequestBody(req: any): Promise<any> {
   });
 }
 
+// Chat participants tracking
+const chatParticipants = new Map<string, { userId: string; userName: string; type: 'human' | 'agent'; socketId: string }>();
+
 // Socket.IO connection handling
 io.on('connection', (socket) => {
   console.log('🔌 Client connected to WebSocket');
@@ -928,8 +955,65 @@ io.on('connection', (socket) => {
     status: isRunning ? 'running' : 'idle',
   });
 
+  // Chat: Join
+  socket.on('command', async (data: { command: string; params?: any }) => {
+    if (data.command === 'chat:join') {
+      const { userId, userName, type } = data.params || {};
+      if (userId) {
+        chatParticipants.set(userId, { userId, userName: userName || 'User', type: type || 'human', socketId: socket.id });
+        
+        // Notify all clients
+        io.emit('chat:participant-joined', {
+          id: userId,
+          name: userName || 'User',
+          type: type || 'human',
+          online: true
+        });
+        
+        console.log(`👤 User joined chat: ${userName || userId} (${type || 'human'})`);
+      }
+    } else if (data.command === 'chat:broadcast') {
+      // Broadcast message to all clients
+      const message = data.params;
+      if (message) {
+        io.emit('chat:broadcast', message);
+        console.log(`📢 Broadcast: ${message.from} → ${message.content.substring(0, 50)}...`);
+      }
+    } else if (data.command === 'chat:direct') {
+      // Direct message - send to specific user
+      const message = data.params;
+      if (message && message.to) {
+        const recipient = Array.from(chatParticipants.values()).find(p => p.userId === message.to);
+        if (recipient) {
+          io.to(recipient.socketId).emit('chat:direct', message);
+          socket.emit('chat:direct', message); // Also send back to sender
+          console.log(`💬 Direct: ${message.from} → ${message.to}: ${message.content.substring(0, 50)}...`);
+        }
+      }
+    } else if (data.command === 'chat:agent') {
+      // Agent message - broadcast to all (for visibility)
+      const message = data.params;
+      if (message) {
+        io.emit('chat:agent', message);
+        io.emit('chat:direct', message); // Also send as direct to recipient
+        console.log(`🤖 Agent: ${message.from} → ${message.to || 'all'}: ${message.content.substring(0, 50)}...`);
+      }
+    }
+  });
+
   socket.on('disconnect', () => {
     console.log('🔌 Client disconnected from WebSocket');
+    
+    // Remove participant
+    const participant = Array.from(chatParticipants.entries()).find(([_, p]) => p.socketId === socket.id);
+    if (participant) {
+      const [userId] = participant;
+      chatParticipants.delete(userId);
+      
+      // Notify all clients
+      io.emit('chat:participant-left', userId);
+      console.log(`👤 User left chat: ${userId}`);
+    }
   });
 });
 
