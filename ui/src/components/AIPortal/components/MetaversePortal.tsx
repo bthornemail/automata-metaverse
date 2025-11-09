@@ -107,6 +107,10 @@ export const MetaversePortal: React.FC<MetaversePortalProps> = ({
   const [showBridgeVisualization, setShowBridgeVisualization] = useState(false); // Closed by default
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isWorldReady, setIsWorldReady] = useState(false);
+  
+  // Load agents from API
+  const { agents, loading: agentsLoading } = useAgentAPI();
+  
   const [worldConfig, setWorldConfig] = useState<EnhancedVirtualWorldConfig>({
     scene: { 
       terrain: { 
@@ -165,6 +169,57 @@ export const MetaversePortal: React.FC<MetaversePortalProps> = ({
     enableDebug: false,
     worldSize: 200
   });
+
+  // Convert agents to avatar configurations
+  const convertAgentsToAvatars = useMemo((): AvatarConfig[] => {
+    if (!agents || agents.length === 0) return [];
+    
+    // Color mapping for dimensions
+    const dimensionColors: Record<string, string> = {
+      '0D': '#ef4444', // Red
+      '1D': '#f59e0b', // Orange
+      '2D': '#eab308', // Yellow
+      '3D': '#10b981', // Green
+      '4D': '#3b82f6', // Blue
+      '5D': '#6366f1', // Indigo
+      '6D': '#8b5cf6', // Purple
+      '7D': '#ec4899', // Pink
+    };
+    
+    return agents.map((agent: Agent, index: number) => {
+      // Arrange agents in a circle around the center
+      const radius = 15;
+      const angle = (index / agents.length) * Math.PI * 2;
+      const x = Math.cos(angle) * radius;
+      const z = Math.sin(angle) * radius;
+      
+      const dimension = agent.dimension || null;
+      const color = dimension ? (dimensionColors[dimension] || '#6366f1') : '#6366f1';
+      
+      return {
+        id: agent.id,
+        name: agent.name,
+        position: [x, 0, z] as [number, number, number],
+        status: agent.status === 'active' ? 'online' : agent.status === 'busy' ? 'away' : 'offline',
+        animationState: 'idle',
+        showNameTag: true,
+        showStatusIndicator: true,
+        dimension: dimension || undefined,
+        color,
+        scale: 1
+      };
+    });
+  }, [agents]);
+
+  // Update world config with agent avatars
+  useEffect(() => {
+    if (convertAgentsToAvatars.length > 0) {
+      setWorldConfig(prev => ({
+        ...prev,
+        avatars: convertAgentsToAvatars
+      }));
+    }
+  }, [convertAgentsToAvatars]);
 
   // Initialize bridges
   useEffect(() => {
