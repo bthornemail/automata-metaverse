@@ -19,6 +19,7 @@ import { NavigationUI, NavigationUIProps } from './NavigationUI';
 import { PerformanceOptimizer, PerformanceOptimizerConfig } from './PerformanceOptimizer';
 import { WorldPersistence, WorldPersistenceProps } from './WorldPersistence';
 import { WorldSettings } from './WorldSettings';
+import { AvatarInteractionSystem } from './AvatarInteractionSystem';
 import { useWorldLayout } from './WorldLayoutManager';
 import { worldService, WorldState } from '../../services/world-service';
 
@@ -145,6 +146,18 @@ const EnhancedVirtualWorldContent: React.FC<EnhancedVirtualWorldProps> = ({
           onClick={() => onAvatarClick?.(avatar)}
         />
       ))}
+
+      {/* Avatar Interaction System (Raycasting for hover and click) */}
+      <AvatarInteractionSystem
+        avatars={avatars}
+        onAvatarHover={(avatar) => {
+          // Handle hover state if needed
+        }}
+        onAvatarClick={(avatar) => {
+          onAvatarClick?.(avatar);
+        }}
+        enableStatusDisplay={true}
+      />
 
       {/* Navigation */}
       <EnhancedNavigation config={config.navigation} />

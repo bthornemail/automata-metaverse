@@ -41,6 +41,18 @@ export const EnhancedGLTFAvatar: React.FC<EnhancedGLTFAvatarProps> = ({
   const [gltfLoaded, setGltfLoaded] = useState(false);
   const [gltfError, setGltfError] = useState<string | null>(null);
 
+  // Register avatar with raycasting system
+  useEffect(() => {
+    if (groupRef.current && (window as any).__registerAvatarRef) {
+      (window as any).__registerAvatarRef(config.id, groupRef.current);
+    }
+    return () => {
+      if ((window as any).__registerAvatarRef) {
+        (window as any).__registerAvatarRef(config.id, null);
+      }
+    };
+  }, [config.id, gltfLoaded]);
+
   const {
     gltfUrl,
     position,
