@@ -14,7 +14,7 @@ test.describe('Automaton UI - Component Interaction Tests', () => {
       await page.waitForTimeout(2000);
       
       // Ensure Overview tab is active (it should be by default)
-      const overviewTab = page.locator('button:has-text("Overview")');
+      const overviewTab = page.getByRole('tab', { name: 'Switch to Overview tab' });
       await expect(overviewTab).toBeVisible({ timeout: 10000 });
       
       // Wait for motion animations to complete (framer-motion default is ~0.5s)
@@ -35,7 +35,7 @@ test.describe('Automaton UI - Component Interaction Tests', () => {
       await page.waitForTimeout(2000);
       
       // Ensure Overview tab is active
-      const overviewTab = page.locator('button:has-text("Overview")');
+      const overviewTab = page.getByRole('tab', { name: 'Switch to Overview tab' });
       await expect(overviewTab).toBeVisible({ timeout: 10000 });
       
       // Wait for motion animations
@@ -62,7 +62,7 @@ test.describe('Automaton UI - Component Interaction Tests', () => {
       await page.waitForTimeout(2000);
       
       // Ensure Overview tab is active
-      const overviewTab = page.locator('button:has-text("Overview")');
+      const overviewTab = page.getByRole('tab', { name: 'Switch to Overview tab' });
       await expect(overviewTab).toBeVisible({ timeout: 10000 });
       
       // Wait for motion animations
@@ -85,7 +85,7 @@ test.describe('Automaton UI - Component Interaction Tests', () => {
       await page.waitForTimeout(2000);
       
       // Ensure Overview tab is active
-      const overviewTab = page.locator('button:has-text("Overview")');
+      const overviewTab = page.getByRole('tab', { name: 'Switch to Overview tab' });
       await expect(overviewTab).toBeVisible({ timeout: 10000 });
       
       // Wait for motion animations
@@ -117,7 +117,7 @@ test.describe('Automaton UI - Component Interaction Tests', () => {
       await page.waitForTimeout(2000);
       
       // Ensure Overview tab is active
-      const overviewTab = page.locator('button:has-text("Overview")');
+      const overviewTab = page.getByRole('tab', { name: 'Switch to Overview tab' });
       await expect(overviewTab).toBeVisible({ timeout: 10000 });
       
       // Wait for motion animations
@@ -135,7 +135,7 @@ test.describe('Automaton UI - Component Interaction Tests', () => {
       await page.waitForTimeout(2000);
       
       // Ensure Overview tab is active
-      const overviewTab = page.locator('button:has-text("Overview")');
+      const overviewTab = page.getByRole('tab', { name: 'Switch to Overview tab' });
       await expect(overviewTab).toBeVisible({ timeout: 10000 });
       
       // Wait for motion animations
@@ -166,7 +166,7 @@ test.describe('Automaton UI - Component Interaction Tests', () => {
       
       // Quantum functionality is now part of Overview tab
       // Ensure Overview tab is active
-      await page.click('button:has-text("Overview")', { timeout: 10000 });
+      await page.getByRole('tab', { name: 'Switch to Overview tab' }).click({ timeout: 10000 });
       await page.waitForTimeout(2000); // Wait for animations
     });
 
@@ -208,7 +208,7 @@ test.describe('Automaton UI - Component Interaction Tests', () => {
       await page.waitForTimeout(2000);
       
       // Click AI Portal tab (where agent interface is located)
-      await page.click('button:has-text("AI Portal")', { timeout: 10000 });
+      await page.getByRole('tab', { name: 'Switch to AI Portal tab' }).click({ timeout: 10000 });
       await page.waitForTimeout(2000); // Wait for animations
     });
 
@@ -259,7 +259,7 @@ test.describe('Automaton UI - Component Interaction Tests', () => {
       await page.waitForTimeout(2000);
       
       // Click Config tab and wait for it to activate
-      await page.click('button:has-text("Config")', { timeout: 10000 });
+      await page.getByRole('tab', { name: 'Switch to Config tab' }).click({ timeout: 10000 });
       await page.waitForTimeout(2000); // Wait for animations
     });
 
@@ -363,7 +363,7 @@ test.describe('Automaton UI - Component Interaction Tests', () => {
 
   test.describe('Form Validation', () => {
     test('should handle form validation', async ({ page }) => {
-      await page.click('button:has-text("Config")');
+      await page.getByRole('tab', { name: 'Switch to Config tab' }).click();
       
       const config = page.locator('[data-testid="configuration"]');
       await expect(config).toBeVisible();
@@ -402,11 +402,11 @@ test.describe('Automaton UI - Component Interaction Tests', () => {
       await page.setViewportSize({ width: 375, height: 667 });
       
       // Ensure Overview tab is active
-      const overviewTab = page.locator('button:has-text("Overview")');
+      const overviewTab = page.getByRole('tab', { name: 'Switch to Overview tab' });
       await expect(overviewTab).toBeVisible({ timeout: 10000 });
       
       // Test navigation on mobile - tap on Self-Reference tab
-      const selfRefTab = page.locator('button:has-text("Self-Reference")');
+      const selfRefTab = page.getByRole('tab', { name: 'Switch to Self-Reference tab' });
       await expect(selfRefTab).toBeVisible({ timeout: 10000 });
       await selfRefTab.tap();
       await page.waitForTimeout(1000);
@@ -422,7 +422,7 @@ test.describe('Automaton UI - Component Interaction Tests', () => {
       await page.setViewportSize({ width: 768, height: 1024 });
       
       // Ensure Overview tab is active
-      const overviewTab = page.locator('button:has-text("Overview")');
+      const overviewTab = page.getByRole('tab', { name: 'Switch to Overview tab' });
       await expect(overviewTab).toBeVisible({ timeout: 10000 });
       
       // Test that components are still interactive

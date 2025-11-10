@@ -165,7 +165,7 @@ test.describe('Automaton UI - Accessibility Tests', () => {
 
     test('should have proper form labels', async ({ page }) => {
       // Navigate to config tab to find forms
-      await page.click('button:has-text("Config")');
+      await page.getByRole('tab', { name: 'Switch to Config tab' }).click();
       await page.waitForTimeout(2000);
       
       const formElements = await page.evaluate(() => {

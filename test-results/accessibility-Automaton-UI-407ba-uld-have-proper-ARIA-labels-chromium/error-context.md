@@ -6,27 +6,28 @@
     - generic [ref=e6]:
       - heading "Self-Referencing Automaton Interface" [level=1] [ref=e7]: Self-Referencing Automaton Interface
       - generic [ref=e10]: "Phase 3: Quantum Visualization"
-  - generic [ref=e14]:
-    - button "Switch to Overview tab" [ref=e15] [cursor=pointer]:
-      - img [ref=e16]
-      - text: Overview
-    - button "Switch to Self-Reference tab" [ref=e18] [cursor=pointer]:
-      - img [ref=e19]
-      - text: Self-Reference
-    - button "Switch to AI Portal tab" [ref=e22] [cursor=pointer]:
-      - img [ref=e23]
-      - text: AI Portal
-    - button "Switch to Canvas Editor tab" [ref=e31] [cursor=pointer]:
-      - img [ref=e32]
-      - text: Canvas Editor
-    - button "Switch to Code Editor tab" [ref=e36] [cursor=pointer]:
-      - img [ref=e37]
-      - text: Code Editor
-    - button "Switch to Config tab" [ref=e40] [cursor=pointer]:
-      - img [ref=e41]
-      - text: Config
+  - navigation "Main navigation" [ref=e12]:
+    - tablist "Application tabs" [ref=e14]:
+      - tab "Switch to Overview tab" [selected] [ref=e15] [cursor=pointer]:
+        - img [ref=e16]
+        - text: Overview
+      - tab "Switch to Self-Reference tab" [ref=e18] [cursor=pointer]:
+        - img [ref=e19]
+        - text: Self-Reference
+      - tab "Switch to AI Portal tab" [ref=e22] [cursor=pointer]:
+        - img [ref=e23]
+        - text: AI Portal
+      - tab "Switch to Canvas Editor tab" [ref=e31] [cursor=pointer]:
+        - img [ref=e32]
+        - text: Canvas Editor
+      - tab "Switch to Code Editor tab" [ref=e36] [cursor=pointer]:
+        - img [ref=e37]
+        - text: Code Editor
+      - tab "Switch to Config tab" [ref=e40] [cursor=pointer]:
+        - img [ref=e41]
+        - text: Config
   - main [ref=e52]:
-    - generic [ref=e53]:
+    - tabpanel [ref=e53]:
       - generic [ref=e56]:
         - generic [ref=e57]:
           - heading "Automaton Dashboard" [level=2] [ref=e58]:
@@ -68,8 +69,8 @@
         - generic [ref=e115]:
           - generic [ref=e116]: "Mode:"
           - generic [ref=e117]:
-            - button "Built-in" [ref=e118] [cursor=pointer]
-            - button "AI (Ollama)" [ref=e119] [cursor=pointer]
+            - button "Built-in execution mode" [pressed] [ref=e118] [cursor=pointer]: Built-in
+            - button "AI (Ollama) execution mode" [ref=e119] [cursor=pointer]: AI (Ollama)
       - generic [ref=e121]:
         - heading "Control Panel" [level=3] [ref=e123]
         - generic [ref=e124]:

@@ -32,7 +32,7 @@ test.describe('Automaton Evolution & Integrity', () => {
     });
 
     // Navigate to Self-Reference Analyzer tab
-    const selfRefTab = page.locator('button:has-text("Self-Reference")').first();
+    const selfRefTab = page.getByRole('tab', { name: 'Switch to Self-Reference tab' });
     const tabCount = await selfRefTab.count();
     
     if (tabCount > 0) {
@@ -80,7 +80,7 @@ test.describe('Automaton Evolution & Integrity', () => {
 
   test('should validate JSONL entries are objects after evolution', async ({ page }) => {
     // Navigate to Self-Reference Analyzer
-    const selfRefTab = page.locator('button:has-text("Self-Reference")').first();
+    const selfRefTab = page.getByRole('tab', { name: 'Switch to Self-Reference tab' });
     if (await selfRefTab.count() > 0) {
       await selfRefTab.click();
       await page.waitForTimeout(1000);
@@ -152,7 +152,7 @@ test.describe('Automaton Evolution & Integrity', () => {
 
   test('should handle multiple evolutions without errors', async ({ page }) => {
     // Navigate to Self-Reference Analyzer
-    const selfRefTab = page.locator('button:has-text("Self-Reference")').first();
+    const selfRefTab = page.getByRole('tab', { name: 'Switch to Self-Reference tab' });
     if (await selfRefTab.count() > 0) {
       await selfRefTab.click();
       await page.waitForTimeout(1000);
@@ -220,7 +220,7 @@ test.describe('Automaton Evolution & Integrity', () => {
     });
 
     // Navigate to Self-Reference Analyzer
-    const selfRefTab = page.locator('button:has-text("Self-Reference")').first();
+    const selfRefTab = page.getByRole('tab', { name: 'Switch to Self-Reference tab' });
     if (await selfRefTab.count() > 0) {
       await selfRefTab.click();
       await page.waitForTimeout(2000);

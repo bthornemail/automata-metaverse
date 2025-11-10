@@ -42,6 +42,7 @@ export const ModernButton: React.FC<{
   icon?: React.ReactNode;
   disabled?: boolean;
   className?: string;
+  'aria-label'?: string;
 }> = ({ 
   children = null, 
   onClick, 
@@ -49,7 +50,8 @@ export const ModernButton: React.FC<{
   size = 'md',
   icon,
   disabled = false,
-  className 
+  className,
+  'aria-label': ariaLabel
 }) => {
   const variants = {
     primary: 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg shadow-blue-500/50',
@@ -68,6 +70,7 @@ export const ModernButton: React.FC<{
     <motion.button
       onClick={onClick}
       disabled={disabled}
+      aria-label={ariaLabel || (icon && !children ? 'Button' : undefined)}
       className={clsx(
         'flex items-center gap-2 rounded-lg font-medium transition-all duration-200',
         'backdrop-blur-sm border border-white/10',
@@ -79,7 +82,7 @@ export const ModernButton: React.FC<{
       whileHover={!disabled ? { scale: 1.05, y: -1 } : {}}
       whileTap={!disabled ? { scale: 0.95 } : {}}
     >
-      {icon && <span className="flex-shrink-0">{icon}</span>}
+      {icon && <span className="flex-shrink-0" aria-hidden="true">{icon}</span>}
       {children}
     </motion.button>
   );

@@ -46,22 +46,24 @@ const AppContent: React.FC = () => {
       </header>
 
       {/* Navigation Tabs */}
-      <div className="bg-gray-800/50 border-b border-gray-700">
+      <nav className="bg-gray-800/50 border-b border-gray-700" aria-label="Main navigation">
         <div className="container mx-auto px-6">
-          <div className="flex gap-2">
+          <div className="flex gap-2" role="tablist" aria-label="Application tabs">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
+                  role="tab"
+                  aria-selected={activeTab === tab.id}
+                  aria-controls={`tabpanel-${tab.id}`}
                   className={`flex items-center gap-2 px-4 py-3 border-b-2 transition-all duration-200 ${
                     activeTab === tab.id
                        ? 'border-[#6366f1] text-white bg-[#6366f1]/10'
                       : 'border-transparent text-gray-400 hover:text-gray-200 hover:bg-gray-700/50'
                   }`}
                   aria-label={`Switch to ${tab.label} tab`}
-                  aria-current={activeTab === tab.id ? 'page' : undefined}
                 >
                   <Icon className="w-4 h-4" aria-hidden="true" />
                   {tab.label}
@@ -70,13 +72,16 @@ const AppContent: React.FC = () => {
             })}
           </div>
         </div>
-      </div>
+      </nav>
 
       {/* Main Content */}
       <main className="container mx-auto px-6 py-8">
         {/* Overview Tab */}
         {activeTab === 'overview' && (
           <motion.div
+            id="tabpanel-overview"
+            role="tabpanel"
+            aria-labelledby="tab-overview"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="space-y-6"
@@ -104,6 +109,9 @@ const AppContent: React.FC = () => {
         {/* Self-Reference Analysis Tab */}
         {activeTab === 'analysis' && (
           <motion.div
+            id="tabpanel-analysis"
+            role="tabpanel"
+            aria-labelledby="tab-analysis"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="max-w-6xl mx-auto"
@@ -115,6 +123,9 @@ const AppContent: React.FC = () => {
         {/* AI Portal Tab - Unified Agent Communication & Evolution */}
         {activeTab === 'ai-portal' && (
           <motion.div
+            id="tabpanel-ai-portal"
+            role="tabpanel"
+            aria-labelledby="tab-ai-portal"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="h-[calc(100vh-280px)] max-w-7xl mx-auto"
@@ -126,6 +137,9 @@ const AppContent: React.FC = () => {
         {/* Canvas Editor Tab - Dedicated Canvas Editor */}
         {activeTab === 'canvas-editor' && (
           <motion.div
+            id="tabpanel-canvas-editor"
+            role="tabpanel"
+            aria-labelledby="tab-canvas-editor"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="h-[calc(100vh-200px)] rounded-xl overflow-hidden shadow-xl"
@@ -141,6 +155,9 @@ const AppContent: React.FC = () => {
         {/* Code Editor Tab - Unified Editor (Code + Canvas) */}
         {activeTab === 'code-editor' && (
           <motion.div
+            id="tabpanel-code-editor"
+            role="tabpanel"
+            aria-labelledby="tab-code-editor"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="h-[calc(100vh-200px)] rounded-xl overflow-hidden shadow-xl"
@@ -156,6 +173,9 @@ const AppContent: React.FC = () => {
         {/* Configuration Tab */}
         {activeTab === 'config' && (
           <motion.div
+            id="tabpanel-config"
+            role="tabpanel"
+            aria-labelledby="tab-config"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="max-w-6xl mx-auto"

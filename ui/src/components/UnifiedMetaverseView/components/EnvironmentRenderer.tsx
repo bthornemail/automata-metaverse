@@ -15,7 +15,9 @@ export const EnvironmentRenderer: React.FC<EnvironmentRendererProps> = ({
   selectedSymbol,
   selectedSymbols,
   onSymbolSelect,
-  config
+  config,
+  agents,
+  agentsLoading
 }) => {
   switch (environment) {
     case 'abstract':
@@ -52,6 +54,8 @@ export const EnvironmentRenderer: React.FC<EnvironmentRendererProps> = ({
         <Combined3DEnvironment
           selectedSymbol={selectedSymbol}
           onSymbolSelect={onSymbolSelect}
+          agents={agents}
+          agentsLoading={agentsLoading}
           config={{
             showAbstract: true,
             showGrokMetaverse: true,

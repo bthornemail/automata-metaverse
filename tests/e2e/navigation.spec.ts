@@ -6,11 +6,11 @@ test.describe('Automaton UI - Navigation Tests', () => {
   });
 
   test('should navigate to Self-Reference tab', async ({ page }) => {
-    await page.click('button:has-text("Self-Reference")');
+    const selfRefTab = page.getByRole('tab', { name: 'Switch to Self-Reference tab' });
+    await selfRefTab.click();
     await page.waitForTimeout(500); // Wait for tab switch animation
     
     // Check tab is active (has border-[#6366f1] class)
-    const selfRefTab = page.locator('button:has-text("Self-Reference")');
     await expect(selfRefTab).toHaveClass(/border-\[#6366f1\]/);
     
     // Check content is visible
@@ -18,11 +18,11 @@ test.describe('Automaton UI - Navigation Tests', () => {
   });
 
   test('should navigate to AI Portal tab', async ({ page }) => {
-    await page.click('button:has-text("AI Portal")');
+    const aiPortalTab = page.getByRole('tab', { name: 'Switch to AI Portal tab' });
+    await aiPortalTab.click();
     await page.waitForTimeout(500); // Wait for tab switch animation
     
     // Check tab is active
-    const aiPortalTab = page.locator('button:has-text("AI Portal")');
     await expect(aiPortalTab).toHaveClass(/border-\[#6366f1\]/);
     
     // Check content is visible
@@ -30,11 +30,11 @@ test.describe('Automaton UI - Navigation Tests', () => {
   });
 
   test('should navigate to Code Editor tab', async ({ page }) => {
-    await page.click('button:has-text("Code Editor")');
+    const codeEditorTab = page.getByRole('tab', { name: 'Switch to Code Editor tab' });
+    await codeEditorTab.click();
     await page.waitForTimeout(500); // Wait for tab switch animation
     
     // Check tab is active
-    const codeEditorTab = page.locator('button:has-text("Code Editor")');
     await expect(codeEditorTab).toHaveClass(/border-\[#6366f1\]/);
     
     // Check content is visible
@@ -42,11 +42,11 @@ test.describe('Automaton UI - Navigation Tests', () => {
   });
 
   test('should navigate to Config tab', async ({ page }) => {
-    await page.click('button:has-text("Config")');
+    const configTab = page.getByRole('tab', { name: 'Switch to Config tab' });
+    await configTab.click();
     await page.waitForTimeout(500); // Wait for tab switch animation
     
     // Check tab is active
-    const configTab = page.locator('button:has-text("Config")');
     await expect(configTab).toHaveClass(/border-\[#6366f1\]/);
     
     // Check content is visible
@@ -59,45 +59,50 @@ test.describe('Automaton UI - Navigation Tests', () => {
     await page.waitForTimeout(2000);
     
     // Start with Overview (default)
-    const overviewTab = page.locator('button:has-text("Overview")');
+    const overviewTab = page.getByRole('tab', { name: 'Switch to Overview tab' });
     await expect(overviewTab).toHaveClass(/border-\[#6366f1\]/);
     
     // Navigate to Self-Reference
-    await page.click('button:has-text("Self-Reference")');
+    const selfRefTab = page.getByRole('tab', { name: 'Switch to Self-Reference tab' });
+    await selfRefTab.click();
     await page.waitForTimeout(500);
-    await expect(page.locator('button:has-text("Self-Reference")')).toHaveClass(/border-\[#6366f1\]/);
+    await expect(selfRefTab).toHaveClass(/border-\[#6366f1\]/);
     await expect(page.locator('[data-testid="self-reference-analyzer"]')).toBeVisible({ timeout: 10000 });
     
     // Navigate to AI Portal
-    await page.click('button:has-text("AI Portal")');
+    const aiPortalTab = page.getByRole('tab', { name: 'Switch to AI Portal tab' });
+    await aiPortalTab.click();
     await page.waitForTimeout(500);
-    await expect(page.locator('button:has-text("AI Portal")')).toHaveClass(/border-\[#6366f1\]/);
+    await expect(aiPortalTab).toHaveClass(/border-\[#6366f1\]/);
     await expect(page.locator('[data-testid="ai-portal"]')).toBeVisible({ timeout: 10000 });
     
     // Navigate to Code Editor
-    await page.click('button:has-text("Code Editor")');
+    const codeEditorTab = page.getByRole('tab', { name: 'Switch to Code Editor tab' });
+    await codeEditorTab.click();
     await page.waitForTimeout(500);
-    await expect(page.locator('button:has-text("Code Editor")')).toHaveClass(/border-\[#6366f1\]/);
+    await expect(codeEditorTab).toHaveClass(/border-\[#6366f1\]/);
     await expect(page.locator('[data-testid="unified-editor"]')).toBeVisible({ timeout: 10000 });
     
     // Navigate to Config
-    await page.click('button:has-text("Config")');
+    const configTab = page.getByRole('tab', { name: 'Switch to Config tab' });
+    await configTab.click();
     await page.waitForTimeout(500);
-    await expect(page.locator('button:has-text("Config")')).toHaveClass(/border-\[#6366f1\]/);
+    await expect(configTab).toHaveClass(/border-\[#6366f1\]/);
     await expect(page.locator('[data-testid="configuration"]')).toBeVisible({ timeout: 10000 });
     
     // Navigate back to Overview
-    await page.click('button:has-text("Overview")');
+    await overviewTab.click();
     await page.waitForTimeout(500);
-    await expect(page.locator('button:has-text("Overview")')).toHaveClass(/border-\[#6366f1\]/);
+    await expect(overviewTab).toHaveClass(/border-\[#6366f1\]/);
     await expect(page.locator('[data-testid="dashboard"]')).toBeVisible({ timeout: 10000 });
   });
 
   test('should maintain tab state during page reload', async ({ page }) => {
     // Navigate to a specific tab
-    await page.click('button:has-text("AI Portal")');
+    const aiPortalTab = page.getByRole('tab', { name: 'Switch to AI Portal tab' });
+    await aiPortalTab.click();
     await page.waitForTimeout(500);
-    await expect(page.locator('button:has-text("AI Portal")')).toHaveClass(/border-\[#6366f1\]/);
+    await expect(aiPortalTab).toHaveClass(/border-\[#6366f1\]/);
     
     // Reload the page
     await page.reload();
@@ -107,11 +112,11 @@ test.describe('Automaton UI - Navigation Tests', () => {
     // Check if tab state is maintained (this depends on implementation)
     // If state is persisted, the AI portal tab should still be active
     // If not, it should default to overview
-    const aiPortalTab = page.locator('button:has-text("AI Portal")');
-    const overviewTab = page.locator('button:has-text("Overview")');
+    const aiPortalTabAfterReload = page.getByRole('tab', { name: 'Switch to AI Portal tab' });
+    const overviewTab = page.getByRole('tab', { name: 'Switch to Overview tab' });
     
     // Check which tab is active
-    const aiPortalClasses = await aiPortalTab.getAttribute('class');
+    const aiPortalClasses = await aiPortalTabAfterReload.getAttribute('class');
     const overviewClasses = await overviewTab.getAttribute('class');
     
     // Either AI portal or overview should be active (valid states)
@@ -127,7 +132,7 @@ test.describe('Automaton UI - Navigation Tests', () => {
     await page.waitForTimeout(2000);
     
     // Focus on Overview tab (default)
-    const overviewTab = page.locator('button:has-text("Overview")');
+    const overviewTab = page.getByRole('tab', { name: 'Switch to Overview tab' });
     await overviewTab.focus();
     
     // Navigate to next tab using arrow keys
@@ -136,7 +141,7 @@ test.describe('Automaton UI - Navigation Tests', () => {
     await page.waitForTimeout(500);
     
     // Check that Self-Reference tab is now active
-    const selfRefTab = page.locator('button:has-text("Self-Reference")');
+    const selfRefTab = page.getByRole('tab', { name: 'Switch to Self-Reference tab' });
     await expect(selfRefTab).toHaveClass(/border-\[#6366f1\]/);
   });
 
@@ -145,7 +150,7 @@ test.describe('Automaton UI - Navigation Tests', () => {
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000);
     
-    const tab = page.locator('button:has-text("AI Portal")');
+    const tab = page.getByRole('tab', { name: 'Switch to AI Portal tab' });
     
     // Check that tab is interactive
     await expect(tab).toBeVisible({ timeout: 10000 });

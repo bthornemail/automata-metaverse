@@ -66,6 +66,9 @@ export default defineConfig({
       },
     },
     chunkSizeWarningLimit: 1000,
+    worker: {
+      format: 'es',
+    },
   },
   optimizeDeps: {
     include: [

@@ -56,7 +56,7 @@ const Dashboard: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-          <Activity className="w-6 h-6" />
+          <Activity className="w-6 h-6" aria-hidden="true" />
           Automaton Dashboard
         </h2>
         
@@ -209,6 +209,9 @@ const Dashboard: React.FC = () => {
         <span className="text-sm text-gray-400">Mode:</span>
         <div className="flex gap-2">
           <button
+            onClick={() => {/* Handle mode change */}}
+            aria-label="Built-in execution mode"
+            aria-pressed={status.executionMode === 'builtin'}
             className={`px-3 py-1 rounded text-sm ${
               status.executionMode === 'builtin'
                  ? 'bg-[#6366f1] text-white'
@@ -218,6 +221,9 @@ const Dashboard: React.FC = () => {
             Built-in
           </button>
           <button
+            onClick={() => {/* Handle mode change */}}
+            aria-label="AI (Ollama) execution mode"
+            aria-pressed={status.executionMode === 'ollama'}
             className={`px-3 py-1 rounded text-sm ${
               status.executionMode === 'ollama'
                 ? 'bg-quantum-superposition text-white'

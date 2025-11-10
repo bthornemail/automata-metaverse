@@ -15,8 +15,6 @@ interface BridgeStatus {
 }
 
 interface AIPortalHeaderProps {
-  metaverseMode: 'abstract' | 'canvasl-3d' | 'unified';
-  onMetaverseModeChange: (mode: 'abstract' | 'canvasl-3d' | 'unified') => void;
   selectedJSONLFile: string;
   onJSONLFileChange: (file: string) => void;
   showChatPanel: boolean;
@@ -29,8 +27,6 @@ interface AIPortalHeaderProps {
 }
 
 export const AIPortalHeader: React.FC<AIPortalHeaderProps> = ({
-  metaverseMode,
-  onMetaverseModeChange,
   selectedJSONLFile,
   onJSONLFileChange,
   showChatPanel,
@@ -51,110 +47,53 @@ export const AIPortalHeader: React.FC<AIPortalHeaderProps> = ({
           <div>
             <h2 className="text-xl font-bold text-white">AI Portal</h2>
             <p className="text-xs text-gray-400">
-              3D Metaverse Portal - Bridging Human NLP ↔ Automaton Metaverse ↔ WebLLM ↔ TinyML
+              Unified Collaborative World - Full 3D Metaverse with Movement, Interactions, Learning & Abstract View Elements
             </p>
           </div>
         </div>
         
         <div className="flex items-center gap-2">
-          {/* Metaverse Mode Toggle */}
-          <div className="flex items-center gap-2 bg-gray-700 rounded-lg p-1">
-            <button
-              onClick={() => onMetaverseModeChange('unified')}
-              className={`px-3 py-1 rounded text-sm transition-colors ${
-                metaverseMode === 'unified' 
-                  ? 'bg-blue-600 text-white' 
-                  : 'text-gray-400 hover:text-white'
-              }`}
-              title="Unified View (Major/Minor Modes)"
-            >
-              Unified
-            </button>
-            <button
-              onClick={() => onMetaverseModeChange('abstract')}
-              className={`px-3 py-1 rounded text-sm transition-colors ${
-                metaverseMode === 'abstract' 
-                  ? 'bg-blue-600 text-white' 
-                  : 'text-gray-400 hover:text-white'
-              }`}
-              title="Abstract Metaverse Only"
-            >
-              Abstract
-            </button>
-            <button
-              onClick={() => onMetaverseModeChange('canvasl-3d')}
-              className={`px-3 py-1 rounded text-sm transition-colors ${
-                metaverseMode === 'canvasl-3d' 
-                  ? 'bg-blue-600 text-white' 
-                  : 'text-gray-400 hover:text-white'
-              }`}
-              title="CanvasL 3D Only"
-            >
-              CanvasL 3D
-            </button>
-          </div>
-          
-          {/* File Selection (for CanvasL 3D mode) */}
-          {metaverseMode === 'canvasl-3d' && (
-            <select
-              value={selectedJSONLFile}
-              onChange={(e) => onJSONLFileChange(e.target.value)}
-              className="px-3 py-1 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm"
-            >
-              <option value="automaton-kernel.jsonl">automaton-kernel.jsonl</option>
-              <option value="generate.metaverse.jsonl">generate.metaverse.jsonl</option>
-              <option value="automaton.jsonl">automaton.jsonl</option>
-              <option value="automaton.canvas.space.jsonl">automaton.canvas.space.jsonl</option>
-              <option value="automaton-kernel.canvasl">automaton-kernel.canvasl</option>
-              <option value="generate.metaverse.canvasl">generate.metaverse.canvasl</option>
-            </select>
-          )}
-          
-          {/* View Changes / Chat Toggle */}
-          <button
-            onClick={onToggleChatPanel}
-            className="flex items-center gap-2 px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors"
-            title={showChatPanel ? "Hide Chat" : "View Chat"}
-          >
-            <MessageSquare className="w-4 h-4" />
-            <span className="text-sm">{showChatPanel ? 'Hide Chat' : 'View Chat'}</span>
-          </button>
           
           {/* Bridge Status Indicators */}
           <button
             onClick={onBridgeStatusClick}
+            aria-label={`Bridge Status: NLP ${bridgeStatus.nlp ? 'connected' : 'disconnected'}, Metaverse ${bridgeStatus.metaverse ? 'connected' : 'disconnected'}, WebLLM ${bridgeStatus.webllm ? 'connected' : 'disconnected'}, TinyML ${bridgeStatus.tinyml ? 'connected' : 'disconnected'}`}
             className="flex items-center gap-2 px-3 py-1 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors"
-            title="Bridge Status"
           >
-            <Network className="w-4 h-4 text-gray-300" />
-            <div className="flex gap-1">
-              <div className={`w-2 h-2 rounded-full ${bridgeStatus.nlp ? 'bg-green-500' : 'bg-gray-500'}`} title="NLP"></div>
-              <div className={`w-2 h-2 rounded-full ${bridgeStatus.metaverse ? 'bg-green-500' : 'bg-gray-500'}`} title="Metaverse"></div>
-              <div className={`w-2 h-2 rounded-full ${bridgeStatus.webllm ? 'bg-green-500' : 'bg-gray-500'}`} title="WebLLM"></div>
-              <div className={`w-2 h-2 rounded-full ${bridgeStatus.tinyml ? 'bg-green-500' : 'bg-gray-500'}`} title="TinyML"></div>
+            <Network className="w-4 h-4 text-gray-300" aria-hidden="true" />
+            <div className="flex gap-1" role="group" aria-label="Bridge status indicators">
+              <div className={`w-2 h-2 rounded-full ${bridgeStatus.nlp ? 'bg-green-500' : 'bg-gray-500'}`} aria-label="NLP bridge status" title="NLP"></div>
+              <div className={`w-2 h-2 rounded-full ${bridgeStatus.metaverse ? 'bg-green-500' : 'bg-gray-500'}`} aria-label="Metaverse bridge status" title="Metaverse"></div>
+              <div className={`w-2 h-2 rounded-full ${bridgeStatus.webllm ? 'bg-green-500' : 'bg-gray-500'}`} aria-label="WebLLM bridge status" title="WebLLM"></div>
+              <div className={`w-2 h-2 rounded-full ${bridgeStatus.tinyml ? 'bg-green-500' : 'bg-gray-500'}`} aria-label="TinyML bridge status" title="TinyML"></div>
             </div>
           </button>
           
-          <div className={`px-2 py-1 rounded text-xs ${
-            isWebLLMLoaded ? 'bg-green-600/20 text-green-300' : 'bg-yellow-600/20 text-yellow-300'
-          }`}>
+          <div 
+            className={`px-2 py-1 rounded text-xs ${
+              isWebLLMLoaded ? 'bg-green-600/20 text-green-300' : 'bg-yellow-600/20 text-yellow-300'
+            }`}
+            role="status"
+            aria-live="polite"
+            aria-label={isWebLLMLoaded ? 'WebLLM Ready' : 'WebLLM Loading'}
+          >
             {isWebLLMLoaded ? 'WebLLM Ready' : 'Loading...'}
           </div>
           
           <button
             onClick={onAgentAPIClick}
+            aria-label="Agent API"
             className="p-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors"
-            title="Agent API"
           >
-            <BotIcon className="w-4 h-4 text-gray-300" />
+            <BotIcon className="w-4 h-4 text-gray-300" aria-hidden="true" />
           </button>
           
           <button
             onClick={onSettingsClick}
+            aria-label="Settings"
             className="p-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors"
-            title="Settings"
           >
-            <Settings className="w-4 h-4 text-gray-300" />
+            <Settings className="w-4 h-4 text-gray-300" aria-hidden="true" />
           </button>
         </div>
       </div>

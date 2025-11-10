@@ -20,7 +20,10 @@ export const UnifiedMetaverseView: React.FC<UnifiedMetaverseViewProps> = ({
   initialMinorMode = '3d-gltf',
   onModeChange,
   onSymbolSelect,
-  height = '100%'
+  height = '100%',
+  hideModeSwitcher = false,
+  agents,
+  agentsLoading
 }) => {
   const [state, setState] = useState<UnifiedViewState>({
     majorMode: initialMajorMode,
@@ -221,16 +224,18 @@ export const UnifiedMetaverseView: React.FC<UnifiedMetaverseViewProps> = ({
   return (
     <div className="h-full flex flex-col bg-gray-900" style={{ height }}>
       {/* Mode Switcher */}
-      <ModeSwitcher
-        majorMode={state.majorMode}
-        minorMode={state.minorMode}
-        selectedSymbol={state.selectedSymbol}
-        availableEnvironments={['3d-gltf', 'code-media']}
-        availableSymbols={availableSymbols}
-        onMajorModeChange={handleMajorModeChange}
-        onMinorModeChange={handleMinorModeChange}
-        onSymbolSelect={handleSymbolSelect}
-      />
+      {!hideModeSwitcher && (
+        <ModeSwitcher
+          majorMode={state.majorMode}
+          minorMode={state.minorMode}
+          selectedSymbol={state.selectedSymbol}
+          availableEnvironments={['3d-gltf', 'code-media']}
+          availableSymbols={availableSymbols}
+          onMajorModeChange={handleMajorModeChange}
+          onMinorModeChange={handleMinorModeChange}
+          onSymbolSelect={handleSymbolSelect}
+        />
+      )}
 
       {/* Main Content Area */}
       <div className="flex-1 overflow-hidden">
@@ -241,6 +246,8 @@ export const UnifiedMetaverseView: React.FC<UnifiedMetaverseViewProps> = ({
             selectedSymbols={state.selectedSymbols}
             onSymbolSelect={handleSymbolSelect}
             config={getEnvironmentConfig(currentEnvironment)}
+            agents={agents}
+            agentsLoading={agentsLoading}
           />
         ) : state.majorMode === 'symbol' && state.selectedSymbol ? (
           // Symbol mode: Show Canvas 2D if symbol is canvas-2d type
@@ -260,6 +267,8 @@ export const UnifiedMetaverseView: React.FC<UnifiedMetaverseViewProps> = ({
               selectedSymbols={state.selectedSymbols}
               onSymbolSelect={handleSymbolSelect}
               config={getEnvironmentConfig(state.selectedSymbol.environment)}
+              agents={agents}
+              agentsLoading={agentsLoading}
             />
           )
         ) : (

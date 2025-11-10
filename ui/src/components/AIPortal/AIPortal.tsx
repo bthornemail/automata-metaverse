@@ -27,6 +27,7 @@ import { AIPortalHeader } from './components/AIPortalHeader';
 import { MetaverseView } from './components/MetaverseView';
 import { MetaversePortal } from './components/MetaversePortal';
 import { MetaversePortalTest } from './components/MetaversePortalTest';
+import MetaverseCanvas3D from '@/components/MetaverseCanvas3D/MetaverseCanvas3D';
 import { BridgeStatusModal } from './components/BridgeStatusModal';
 import { EvolutionMetricsPanel } from './components/EvolutionMetricsPanel';
 import { AgentSelectionModal } from './components/AgentSelectionModal';
@@ -214,7 +215,7 @@ const AIPortal: React.FC = () => {
   const [activeAITab, setActiveAITab] = useState<'evolution' | 'metrics' | 'canvas' | 'llm-config' | 'agent-api'>('evolution');
   const [showCanvasEditor, setShowCanvasEditor] = useState(false);
   const [selectedJSONLFile, setSelectedJSONLFile] = useState<string>('automaton-kernel.jsonl');
-  const [metaverseMode, setMetaverseMode] = useState<'abstract' | 'canvasl-3d' | 'unified'>('unified');
+  const [canvasEditorView, setCanvasEditorView] = useState<'editor' | 'canvasl-3d'>('editor');
   const [showEvolutionMetrics, setShowEvolutionMetrics] = useState(false);
   
   // Metaverse Stats State
@@ -1064,8 +1065,6 @@ Generate a helpful, informative response:
     <div className="w-full h-full bg-gray-800 rounded-xl shadow-xl border border-gray-700 flex flex-col" data-testid="ai-portal">
       {/* Header */}
       <AIPortalHeader
-        metaverseMode={metaverseMode}
-        onMetaverseModeChange={setMetaverseMode}
         selectedJSONLFile={selectedJSONLFile}
         onJSONLFileChange={setSelectedJSONLFile}
         showChatPanel={showChatPanel}
@@ -1082,61 +1081,29 @@ Generate a helpful, informative response:
 
       {/* Main Layout: 3D Metaverse Portal with Chat Overlay */}
       <div className="flex-1 overflow-hidden relative" style={{ minHeight: '600px', height: '100%' }}>
-        {/* Debug: Show mode */}
-        {import.meta.env.DEV && (
-          <div className="absolute top-2 right-2 z-50 bg-yellow-500 text-black px-2 py-1 text-xs">
-            Mode: {metaverseMode}
-          </div>
-        )}
-        {/* 3D Metaverse Portal - Bridging Human NLP ↔ Automaton Metaverse ↔ WebLLM ↔ TinyML */}
-        {metaverseMode === 'unified' ? (
-          <MetaversePortal
-            llmProviderConfig={llmProviderConfig}
-            onNLPMessage={(message) => {
-              addEvolutionLog(`NLP Input: ${message}`);
-              // Also send to chat
-              sendMessage(message);
-            }}
-            onMetaverseAction={(action, params) => {
-              addEvolutionLog(`Metaverse Action: ${action} with params ${JSON.stringify(params)}`);
-              // Execute automaton action
-              if (action === 'start') {
-                automatonActions.startAutomaton(params);
-              } else if (action === 'stop') {
-                automatonActions.stopAutomaton();
-              } else if (action === 'evolve' && params.dimension !== undefined) {
-                automatonActions.setDimension(params.dimension);
-              }
-            }}
-            onBridgeStatusChange={(status) => {
-              setBridgeStatus(status);
-            }}
-          />
-        ) : (
-          <MetaverseView
-            mode={metaverseMode}
-            selectedJSONLFile={selectedJSONLFile}
-            onOpenAIModal={() => setShowAIEvolutionModal(true)}
-            onDimensionChange={(dimension) => {
-              automatonActions.setDimension(dimension);
-            }}
-            onStatsUpdate={(stats) => {
-              setMetaverseStats(stats);
-            }}
-            onSave={(canvas3D) => {
-              addEvolutionLog(`Saved 3D canvas: ${selectedJSONLFile}`);
-            }}
-            onModeChange={(major, minor) => {
-              addEvolutionLog(`Mode changed: ${major}/${minor}`);
-            }}
-            onSymbolSelect={(symbol) => {
-              if (symbol) {
-                addEvolutionLog(`Selected symbol: ${symbol.name} (${symbol.type})`);
-              }
-            }}
-            onEvolutionLog={addEvolutionLog}
-          />
-        )}
+        {/* 3D Metaverse Portal - Unified Collaborative World */}
+        <MetaversePortal
+          llmProviderConfig={llmProviderConfig}
+          onNLPMessage={(message) => {
+            addEvolutionLog(`NLP Input: ${message}`);
+            // Also send to chat
+            sendMessage(message);
+          }}
+          onMetaverseAction={(action, params) => {
+            addEvolutionLog(`Metaverse Action: ${action} with params ${JSON.stringify(params)}`);
+            // Execute automaton action
+            if (action === 'start') {
+              automatonActions.startAutomaton(params);
+            } else if (action === 'stop') {
+              automatonActions.stopAutomaton();
+            } else if (action === 'evolve' && params.dimension !== undefined) {
+              automatonActions.setDimension(params.dimension);
+            }
+          }}
+          onBridgeStatusChange={(status) => {
+            setBridgeStatus(status);
+          }}
+        />
 
         {/* Chat Panel Overlay - Toggleable */}
         <AnimatePresence>
@@ -2192,8 +2159,33 @@ Generate a helpful, informative response:
             {/* Canvas Editor Tab */}
             {activeAITab === 'canvas' && (
               <div className="space-y-4">
+                {/* View Mode Toggle */}
+                <div className="flex gap-2 border-b border-gray-700 pb-2">
+                  <button
+                    onClick={() => setCanvasEditorView('editor')}
+                    className={`px-4 py-2 text-sm font-medium transition-colors ${
+                      canvasEditorView === 'editor'
+                        ? 'text-white border-b-2 border-purple-500'
+                        : 'text-gray-400 hover:text-gray-300'
+                    }`}
+                  >
+                    Editor
+                  </button>
+                  <button
+                    onClick={() => setCanvasEditorView('canvasl-3d')}
+                    className={`px-4 py-2 text-sm font-medium transition-colors ${
+                      canvasEditorView === 'canvasl-3d'
+                        ? 'text-white border-b-2 border-purple-500'
+                        : 'text-gray-400 hover:text-gray-300'
+                    }`}
+                  >
+                    CanvasL 3D
+                  </button>
+                </div>
+
+                {/* File Selection */}
                 <div>
-                  <label className="block text-sm text-gray-400 mb-2">Select JSONL File</label>
+                  <label className="block text-sm text-gray-400 mb-2">Select JSONL/CanvasL File</label>
                   <select
                     value={selectedJSONLFile}
                     onChange={(e) => setSelectedJSONLFile(e.target.value)}
@@ -2207,16 +2199,32 @@ Generate a helpful, informative response:
                     <option value="generate.metaverse.canvasl">generate.metaverse.canvasl (CanvasL)</option>
                   </select>
                 </div>
-                <div className="border border-gray-700 rounded-lg overflow-hidden" style={{ height: '600px' }}>
-                  <UnifiedEditor
-                    filename={selectedJSONLFile}
-                    initialMode="auto"
-                    height="100%"
-                    onSave={(content, format) => {
-                      addEvolutionLog(`Saved canvas: ${selectedJSONLFile} (${format})`);
-                    }}
-                  />
-                </div>
+
+                {/* Editor View */}
+                {canvasEditorView === 'editor' && (
+                  <div className="border border-gray-700 rounded-lg overflow-hidden" style={{ height: '600px' }}>
+                    <UnifiedEditor
+                      filename={selectedJSONLFile}
+                      initialMode="auto"
+                      height="100%"
+                      onSave={(content, format) => {
+                        addEvolutionLog(`Saved canvas: ${selectedJSONLFile} (${format})`);
+                      }}
+                    />
+                  </div>
+                )}
+
+                {/* CanvasL 3D View */}
+                {canvasEditorView === 'canvasl-3d' && (
+                  <div className="border border-gray-700 rounded-lg overflow-hidden" style={{ height: '600px' }}>
+                    <MetaverseCanvas3D
+                      filename={selectedJSONLFile}
+                      onSave={(canvas3D) => {
+                        addEvolutionLog(`Saved 3D canvas: ${selectedJSONLFile}`);
+                      }}
+                    />
+                  </div>
+                )}
               </div>
             )}
 

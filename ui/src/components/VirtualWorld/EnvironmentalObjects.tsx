@@ -7,6 +7,7 @@ import React, { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
+import { useWindAt } from '@/hooks/useMetaversePhysics';
 
 export interface EnvironmentalObject {
   id: string;
@@ -60,11 +61,17 @@ const EnvironmentalObjectRenderer: React.FC<{
     }
   }
 
-  // Animate based on type
+  // Use wind physics for tree animation
+  const wind = useWindAt(position);
+
+  // Animate based on type and physics
   useFrame((state) => {
     if (meshRef.current && type === 'tree') {
-      // Gentle swaying for trees
-      meshRef.current.rotation.z = Math.sin(state.clock.elapsedTime * 0.3) * 0.05;
+      // Tree swaying driven by wind physics
+      const windStrength = wind.strength;
+      const windDirection = Math.atan2(wind.direction[0], wind.direction[2]);
+      meshRef.current.rotation.z = Math.sin(state.clock.elapsedTime * 0.5 + windDirection) * windStrength * 0.1;
+      meshRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.3 + windDirection) * windStrength * 0.05;
     }
   });
 

@@ -127,6 +127,7 @@ export const WorldPersistence: React.FC<WorldPersistenceProps> = ({
             variant="primary"
             size="sm"
             icon={<Save className="w-4 h-4" />}
+            aria-label="Save to localStorage"
           >
             {/* Icon-only button */}
           </ModernButton>
@@ -139,6 +140,7 @@ export const WorldPersistence: React.FC<WorldPersistenceProps> = ({
             variant="secondary"
             size="sm"
             icon={<Upload className="w-4 h-4" />}
+            aria-label="Load from localStorage"
           >
             {/* Icon-only button */}
           </ModernButton>
@@ -150,6 +152,7 @@ export const WorldPersistence: React.FC<WorldPersistenceProps> = ({
             variant="secondary"
             size="sm"
             icon={<Download className="w-4 h-4" />}
+            aria-label="Download as file"
           >
             {/* Icon-only button */}
           </ModernButton>
@@ -162,11 +165,13 @@ export const WorldPersistence: React.FC<WorldPersistenceProps> = ({
               accept=".json"
               onChange={handleUpload}
               className="hidden"
+              aria-label="Upload from file"
             />
             <ModernButton
               variant="secondary"
               size="sm"
               icon={<Upload className="w-4 h-4" />}
+              aria-label="Upload from file"
             >
               {/* Icon-only button */}
             </ModernButton>
@@ -179,6 +184,7 @@ export const WorldPersistence: React.FC<WorldPersistenceProps> = ({
             variant="danger"
             size="sm"
             icon={<Trash2 className="w-4 h-4" />}
+            aria-label="Clear world state"
           >
             {/* Icon-only button */}
           </ModernButton>

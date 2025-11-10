@@ -383,10 +383,11 @@ const Configuration: React.FC<ConfigurationProps> = ({ className = '' }) => {
           <button
             onClick={saveConfiguration}
             disabled={saving || !hasChanges}
+            aria-label={saving ? 'Saving configuration' : 'Save configuration'}
             className="control-button bg-green-600 hover:bg-green-700 text-white disabled:opacity-50"
           >
-            <Save className="w-4 h-4" />
-            {saving ? 'Saving...' : 'Save'}
+            <Save className="w-4 h-4" aria-hidden="true" />
+            <span>{saving ? 'Saving...' : 'Save'}</span>
           </button>
           
           <button
@@ -394,7 +395,8 @@ const Configuration: React.FC<ConfigurationProps> = ({ className = '' }) => {
             className="control-button bg-gray-600 hover:bg-gray-700 text-white"
             aria-label="Reset configuration to defaults"
           >
-            <RotateCcw className="w-4 h-4" />
+            <RotateCcw className="w-4 h-4" aria-hidden="true" />
+            <span className="sr-only">Reset</span>
           </button>
           
           <button
@@ -402,11 +404,13 @@ const Configuration: React.FC<ConfigurationProps> = ({ className = '' }) => {
             className="control-button bg-blue-600 hover:bg-blue-700 text-white"
             aria-label="Export configuration"
           >
-            <Download className="w-4 h-4" />
+            <Download className="w-4 h-4" aria-hidden="true" />
+            <span className="sr-only">Export</span>
           </button>
           
           <label className="control-button bg-purple-600 hover:bg-purple-700 text-white cursor-pointer" aria-label="Import configuration">
-            <Upload className="w-4 h-4" />
+            <Upload className="w-4 h-4" aria-hidden="true" />
+            <span className="sr-only">Import</span>
             <input
               type="file"
               accept=".json"
@@ -419,20 +423,24 @@ const Configuration: React.FC<ConfigurationProps> = ({ className = '' }) => {
       </div>
 
       {/* Configuration Tabs */}
-      <div className="flex gap-2 mb-6">
+      <div className="flex gap-2 mb-6" role="tablist" aria-label="Configuration categories">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
+              role="tab"
+              aria-selected={activeTab === tab.id}
+              aria-controls={`config-tabpanel-${tab.id}`}
+              aria-label={`${tab.label} configuration settings`}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 ${
                 activeTab === tab.id
                   ? 'bg-green-600 text-white'
                   : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
               }`}
             >
-              <Icon className="w-4 h-4" />
+              <Icon className="w-4 h-4" aria-hidden="true" />
               {tab.label}
             </button>
           );
@@ -442,6 +450,9 @@ const Configuration: React.FC<ConfigurationProps> = ({ className = '' }) => {
       {/* Configuration Options */}
       <motion.div
         key={activeTab}
+        id={`config-tabpanel-${activeTab}`}
+        role="tabpanel"
+        aria-labelledby={`config-tab-${activeTab}`}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="space-y-4"

@@ -40,6 +40,9 @@ export interface UnifiedMetaverseViewProps {
   onModeChange?: (major: MajorMode, minor: MinorMode) => void;
   onSymbolSelect?: (symbol: Symbol | null) => void;
   height?: string;
+  hideModeSwitcher?: boolean;
+  agents?: any[]; // Agent API agents
+  agentsLoading?: boolean;
 }
 
 export interface EnvironmentRendererProps {
@@ -48,4 +51,6 @@ export interface EnvironmentRendererProps {
   selectedSymbols: Set<string>;
   onSymbolSelect: (symbol: Symbol | null) => void;
   config?: any;
+  agents?: any[]; // Agent API agents
+  agentsLoading?: boolean;
 }

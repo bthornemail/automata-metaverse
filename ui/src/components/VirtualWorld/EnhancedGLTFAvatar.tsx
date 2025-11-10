@@ -8,6 +8,8 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { useGLTF, Text, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { AvatarAnimationController } from './AvatarAnimationController';
+import { useGravityAt } from '@/hooks/useMetaversePhysics';
+import { avatarAIService, ConversationMessage } from '@/services/avatar-ai-service';
 
 export interface AvatarConfig {
   id: string;
@@ -21,6 +23,8 @@ export interface AvatarConfig {
   dimension?: string; // e.g., "0D", "1D", etc.
   color?: string; // Avatar color theme
   scale?: number; // Avatar scale (default: 1)
+  enableAI?: boolean; // Enable AI-driven autonomous behavior
+  nearbyAgents?: Array<{ id: string; position: [number, number, number] }>; // For AI decision making
 }
 
 interface EnhancedGLTFAvatarProps {
@@ -28,18 +32,42 @@ interface EnhancedGLTFAvatarProps {
   selected?: boolean;
   onClick?: () => void;
   onHover?: (hovered: boolean) => void;
+  onPositionUpdate?: (id: string, position: [number, number, number]) => void; // Callback for AI-driven movement
 }
 
 export const EnhancedGLTFAvatar: React.FC<EnhancedGLTFAvatarProps> = ({
   config,
   selected = false,
   onClick,
-  onHover
+  onHover,
+  onPositionUpdate
 }) => {
+  // React DevTools: Set display name for easier debugging
+  EnhancedGLTFAvatar.displayName = `EnhancedGLTFAvatar(${config.name || config.id})`;
+  
+  // Debug logging for React DevTools inspection
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`[React DevTools] EnhancedGLTFAvatar rendered:`, {
+      id: config.id,
+      name: config.name,
+      position: config.position,
+      dimension: config.dimension,
+      hasGLTF: !!config.gltfUrl,
+      gltfUrl: config.gltfUrl,
+      enableAI: config.enableAI,
+      scale: config.scale
+    });
+  }
   const groupRef = useRef<THREE.Group>(null);
   const [hovered, setHovered] = useState(false);
   const [gltfLoaded, setGltfLoaded] = useState(false);
   const [gltfError, setGltfError] = useState<string | null>(null);
+  const [currentPosition, setCurrentPosition] = useState<[number, number, number]>(config.position);
+  const [conversationBubble, setConversationBubble] = useState<ConversationMessage | null>(null);
+  const [learningIndicator, setLearningIndicator] = useState(false);
+  const [aiAnimationState, setAiAnimationState] = useState<'idle' | 'walking' | 'gesturing'>(config.animationState || 'idle');
+  const lastDecisionTime = useRef<number>(0);
+  const movementTarget = useRef<[number, number, number] | null>(null);
 
   // Register avatar with raycasting system
   useEffect(() => {
@@ -82,12 +110,166 @@ export const EnhancedGLTFAvatar: React.FC<EnhancedGLTFAvatarProps> = ({
     }
   }
 
+  // Get gravity at avatar position
+  const gravity = useGravityAt(currentPosition);
+
+  // AI-driven autonomous behavior
+  useEffect(() => {
+    if (!config.enableAI) return;
+
+    const aiLoop = async () => {
+      const now = Date.now();
+      const timeSinceLastDecision = now - lastDecisionTime.current;
+
+      // Make decision every 2-5 seconds
+      if (timeSinceLastDecision > 2000 + Math.random() * 3000) {
+        try {
+          // Calculate nearby agents
+          const nearbyAgents = (config.nearbyAgents || []).map(agent => {
+            const dx = agent.position[0] - currentPosition[0];
+            const dy = agent.position[1] - currentPosition[1];
+            const dz = agent.position[2] - currentPosition[2];
+            const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+            return { ...agent, distance };
+          }).filter(a => a.distance < 20).sort((a, b) => a.distance - b.distance);
+
+          const decision = await avatarAIService.makeDecision(config.id, {
+            position: currentPosition,
+            nearbyAgents,
+            nearbyObjects: [],
+            timeSinceLastAction: timeSinceLastDecision
+          });
+
+          lastDecisionTime.current = now;
+
+          // Execute decision
+          if (decision.action === 'move' && decision.target?.direction) {
+            const direction = decision.target.direction;
+            const moveDistance = 2;
+            let newPosition: [number, number, number] = [...currentPosition];
+            
+            switch (direction) {
+              case 'forward':
+                newPosition[2] -= moveDistance;
+                break;
+              case 'backward':
+                newPosition[2] += moveDistance;
+                break;
+              case 'left':
+                newPosition[0] -= moveDistance;
+                break;
+              case 'right':
+                newPosition[0] += moveDistance;
+                break;
+            }
+            
+            movementTarget.current = newPosition;
+            setAiAnimationState('walking');
+          } else if (decision.action === 'explore' && decision.target?.position) {
+            movementTarget.current = decision.target.position;
+            setAiAnimationState('walking');
+          } else if (decision.action === 'converse' && decision.target?.agentId) {
+            const message = await avatarAIService.generateConversation(
+              config.id,
+              decision.target.agentId
+            );
+            setConversationBubble(message);
+            setAiAnimationState('gesturing');
+            setTimeout(() => setConversationBubble(null), 5000);
+          } else if (decision.action === 'learn') {
+            setLearningIndicator(true);
+            setTimeout(() => setLearningIndicator(false), 2000);
+          } else if (decision.action === 'idle') {
+            setAiAnimationState('idle');
+          }
+        } catch (error) {
+          console.error(`[AvatarAI] Error making decision for ${config.id}:`, error);
+        }
+      }
+
+      // Move towards target
+      if (movementTarget.current && groupRef.current) {
+        const dx = movementTarget.current[0] - currentPosition[0];
+        const dy = movementTarget.current[1] - currentPosition[1];
+        const dz = movementTarget.current[2] - currentPosition[2];
+        const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+        if (distance > 0.1) {
+          const speed = 0.05;
+          const newPos: [number, number, number] = [
+            currentPosition[0] + (dx / distance) * speed,
+            currentPosition[1] + (dy / distance) * speed,
+            currentPosition[2] + (dz / distance) * speed
+          ];
+          setCurrentPosition(newPos);
+          if (onPositionUpdate) {
+            onPositionUpdate(config.id, newPos);
+          }
+        } else {
+          movementTarget.current = null;
+          setAiAnimationState('idle');
+        }
+      }
+    };
+
+    const interval = setInterval(aiLoop, 100);
+    return () => clearInterval(interval);
+  }, [config.enableAI, config.id, config.nearbyAgents, currentPosition, onPositionUpdate]);
+
+  // Listen for conversations from other avatars
+  useEffect(() => {
+    if (!config.enableAI) return;
+
+    const checkConversations = () => {
+      const conversations = avatarAIService.getConversations(config.id);
+      const recentConversation = conversations
+        .filter(c => Date.now() - c.timestamp < 5000)
+        .sort((a, b) => b.timestamp - a.timestamp)[0];
+
+      if (recentConversation && recentConversation.from !== config.id) {
+        setConversationBubble(recentConversation);
+        setAiAnimationState('gesturing');
+        setTimeout(() => {
+          setConversationBubble(null);
+          setAiAnimationState('idle');
+        }, 5000);
+      }
+    };
+
+    const interval = setInterval(checkConversations, 1000);
+    return () => clearInterval(interval);
+  }, [config.enableAI, config.id]);
+
   // Animation and interaction
   useFrame((state) => {
     if (groupRef.current) {
-      // Gentle floating animation for idle
-      if (animationState === 'idle') {
-        groupRef.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * 0.5) * 0.1;
+      // Use current position (updated by AI if enabled)
+      const displayPosition = config.enableAI ? currentPosition : position;
+      
+      // Apply gravity physics (subtle effect on position)
+      const gravityEffect = gravity[1] * 0.001; // Subtle vertical pull
+      const baseY = displayPosition[1] + gravityEffect;
+      
+      // Use AI animation state if AI is enabled
+      const effectiveAnimationState = config.enableAI ? aiAnimationState : animationState;
+      
+      // Gentle floating animation for idle (affected by gravity)
+      if (effectiveAnimationState === 'idle') {
+        groupRef.current.position.y = baseY + Math.sin(state.clock.elapsedTime * 0.5) * 0.1;
+      } else {
+        groupRef.current.position.y = baseY;
+      }
+
+      // Update position
+      groupRef.current.position.x = displayPosition[0];
+      groupRef.current.position.z = displayPosition[2];
+
+      // Subtle tilt based on gravity direction (for dimension node attraction)
+      if (Math.abs(gravity[0]) > 0.1 || Math.abs(gravity[2]) > 0.1) {
+        const tiltX = gravity[0] * 0.01;
+        const tiltZ = gravity[2] * 0.01;
+        groupRef.current.rotation.x = tiltZ;
+        groupRef.current.rotation.z = -tiltX;
       }
 
       // Selection pulsing
@@ -149,7 +331,7 @@ export const EnhancedGLTFAvatar: React.FC<EnhancedGLTFAvatarProps> = ({
       {renderAvatar()}
 
       {/* Name tag */}
-      {showNameTag && (
+      {showNameTag && name && (
         <group position={[0, 2.5, 0]}>
           <Text
             position={[0, 0, 0]}
@@ -161,7 +343,7 @@ export const EnhancedGLTFAvatar: React.FC<EnhancedGLTFAvatarProps> = ({
             outlineColor="#000000"
             maxWidth={5}
           >
-            {name}
+            {String(name)}
           </Text>
           
           {/* Dimension label */}
@@ -173,7 +355,7 @@ export const EnhancedGLTFAvatar: React.FC<EnhancedGLTFAvatarProps> = ({
               anchorX="center"
               anchorY="middle"
             >
-              {dimension}
+              {String(dimension)}
             </Text>
           )}
         </group>
@@ -200,6 +382,56 @@ export const EnhancedGLTFAvatar: React.FC<EnhancedGLTFAvatarProps> = ({
         <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0.1, 0]}>
           <ringGeometry args={[1.1, 1.15, 32]} />
           <meshBasicMaterial color="#ffffff" side={THREE.DoubleSide} transparent opacity={0.3} />
+        </mesh>
+      )}
+
+      {/* Conversation bubble */}
+      {conversationBubble && conversationBubble.message && (
+        <Html
+          position={[0, 3, 0]}
+          center
+          distanceFactor={10}
+          style={{
+            pointerEvents: 'none',
+            userSelect: 'none'
+          }}
+        >
+          <div className="bg-black/80 text-white px-3 py-2 rounded-lg text-sm max-w-xs shadow-lg border border-white/20">
+            <div className="font-semibold text-xs mb-1 opacity-70">
+              {conversationBubble.type === 'greeting' ? '👋' : 
+               conversationBubble.type === 'question' ? '❓' :
+               conversationBubble.type === 'statement' ? '💬' : '💭'}
+            </div>
+            <div>{String(conversationBubble.message)}</div>
+            <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent border-t-black/80"></div>
+          </div>
+        </Html>
+      )}
+
+      {/* Learning indicator */}
+      {learningIndicator && (
+        <group position={[0, 2.5, 0]}>
+          <mesh>
+            <sphereGeometry args={[0.2, 8, 8]} />
+            <meshBasicMaterial color="#fbbf24" transparent opacity={0.8} />
+          </mesh>
+          <Text
+            position={[0, 0.4, 0]}
+            fontSize={0.15}
+            color="#fbbf24"
+            anchorX="center"
+            anchorY="middle"
+          >
+            ✨ Learning
+          </Text>
+        </group>
+      )}
+
+      {/* AI indicator */}
+      {config.enableAI && (
+        <mesh position={[0, 1.8, 0]}>
+          <sphereGeometry args={[0.1, 8, 8]} />
+          <meshBasicMaterial color="#10b981" emissive="#10b981" emissiveIntensity={0.5} />
         </mesh>
       )}
     </group>

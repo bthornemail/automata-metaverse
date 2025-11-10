@@ -8,7 +8,7 @@ test.describe('Automaton UI - Agent Communication Tests', () => {
 
   test.describe('Agent Interface Functionality', () => {
     test('should load and display available agents', async ({ page }) => {
-      await page.click('button:has-text("AI Portal")');
+      await page.getByRole('tab', { name: 'Switch to AI Portal tab' }).click();
       await page.waitForTimeout(2000);
       
       // Check AI Portal is visible
@@ -29,7 +29,7 @@ test.describe('Automaton UI - Agent Communication Tests', () => {
     });
 
     test('should switch between different agents', async ({ page }) => {
-      await page.click('button:has-text("AI Portal")');
+      await page.getByRole('tab', { name: 'Switch to AI Portal tab' }).click();
       await page.waitForTimeout(2000);
       
       // Check AI Portal is visible
@@ -57,7 +57,7 @@ test.describe('Automaton UI - Agent Communication Tests', () => {
     });
 
     test('should display agent descriptions correctly', async ({ page }) => {
-      await page.click('button:has-text("AI Portal")');
+      await page.getByRole('tab', { name: 'Switch to AI Portal tab' }).click();
       await page.waitForTimeout(2000);
       
       // Check AI Portal is visible
@@ -86,7 +86,7 @@ test.describe('Automaton UI - Agent Communication Tests', () => {
 
   test.describe('Agent Message Exchange', () => {
     test('should send messages to agents and receive responses', async ({ page }) => {
-      await page.click('button:has-text("AI Portal")');
+      await page.getByRole('tab', { name: 'Switch to AI Portal tab' }).click();
       await page.waitForTimeout(2000);
       
       // Check AI Portal is visible
@@ -122,7 +122,7 @@ test.describe('Automaton UI - Agent Communication Tests', () => {
     });
 
     test('should display typing indicators when agent is responding', async ({ page }) => {
-      await page.click('button:has-text("AI Portal")');
+      await page.getByRole('tab', { name: 'Switch to AI Portal tab' }).click();
       await page.waitForTimeout(2000);
       
       // Check AI Portal is visible
@@ -160,7 +160,7 @@ test.describe('Automaton UI - Agent Communication Tests', () => {
     });
 
     test('should maintain message history and conversation context', async ({ page }) => {
-      await page.click('button:has-text("AI Portal")');
+      await page.getByRole('tab', { name: 'Switch to AI Portal tab' }).click();
       await page.waitForTimeout(2000);
       
       // Check AI Portal is visible
@@ -202,7 +202,7 @@ test.describe('Automaton UI - Agent Communication Tests', () => {
 
   test.describe('Agent Capabilities and Specializations', () => {
     test('should handle automaton-interface agent requests', async ({ page }) => {
-      await page.click('button:has-text("AI Portal")');
+      await page.getByRole('tab', { name: 'Switch to AI Portal tab' }).click();
       await page.waitForTimeout(2000);
       
       // Check AI Portal is visible
@@ -244,7 +244,7 @@ test.describe('Automaton UI - Agent Communication Tests', () => {
     });
 
     test('should handle automaton-analyzer agent requests', async ({ page }) => {
-      await page.click('button:has-text("AI Portal")');
+      await page.getByRole('tab', { name: 'Switch to AI Portal tab' }).click();
       await page.waitForTimeout(2000);
       
       // Check AI Portal is visible
@@ -285,7 +285,7 @@ test.describe('Automaton UI - Agent Communication Tests', () => {
     });
 
     test('should handle dimensional-guide agent requests', async ({ page }) => {
-      await page.click('button:has-text("AI Portal")');
+      await page.getByRole('tab', { name: 'Switch to AI Portal tab' }).click();
       await page.waitForTimeout(2000);
       
       // Check AI Portal is visible
@@ -328,7 +328,7 @@ test.describe('Automaton UI - Agent Communication Tests', () => {
 
   test.describe('Agent Message Suggestions', () => {
     test('should display suggested questions for users', async ({ page }) => {
-      await page.click('button:has-text("AI Portal")');
+      await page.getByRole('tab', { name: 'Switch to AI Portal tab' }).click();
       await page.waitForTimeout(2000);
       
       // Check AI Portal is visible
@@ -360,7 +360,7 @@ test.describe('Automaton UI - Agent Communication Tests', () => {
     });
 
     test('should hide suggestions after starting conversation', async ({ page }) => {
-      await page.click('button:has-text("AI Portal")');
+      await page.getByRole('tab', { name: 'Switch to AI Portal tab' }).click();
       await page.waitForTimeout(2000);
       
       // Check AI Portal is visible
@@ -407,7 +407,7 @@ test.describe('Automaton UI - Agent Communication Tests', () => {
         });
       });
       
-      await page.click('button:has-text("AI Portal")');
+      await page.getByRole('tab', { name: 'Switch to AI Portal tab' }).click();
       await page.waitForTimeout(2000);
       
       // Check AI Portal is visible
@@ -448,7 +448,7 @@ test.describe('Automaton UI - Agent Communication Tests', () => {
         });
       });
       
-      await page.click('button:has-text("AI Portal")');
+      await page.getByRole('tab', { name: 'Switch to AI Portal tab' }).click();
       await page.waitForTimeout(2000);
       
       // Check AI Portal is visible
@@ -481,7 +481,7 @@ test.describe('Automaton UI - Agent Communication Tests', () => {
 
   test.describe('Agent Performance and Scalability', () => {
     test('should handle rapid message sending', async ({ page }) => {
-      await page.click('button:has-text("AI Portal")');
+      await page.getByRole('tab', { name: 'Switch to AI Portal tab' }).click();
       await page.waitForTimeout(2000);
       
       // Check AI Portal is visible
@@ -518,7 +518,7 @@ test.describe('Automaton UI - Agent Communication Tests', () => {
     });
 
     test('should maintain conversation context across multiple interactions', async ({ page }) => {
-      await page.click('button:has-text("AI Portal")');
+      await page.getByRole('tab', { name: 'Switch to AI Portal tab' }).click();
       await page.waitForTimeout(2000);
       
       // Check AI Portal is visible

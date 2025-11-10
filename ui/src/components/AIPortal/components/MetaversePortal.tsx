@@ -13,6 +13,7 @@ import {
 import { EnhancedVirtualWorld } from '@/components/VirtualWorld';
 import type { EnhancedVirtualWorldConfig } from '@/components/VirtualWorld';
 import type { AvatarConfig } from '@/components/VirtualWorld/EnhancedGLTFAvatar';
+import UnifiedMetaverseView from '@/components/UnifiedMetaverseView';
 import { nlpService } from '@/services/nlp-service';
 import { llmService } from '@/services/llm-service';
 import type { LLMProviderConfig } from '@/services/llm-service';
@@ -22,6 +23,7 @@ import { cameraService } from '@/services/camera-service';
 import { useAgentAPI } from '@/hooks/useAgentAPI';
 import type { Agent } from '@/services/agent-api/types';
 import { GlassCard, ModernButton, ModernBadge, ModernTooltip } from '@/components/VirtualWorld/ModernUI';
+import { agentCommunicationService } from '@/services/agent-communication-service';
 
 export interface MetaversePortalProps {
   llmProviderConfig: LLMProviderConfig;
@@ -104,122 +106,24 @@ export const MetaversePortal: React.FC<MetaversePortalProps> = ({
   const [connections, setConnections] = useState<BridgeConnection[]>([]);
   const [nlpInput, setNlpInput] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [showBridgeVisualization, setShowBridgeVisualization] = useState(false); // Closed by default
+  const [showBridgeVisualization, setShowBridgeVisualization] = useState(false); // Hidden by default - moved to bottom-right when shown
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isWorldReady, setIsWorldReady] = useState(false);
+  const [showChatPanel, setShowChatPanel] = useState(false);
+  const [chatMode, setChatMode] = useState<'broadcast' | 'direct'>('broadcast');
+  const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
   
   // Load agents from API
-  const { agents, loading: agentsLoading } = useAgentAPI();
+  const { agents, loading: agentsLoading, executeOperation } = useAgentAPI();
   
-  const [worldConfig, setWorldConfig] = useState<EnhancedVirtualWorldConfig>({
-    scene: { 
-      terrain: { 
-        size: 200,
-        color: '#4a5568',
-        roughness: 0.8,
-        metalness: 0.1
-      },
-      skybox: { 
-        type: 'procedural',
-        skyColor: '#87CEEB',
-        stars: true
-      },
-      enableControls: true,
-      camera: {
-        position: [0, 15, 25],
-        fov: 75
-      }
-    },
-    lighting: { 
-      enableShadows: true,
-      ambientIntensity: 0.6
-      // Note: directionalIntensity is not part of AdvancedLightingConfig
-    },
-    camera: { 
-      mode: 'orbital', 
-      target: [0, 0, 0], 
-      distance: 25,
-      fov: 75,
-      enableControls: true
-    },
-    navigation: { 
-      showWaypoints: true,
-      enableTeleportation: true
-    },
-    minimap: { 
-      enabled: true, 
-      position: 'top-right',
-      showZones: true,
-      showBuildings: true,
-      showWaypoints: true
-    },
-    performance: { 
-      enableLOD: true, 
-      enableFrustumCulling: true,
-      enableObjectPooling: true
-    },
-    avatars: [],
-    buildings: [],
-    environmentalObjects: [],
-    showBuildings: true,
-    showPaths: true,
-    showEnvironment: true,
-    enablePersistence: true,
-    enableSettings: true,
-    enableDebug: false,
-    worldSize: 200
-  });
-
-  // Convert agents to avatar configurations
-  const convertAgentsToAvatars = useMemo((): AvatarConfig[] => {
-    if (!agents || agents.length === 0) return [];
-    
-    // Color mapping for dimensions
-    const dimensionColors: Record<string, string> = {
-      '0D': '#ef4444', // Red
-      '1D': '#f59e0b', // Orange
-      '2D': '#eab308', // Yellow
-      '3D': '#10b981', // Green
-      '4D': '#3b82f6', // Blue
-      '5D': '#6366f1', // Indigo
-      '6D': '#8b5cf6', // Purple
-      '7D': '#ec4899', // Pink
-    };
-    
-    return agents.map((agent: Agent, index: number) => {
-      // Arrange agents in a circle around the center
-      const radius = 15;
-      const angle = (index / agents.length) * Math.PI * 2;
-      const x = Math.cos(angle) * radius;
-      const z = Math.sin(angle) * radius;
-      
-      const dimension = agent.dimension || null;
-      const color = dimension ? (dimensionColors[dimension] || '#6366f1') : '#6366f1';
-      
-      return {
-        id: agent.id,
-        name: agent.name,
-        position: [x, 0, z] as [number, number, number],
-        status: agent.status === 'active' ? 'online' : agent.status === 'busy' ? 'away' : 'offline',
-        animationState: 'idle',
-        showNameTag: true,
-        showStatusIndicator: true,
-        dimension: dimension || undefined,
-        color,
-        scale: 1
-      };
-    });
-  }, [agents]);
-
-  // Update world config with agent avatars
+  // Debug: Log agents when they change
   useEffect(() => {
-    if (convertAgentsToAvatars.length > 0) {
-      setWorldConfig(prev => ({
-        ...prev,
-        avatars: convertAgentsToAvatars
-      }));
-    }
-  }, [convertAgentsToAvatars]);
+    console.log('[MetaversePortal] Agents loaded:', {
+      count: agents.length,
+      agents: agents.map(a => ({ id: a.id, name: a.name, dimension: a.dimension, status: a.status })),
+      loading: agentsLoading
+    });
+  }, [agents, agentsLoading]);
 
   // Initialize bridges
   useEffect(() => {
@@ -289,6 +193,57 @@ export const MetaversePortal: React.FC<MetaversePortalProps> = ({
     onNLPMessage?.(input);
 
     try {
+      // Check if this is a direct message to an agent
+      if (chatMode === 'direct' && selectedAgentId) {
+        // Direct message to selected agent
+        const currentUserId = 'user'; // Could be from auth service
+        await agentCommunicationService.sendMessage(currentUserId, selectedAgentId, input);
+        addConnection('nlp', 'metaverse', 'active', { 
+          type: 'direct-message', 
+          to: selectedAgentId, 
+          message: input 
+        });
+        setIsProcessing(false);
+        return;
+      }
+
+      // Check if input contains agent commands (e.g., "tell 0D agent to...", "ask 4D agent...")
+      const agentCommandMatch = input.match(/(?:tell|ask|command|message)\s+(\d+D[-\w]*)\s+(?:agent\s+)?(?:to\s+)?(.+)/i);
+      if (agentCommandMatch) {
+        const [, agentIdentifier, command] = agentCommandMatch;
+        // Find agent by name or dimension
+        const targetAgent = agents.find(a => 
+          a.name.toLowerCase().includes(agentIdentifier.toLowerCase()) ||
+          a.dimension === agentIdentifier.toUpperCase() ||
+          a.id.toLowerCase().includes(agentIdentifier.toLowerCase())
+        );
+        
+        if (targetAgent) {
+          // Execute operation on agent
+          try {
+            const response = await executeOperation({
+              agentId: targetAgent.id,
+              operation: 'execute-command',
+              parameters: { command, originalInput: input }
+            });
+            
+            // Also send as communication message
+            await agentCommunicationService.sendMessage('user', targetAgent.id, command);
+            
+            addConnection('nlp', 'metaverse', 'active', { 
+              type: 'agent-command', 
+              agent: targetAgent.id, 
+              command,
+              response 
+            });
+            setIsProcessing(false);
+            return;
+          } catch (error) {
+            console.error('Failed to execute agent command:', error);
+          }
+        }
+      }
+
       // Step 1: NLP Processing
       addConnection('nlp', 'webllm', 'active', { input });
       const nlpAnalysis = await nlpService.parseInput(input);
@@ -301,7 +256,7 @@ export const MetaversePortal: React.FC<MetaversePortalProps> = ({
           [
             {
               role: 'system',
-              content: `You are an AI assistant for a 3D Metaverse Portal. Translate natural language commands into metaverse actions. Current world state: ${JSON.stringify(worldService.getState())}`
+              content: `You are an AI assistant for a 3D Metaverse Portal. Translate natural language commands into metaverse actions. Current world state: ${JSON.stringify(worldService.getState())}. Available agents: ${agents.map(a => `${a.name} (${a.dimension})`).join(', ')}`
             },
             {
               role: 'user',
@@ -311,6 +266,26 @@ export const MetaversePortal: React.FC<MetaversePortalProps> = ({
           llmProviderConfig
         );
         addConnection('webllm', 'metaverse', 'active', { response: llmResponse });
+
+        // Check if LLM response suggests agent communication
+        const llmResponseText = llmResponse.content || '';
+        const agentMentionMatch = llmResponseText.match(/(\d+D[-\w]*)\s+(?:agent|agent's)/i);
+        if (agentMentionMatch) {
+          const agentIdentifier = agentMentionMatch[1];
+          const targetAgent = agents.find(a => 
+            a.name.toLowerCase().includes(agentIdentifier.toLowerCase()) ||
+            a.dimension === agentIdentifier.toUpperCase()
+          );
+          
+          if (targetAgent) {
+            // Send message to agent via communication service
+            await agentCommunicationService.sendMessage('user', targetAgent.id, llmResponseText);
+            addConnection('metaverse', 'nlp', 'active', { 
+              type: 'agent-communication', 
+              agent: targetAgent.id 
+            });
+          }
+        }
 
         // Step 3: TinyML Pattern Prediction
         if (bridgeStatus.tinyml) {
@@ -440,19 +415,22 @@ export const MetaversePortal: React.FC<MetaversePortalProps> = ({
         )}
       </AnimatePresence>
 
-      {/* 3D Metaverse World - Always render, just control visibility */}
+      {/* 3D Metaverse World - Unified Collaborative World with Research Mode */}
       <div className="absolute inset-0 w-full h-full" style={{ minHeight: '600px', height: '100%', position: 'relative', zIndex: 1 }}>
         <MetaversePortalErrorBoundary>
-          <EnhancedVirtualWorld
-            config={worldConfig}
-            onWorldStateChange={(state) => {
-              setIsWorldReady(true);
-              // Update bridge status based on world state
-              setBridgeStatus(prev => ({
-                ...prev,
-                metaverse: true // Always true when world is rendered
-              }));
+          <UnifiedMetaverseView
+            initialMajorMode="environment"
+            initialMinorMode="3d-gltf"
+            agents={agents}
+            agentsLoading={agentsLoading}
+            onModeChange={(major, minor) => {
+              // Handle mode changes if needed
             }}
+            onSymbolSelect={(symbol) => {
+              // Handle symbol selection if needed
+            }}
+            height="100%"
+            hideModeSwitcher={true}
           />
         </MetaversePortalErrorBoundary>
       </div>
@@ -465,9 +443,9 @@ export const MetaversePortal: React.FC<MetaversePortalProps> = ({
         </div>
       </div>
 
-      {/* Bridge Visualization Overlay */}
+      {/* Bridge Visualization Overlay - Hidden by default, moved to bottom-right corner */}
       {showBridgeVisualization && (
-        <div className="absolute top-4 left-4 right-4 z-10">
+        <div className="absolute bottom-4 right-4 w-80 z-10">
           <GlassCard className="p-4">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
@@ -543,10 +521,63 @@ export const MetaversePortal: React.FC<MetaversePortalProps> = ({
       {/* NLP Input Panel */}
       <div className="absolute bottom-4 left-4 right-4 z-10">
         <GlassCard className="p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <Brain className="w-5 h-5 text-purple-400" />
-            <h3 className="text-white font-semibold">Natural Language Interface</h3>
-            <ModernBadge variant="info">NLP → WebLLM → Metaverse</ModernBadge>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Brain className="w-5 h-5 text-purple-400" />
+              <h3 className="text-white font-semibold">Natural Language Interface</h3>
+              <ModernBadge variant="info">NLP → WebLLM → Metaverse</ModernBadge>
+            </div>
+            
+            {/* Chat Mode Toggle and Agent Selection */}
+            <div className="flex items-center gap-2">
+              {/* Chat Mode Toggle (Direct/Broadcast) */}
+              <div className="flex gap-1 bg-gray-800/50 rounded-lg p-1" role="tablist">
+                <button
+                  onClick={() => {
+                    setChatMode('broadcast');
+                    setSelectedAgentId(null);
+                  }}
+                  role="tab"
+                  aria-selected={chatMode === 'broadcast'}
+                  className={`px-3 py-1 rounded text-xs transition-colors ${
+                    chatMode === 'broadcast'
+                      ? 'bg-blue-600 text-white'
+                      : 'text-gray-300 hover:text-white'
+                  }`}
+                >
+                  Broadcast
+                </button>
+                <button
+                  onClick={() => setChatMode('direct')}
+                  role="tab"
+                  aria-selected={chatMode === 'direct'}
+                  className={`px-3 py-1 rounded text-xs transition-colors ${
+                    chatMode === 'direct'
+                      ? 'bg-blue-600 text-white'
+                      : 'text-gray-300 hover:text-white'
+                  }`}
+                >
+                  Direct
+                </button>
+              </div>
+              
+              {/* Agent Selection (for Direct mode) */}
+              {chatMode === 'direct' && (
+                <select
+                  value={selectedAgentId || ''}
+                  onChange={(e) => setSelectedAgentId(e.target.value || null)}
+                  className="px-3 py-1 bg-gray-800 border border-gray-700 rounded text-xs text-white focus:outline-none focus:border-blue-500"
+                  aria-label="Select agent for direct message"
+                >
+                  <option value="">Select agent...</option>
+                  {agents.filter(a => a.dimension).map((agent) => (
+                    <option key={agent.id} value={agent.id}>
+                      {agent.name} ({agent.dimension})
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
           </div>
 
           <div className="flex gap-2">
@@ -555,13 +586,17 @@ export const MetaversePortal: React.FC<MetaversePortalProps> = ({
               value={nlpInput}
               onChange={(e) => setNlpInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && processNLPInput(nlpInput)}
-              placeholder="Say something... (e.g., 'Show me the overview', 'Create an avatar', 'Move to 3D dimension')"
+              placeholder={chatMode === 'broadcast' 
+                ? "Say something... (e.g., 'Show me the overview', 'Tell 0D agent to analyze topology', 'Ask 4D agent about network status')"
+                : selectedAgentId 
+                  ? `Message ${agents.find(a => a.id === selectedAgentId)?.name || 'agent'}...`
+                  : "Select an agent to send direct message..."}
               disabled={isProcessing}
               className="flex-1 px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500/50 disabled:opacity-50"
             />
             <ModernButton
               onClick={() => processNLPInput(nlpInput)}
-              disabled={!nlpInput.trim() || isProcessing}
+              disabled={!nlpInput.trim() || isProcessing || (chatMode === 'direct' && !selectedAgentId)}
               variant="primary"
               size="md"
               icon={<Send className="w-4 h-4" />}
@@ -604,13 +639,14 @@ export const MetaversePortal: React.FC<MetaversePortalProps> = ({
         </GlassCard>
       </div>
 
-      {/* Bridge Status Indicator (Minimized) */}
+      {/* Bridge Status Indicator (Minimized) - Moved to bottom-left to avoid minimap overlap */}
       {!showBridgeVisualization && (
         <motion.button
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           onClick={() => setShowBridgeVisualization(true)}
-          className="absolute top-4 left-4 z-10 p-2 bg-white/10 backdrop-blur-xl border border-white/20 rounded-lg hover:bg-white/15 transition-colors"
+          className="absolute bottom-20 left-4 z-10 p-2 bg-white/10 backdrop-blur-xl border border-white/20 rounded-lg hover:bg-white/15 transition-colors"
+          title="Show Bridge Connections"
         >
           <Network className="w-5 h-5 text-blue-400" />
         </motion.button>

@@ -1,0 +1,123 @@
+@version: "1.0"
+@schema: "canvasl-v1"
+@r5rs-engine: "r5rs-canvas-engine.scm"
+@dimension: "4D-6D"
+@phase: "ai-portal-collaborative-world"
+
+{"id":"ai-portal-world","type":"world","name":"AI Portal Collaborative World","dimension":"4D-6D","metadata":{"phase":"ai-portal-collaborative-world","created":"2025-01-07"}}
+
+{"id":"agent-movement-system","type":"system","name":"Agent Movement System","dimension":"4D","description":"Handles agent movement, physics, and spatial interactions","components":["movement-controller","physics-engine","collision-detector"]}
+
+{"id":"interaction-propagation-system","type":"system","name":"Interaction Propagation System","dimension":"5D","description":"Manages interaction propagation across global, local, personal, peer, and agentic levels","components":["propagation-router","interaction-queue","learning-backprop"]}
+
+{"id":"learning-system","type":"system","name":"Learning and Back Propagation System","dimension":"6D","description":"Handles learning from interactions and back propagation of knowledge","components":["neural-network","gradient-descent","knowledge-graph"]}
+
+{"id":"movement-controller","type":"component","name":"Movement Controller","system":"agent-movement-system","r5rs-functions":["r5rs:church-add","r5rs:church-mult"],"description":"Controls agent movement using Church encoding for position calculations"}
+
+{"id":"physics-engine","type":"component","name":"Physics Engine","system":"agent-movement-system","r5rs-functions":["r5rs:church-add","r5rs:church-mult"],"description":"Handles physics simulation including velocity, acceleration, and collision detection"}
+
+{"id":"collision-detector","type":"component","name":"Collision Detector","system":"agent-movement-system","r5rs-functions":["r5rs:church-add"],"description":"Detects collisions between agents and environment objects"}
+
+{"id":"propagation-router","type":"component","name":"Propagation Router","system":"interaction-propagation-system","r5rs-functions":["r5rs:church-add","r5rs:church-mult"],"description":"Routes interactions to appropriate propagation levels (global, local, personal, peer, agentic)"}
+
+{"id":"interaction-queue","type":"component","name":"Interaction Queue","system":"interaction-propagation-system","r5rs-functions":["r5rs:church-add"],"description":"Manages interaction event queue for asynchronous processing"}
+
+{"id":"learning-backprop","type":"component","name":"Learning Back Propagation","system":"interaction-propagation-system","r5rs-functions":["r5rs:church-mult","r5rs:church-exp"],"description":"Handles back propagation of learning signals through interaction network"}
+
+{"id":"neural-network","type":"component","name":"Neural Network","system":"learning-system","r5rs-functions":["r5rs:church-add","r5rs:church-mult","r5rs:church-exp"],"description":"Neural network for learning from agent interactions"}
+
+{"id":"gradient-descent","type":"component","name":"Gradient Descent","system":"learning-system","r5rs-functions":["r5rs:church-add","r5rs:church-mult"],"description":"Gradient descent optimizer for neural network training"}
+
+{"id":"knowledge-graph","type":"component","name":"Knowledge Graph","system":"learning-system","r5rs-functions":["r5rs:church-add"],"description":"Knowledge graph storing learned patterns and relationships"}
+
+{"id":"agent-move-forward","type":"r5rs-call","function":"r5rs:church-add","args":["agent-position","forward-vector"],"description":"Move agent forward using Church addition","component":"movement-controller"}
+
+{"id":"agent-move-backward","type":"r5rs-call","function":"r5rs:church-add","args":["agent-position","backward-vector"],"description":"Move agent backward using Church addition","component":"movement-controller"}
+
+{"id":"agent-rotate","type":"r5rs-call","function":"r5rs:church-mult","args":["agent-rotation","rotation-angle"],"description":"Rotate agent using Church multiplication","component":"movement-controller"}
+
+{"id":"calculate-velocity","type":"r5rs-call","function":"r5rs:church-add","args":["current-velocity","acceleration"],"description":"Calculate new velocity from acceleration","component":"physics-engine"}
+
+{"id":"calculate-position","type":"r5rs-call","function":"r5rs:church-add","args":["current-position","velocity"],"description":"Calculate new position from velocity","component":"physics-engine"}
+
+{"id":"check-collision","type":"r5rs-call","function":"r5rs:church-add","args":["agent-position","object-position"],"description":"Check collision between agent and object","component":"collision-detector"}
+
+{"id":"propagate-global","type":"r5rs-call","function":"r5rs:church-mult","args":["interaction-event","global-multiplier"],"description":"Propagate interaction to global level","component":"propagation-router"}
+
+{"id":"propagate-local","type":"r5rs-call","function":"r5rs:church-mult","args":["interaction-event","local-multiplier"],"description":"Propagate interaction to local level","component":"propagation-router"}
+
+{"id":"propagate-personal","type":"r5rs-call","function":"r5rs:church-add","args":["interaction-event","personal-context"],"description":"Propagate interaction to personal level","component":"propagation-router"}
+
+{"id":"propagate-peer","type":"r5rs-call","function":"r5rs:church-add","args":["interaction-event","peer-context"],"description":"Propagate interaction to peer level","component":"propagation-router"}
+
+{"id":"propagate-agentic","type":"r5rs-call","function":"r5rs:church-exp","args":["interaction-event","agentic-power"],"description":"Propagate interaction to agentic level using Church exponentiation","component":"propagation-router"}
+
+{"id":"queue-interaction","type":"r5rs-call","function":"r5rs:church-add","args":["interaction-queue","new-interaction"],"description":"Add interaction to queue","component":"interaction-queue"}
+
+{"id":"backpropagate-learning","type":"r5rs-call","function":"r5rs:church-mult","args":["learning-signal","backprop-weight"],"description":"Back propagate learning signal through network","component":"learning-backprop"}
+
+{"id":"forward-pass","type":"r5rs-call","function":"r5rs:church-mult","args":["input","neural-weight"],"description":"Neural network forward pass","component":"neural-network"}
+
+{"id":"backward-pass","type":"r5rs-call","function":"r5rs:church-mult","args":["error","gradient"],"description":"Neural network backward pass for learning","component":"neural-network"}
+
+{"id":"update-weights","type":"r5rs-call","function":"r5rs:church-add","args":["current-weight","weight-delta"],"description":"Update neural network weights","component":"gradient-descent"}
+
+{"id":"store-knowledge","type":"r5rs-call","function":"r5rs:church-add","args":["knowledge-graph","new-pattern"],"description":"Store learned pattern in knowledge graph","component":"knowledge-graph"}
+
+{"id":"agent-0D","type":"agent","dimension":"0D","name":"0D-Topology-Agent","position":[0,0,0],"velocity":[0,0,0],"interaction-range":"personal","learning-enabled":true}
+
+{"id":"agent-1D","type":"agent","dimension":"1D","name":"1D-Temporal-Agent","position":[1,0,0],"velocity":[0,0,0],"interaction-range":"peer","learning-enabled":true}
+
+{"id":"agent-2D","type":"agent","dimension":"2D","name":"2D-Structural-Agent","position":[2,0,0],"velocity":[0,0,0],"interaction-range":"local","learning-enabled":true}
+
+{"id":"agent-3D","type":"agent","dimension":"3D","name":"3D-Algebraic-Agent","position":[3,0,0],"velocity":[0,0,0],"interaction-range":"local","learning-enabled":true}
+
+{"id":"agent-4D","type":"agent","dimension":"4D","name":"4D-Network-Agent","position":[4,0,0],"velocity":[0,0,0],"interaction-range":"global","learning-enabled":true}
+
+{"id":"agent-5D","type":"agent","dimension":"5D","name":"5D-Consensus-Agent","position":[5,0,0],"velocity":[0,0,0],"interaction-range":"global","learning-enabled":true}
+
+{"id":"agent-6D","type":"agent","dimension":"6D","name":"6D-Intelligence-Agent","position":[6,0,0],"velocity":[0,0,0],"interaction-range":"agentic","learning-enabled":true}
+
+{"id":"agent-7D","type":"agent","dimension":"7D","name":"7D-Quantum-Agent","position":[7,0,0],"velocity":[0,0,0],"interaction-range":"agentic","learning-enabled":true}
+
+{"id":"movement-pattern-random","type":"movement-pattern","name":"Random Movement","r5rs-expression":"(church-add (random-position) (random-velocity))","description":"Random movement pattern using Church addition"}
+
+{"id":"movement-pattern-follow","type":"movement-pattern","name":"Follow Pattern","r5rs-expression":"(church-add agent-position (church-mult follow-direction follow-speed))","description":"Follow another agent using Church operations"}
+
+{"id":"movement-pattern-avoid","type":"movement-pattern","name":"Avoid Pattern","r5rs-expression":"(church-add agent-position (church-mult avoid-direction avoid-speed))","description":"Avoid obstacles using Church operations"}
+
+{"id":"movement-pattern-flock","type":"movement-pattern","name":"Flocking Pattern","r5rs-expression":"(church-add agent-position (church-mult flock-center flock-cohesion))","description":"Flocking behavior using Church operations"}
+
+{"id":"interaction-type-touch","type":"interaction-type","name":"Touch Interaction","propagation-levels":["personal","peer"],"learning-weight":0.1,"description":"Physical touch interaction"}
+
+{"id":"interaction-type-communicate","type":"interaction-type","name":"Communication Interaction","propagation-levels":["peer","local"],"learning-weight":0.3,"description":"Communication interaction"}
+
+{"id":"interaction-type-collaborate","type":"interaction-type","name":"Collaboration Interaction","propagation-levels":["local","global"],"learning-weight":0.5,"description":"Collaboration interaction"}
+
+{"id":"interaction-type-learn","type":"interaction-type","name":"Learning Interaction","propagation-levels":["agentic"],"learning-weight":1.0,"description":"Learning interaction with full back propagation"}
+
+{"id":"learning-rule-movement","type":"learning-rule","name":"Movement Learning Rule","r5rs-expression":"(church-mult movement-success (church-exp learning-rate time-delta))","description":"Learn from movement success"}
+
+{"id":"learning-rule-interaction","type":"learning-rule","name":"Interaction Learning Rule","r5rs-expression":"(church-mult interaction-value (church-exp learning-rate interaction-weight))","description":"Learn from interaction value"}
+
+{"id":"learning-rule-backprop","type":"learning-rule","name":"Back Propagation Rule","r5rs-expression":"(church-mult error-signal (church-exp gradient learning-rate))","description":"Back propagate error signal"}
+
+{"id":"edge-movement-to-physics","type":"edge","from":"movement-controller","to":"physics-engine","type":"data-flow","description":"Movement data flows to physics engine"}
+
+{"id":"edge-physics-to-collision","type":"edge","from":"physics-engine","to":"collision-detector","type":"data-flow","description":"Physics data flows to collision detector"}
+
+{"id":"edge-interaction-to-propagation","type":"edge","from":"interaction-queue","to":"propagation-router","type":"data-flow","description":"Interaction events flow to propagation router"}
+
+{"id":"edge-propagation-to-learning","type":"edge","from":"propagation-router","to":"learning-backprop","type":"data-flow","description":"Propagated interactions flow to learning system"}
+
+{"id":"edge-learning-to-neural","type":"edge","from":"learning-backprop","to":"neural-network","type":"data-flow","description":"Learning signals flow to neural network"}
+
+{"id":"edge-neural-to-gradient","type":"edge","from":"neural-network","to":"gradient-descent","type":"data-flow","description":"Neural network outputs flow to gradient descent"}
+
+{"id":"edge-gradient-to-knowledge","type":"edge","from":"gradient-descent","to":"knowledge-graph","type":"data-flow","description":"Gradient updates flow to knowledge graph"}
+
+{"id":"edge-knowledge-to-backprop","type":"edge","from":"knowledge-graph","to":"learning-backprop","type":"feedback","description":"Knowledge graph provides feedback for back propagation"}
+
+{"id":"world-config","type":"config","world-size":200,"agent-count":8,"interaction-radius":10,"learning-rate":0.01,"backprop-depth":3,"propagation-delay":100}
+
+{"id":"self-reference","type":"self-ref","file":"ai-portal-agent-movement.canvasl","line":1,"pattern":"collaborative-world-creation","metadata":{"phase":"ai-portal-collaborative-world","version":"1.0"}}

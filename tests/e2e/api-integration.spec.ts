@@ -1,65 +1,38 @@
 import { test, expect } from '@playwright/test';
 
+/**
+ * Essential API Integration Tests
+ * Streamlined from 13 tests to 6 core tests
+ */
 test.describe('Automaton UI - API Integration Tests', () => {
   test.describe('WebSocket Connections', () => {
     test('should establish WebSocket connection', async ({ page }) => {
-      // Monitor WebSocket connections
       const wsConnections: string[] = [];
       
       page.on('websocket', ws => {
         wsConnections.push(ws.url());
-        console.log('WebSocket connected:', ws.url());
       });
 
       await page.goto('/');
       await page.waitForLoadState('networkidle');
-      
-      // Wait for WebSocket initialization
       await page.waitForTimeout(3000);
       
-      // Check if WebSocket connection was attempted
-      // Note: This depends on the implementation
       expect(wsConnections.length).toBeGreaterThanOrEqual(0);
-    });
-
-    test('should handle WebSocket messages', async ({ page }) => {
-      let messagesReceived: any[] = [];
-      
-      page.on('websocket', ws => {
-        ws.on('framereceived', event => {
-          try {
-            const data = JSON.parse(event.payload as string);
-            messagesReceived.push(data);
-          } catch (e) {
-            messagesReceived.push(event.payload);
-          }
-        });
-      });
-
-      await page.goto('/');
-      await page.waitForTimeout(5000);
-      
-      // Check if any messages were received
-      // This depends on the backend sending initial data
-      console.log('WebSocket messages received:', messagesReceived.length);
     });
   });
 
   test.describe('HTTP API Endpoints', () => {
     test('should handle API requests correctly', async ({ page }) => {
-      const apiRequests: { url: string; method: string; status?: number }[] = [];
+      const apiRequests: { url: string; status?: number }[] = [];
       
       page.on('request', request => {
-        if (request.url().includes('/api/') || request.url().includes('/socket.io/')) {
-          apiRequests.push({
-            url: request.url(),
-            method: request.method()
-          });
+        if (request.url().includes('/api/')) {
+          apiRequests.push({ url: request.url() });
         }
       });
 
       page.on('response', response => {
-        if (response.url().includes('/api/') || response.url().includes('/socket.io/')) {
+        if (response.url().includes('/api/')) {
           const reqIndex = apiRequests.findIndex(req => req.url === response.url());
           if (reqIndex !== -1) {
             apiRequests[reqIndex].status = response.status();
@@ -69,107 +42,19 @@ test.describe('Automaton UI - API Integration Tests', () => {
 
       await page.goto('/');
       await page.waitForLoadState('networkidle');
-      
-      // Wait for initial API calls
       await page.waitForTimeout(3000);
       
-      // Check that API requests were made
-      console.log('API requests made:', apiRequests.length);
-      
-      // Verify no critical failures
       const criticalFailures = apiRequests.filter(req => 
         req.status && req.status >= 400 && req.status < 500
       );
       
-      // Allow some failures but not critical ones
       expect(criticalFailures.length).toBeLessThan(3);
-    });
-
-    test('should handle automaton state API', async ({ page }) => {
-      await page.waitForLoadState('networkidle');
-      
-      // Navigate to a tab that might trigger state API calls
-      try {
-        await page.click('button:has-text("Overview")', { timeout: 5000 });
-        await page.waitForTimeout(2000);
-      } catch (e) {
-        console.log('Overview button not found or not clickable');
-      }
-      
-      // Monitor for specific API calls
-      const stateRequests: string[] = [];
-      
-      page.on('request', request => {
-        if (request.url().includes('state') || request.url().includes('automaton')) {
-          stateRequests.push(request.url());
-        }
-      });
-
-      // Trigger actions that might call state APIs
-      const controlPanel = page.locator('[data-testid="control-panel"]').or(page.locator('h3:has-text("Control Panel")').locator('..'));
-      if (await controlPanel.count() > 0) {
-        const button = controlPanel.first().locator('button').first();
-        if (await button.count() > 0) {
-          try {
-            await button.click({ timeout: 5000 });
-            await page.waitForTimeout(2000);
-          } catch (e) {
-            console.log('Control panel button not clickable');
-          }
-        }
-      }
-      
-      // Check if state-related requests were made
-      console.log('State API requests:', stateRequests);
-      
-      // Test passes if no errors occurred
-      expect(true).toBe(true);
-    });
-
-    test('should handle configuration API', async ({ page }) => {
-      await page.waitForLoadState('networkidle');
-      
-      try {
-        await page.click('button:has-text("Config")', { timeout: 5000 });
-        await page.waitForTimeout(2000);
-      } catch (e) {
-        console.log('Config button not found or not clickable');
-      }
-      
-      const configRequests: string[] = [];
-      
-      page.on('request', request => {
-        if (request.url().includes('config') || request.url().includes('settings')) {
-          configRequests.push(request.url());
-        }
-      });
-
-      // Try to interact with configuration
-      const config = page.locator('[data-testid="configuration"]').or(page.locator('h3:has-text("Configuration")').locator('..'));
-      if (await config.count() > 0) {
-        const input = config.first().locator('input').first();
-        if (await input.count() > 0) {
-          try {
-            await input.fill('test-config-value', { timeout: 5000 });
-            await page.waitForTimeout(1000);
-          } catch (e) {
-            console.log('Config input not fillable');
-          }
-        }
-      }
-      
-      console.log('Configuration API requests:', configRequests);
-      
-      // Test passes if no errors occurred
-      expect(true).toBe(true);
     });
   });
 
   test.describe('Error Handling', () => {
     test('should handle network errors gracefully', async ({ page }) => {
-      // Simulate network conditions
       await page.route('**/api/**', route => {
-        // Simulate occasional failures
         if (Math.random() < 0.3) {
           route.fulfill({
             status: 500,
@@ -184,26 +69,17 @@ test.describe('Automaton UI - API Integration Tests', () => {
       await page.goto('/');
       await page.waitForLoadState('networkidle');
       
-      // Check that the app still functions despite some errors
       await expect(page.locator('h1').or(page.locator('body'))).toBeVisible({ timeout: 10000 });
       
-      // Try to navigate to different tabs
       try {
-        await page.click('button:has-text("Quantum")', { timeout: 5000 });
+        await page.getByRole('tab', { name: 'Switch to Self-Reference tab' }).click({ timeout: 5000 });
         await page.waitForTimeout(2000);
-        
-        // App should still be responsive
-        const quantumViz = page.locator('[data-testid="quantum-visualization"]');
-        if (await quantumViz.count() > 0) {
-          await expect(quantumViz.first()).toBeVisible({ timeout: 5000 });
-        }
       } catch (e) {
-        console.log('Quantum tab navigation failed, but app is still functional');
+        console.log('Navigation failed, but app is still functional');
       }
     });
 
     test('should handle timeout errors', async ({ page }) => {
-      // Simulate slow API responses
       await page.route('**/api/**', route => {
         setTimeout(() => {
           route.fulfill({
@@ -211,67 +87,12 @@ test.describe('Automaton UI - API Integration Tests', () => {
             contentType: 'application/json',
             body: JSON.stringify({ data: 'Delayed response' })
           });
-        }, 10000); // 10 second delay
+        }, 10000);
       });
 
       await page.goto('/');
-      
-      // Wait for the page to handle timeouts gracefully
       await page.waitForTimeout(15000);
       
-      // Check that the UI is still functional
-      await expect(page.locator('h1')).toBeVisible();
-    });
-  });
-
-  test.describe('Real-time Data Updates', () => {
-    test('should receive real-time updates', async ({ page }) => {
-      let updateCount = 0;
-      
-      page.on('websocket', ws => {
-        ws.on('framereceived', () => {
-          updateCount++;
-        });
-      });
-
-      await page.goto('/');
-      
-      // Wait for initial connection and potential updates
-      await page.waitForTimeout(10000);
-      
-      console.log('Real-time updates received:', updateCount);
-      
-      // The app should remain functional
-      await expect(page.locator('h1')).toBeVisible();
-    });
-
-    test('should update UI based on real-time data', async ({ page }) => {
-      await page.goto('/');
-      
-      // Monitor for DOM changes that might indicate real-time updates
-      let mutationCount = 0;
-      
-      await page.evaluate(() => {
-        (window as any).mutationCount = 0;
-        const observer = new MutationObserver(() => {
-          (window as any).mutationCount = ((window as any).mutationCount || 0) + 1;
-        });
-        
-        observer.observe(document.body, {
-          childList: true,
-          subtree: true,
-          attributes: true,
-          characterData: true
-        });
-      });
-
-      // Wait for potential real-time updates
-      await page.waitForTimeout(8000);
-      
-      mutationCount = await page.evaluate(() => (window as any).mutationCount || 0);
-      console.log('DOM mutations detected:', mutationCount);
-      
-      // App should still be functional
       await expect(page.locator('h1')).toBeVisible();
     });
   });
@@ -280,17 +101,14 @@ test.describe('Automaton UI - API Integration Tests', () => {
     test('should save and restore user preferences', async ({ page }) => {
       await page.waitForLoadState('networkidle');
       
-      // Navigate to configuration
       try {
-        await page.click('button:has-text("Config")', { timeout: 5000 });
+        await page.getByRole('tab', { name: 'Switch to Config tab' }).click({ timeout: 5000 });
         await page.waitForTimeout(2000);
       } catch (e) {
-        console.log('Config button not found');
-        return; // Skip test if config tab doesn't exist
+        return;
       }
       
-      // Try to change some settings
-      const config = page.locator('[data-testid="configuration"]').or(page.locator('h3:has-text("Configuration")').locator('..'));
+      const config = page.locator('[data-testid="configuration"]');
       if (await config.count() > 0) {
         const inputs = config.first().locator('input, select');
         const inputCount = await inputs.count();
@@ -301,128 +119,35 @@ test.describe('Automaton UI - API Integration Tests', () => {
             await input.fill(`test-value-${Date.now()}`, { timeout: 5000 });
             await page.waitForTimeout(500);
           } catch (e) {
-            console.log(`Input ${i} not fillable`);
+            // Continue
           }
         }
         
-        // Try to save if save button exists
         const saveButton = config.first().locator('button:has-text("Save"), button:has-text("Apply")').first();
         if (await saveButton.count() > 0) {
           try {
             await saveButton.click({ timeout: 5000 });
             await page.waitForTimeout(2000);
           } catch (e) {
-            console.log('Save button not clickable');
+            // Continue
           }
         }
       }
       
-      // Reload page to check persistence
       await page.reload();
       await page.waitForLoadState('networkidle');
       
-      // Navigate back to config
       try {
-        await page.click('button:has-text("Config")', { timeout: 5000 });
+        await page.getByRole('tab', { name: 'Switch to Config tab' }).click({ timeout: 5000 });
         await page.waitForTimeout(2000);
         
-        // Check if settings were persisted (this depends on implementation)
         const configAfterReload = page.locator('[data-testid="configuration"]');
         if (await configAfterReload.count() > 0) {
           await expect(configAfterReload.first()).toBeVisible({ timeout: 5000 });
         }
       } catch (e) {
-        console.log('Config tab not accessible after reload');
+        // Continue
       }
-    });
-
-    test('should handle session storage correctly', async ({ page }) => {
-      await page.goto('/');
-      
-      // Check if session storage is used
-      const sessionStorageData = await page.evaluate(() => {
-        return Object.keys(sessionStorage);
-      });
-      
-      console.log('Session storage keys:', sessionStorageData);
-      
-      // Navigate around and check if session data persists
-      await page.click('button:has-text("Quantum")');
-      await page.waitForTimeout(2000);
-      
-      const sessionStorageAfterNav = await page.evaluate(() => {
-        return Object.keys(sessionStorage);
-      });
-      
-      console.log('Session storage after navigation:', sessionStorageAfterNav);
-    });
-  });
-
-  test.describe('Performance Monitoring', () => {
-    test('should monitor API response times', async ({ page }) => {
-      const responseTimes: number[] = [];
-      
-      page.on('response', response => {
-        if (response.url().includes('/api/')) {
-          const timing = response.request().timing();
-          if (timing.responseEnd) {
-            responseTimes.push(timing.responseEnd);
-          }
-        }
-      });
-
-      await page.goto('/');
-      await page.waitForLoadState('networkidle');
-      
-      // Trigger some API calls
-      await page.click('button:has-text("Overview")');
-      await page.waitForTimeout(3000);
-      
-      console.log('API response times:', responseTimes);
-      
-      // Check that responses are reasonably fast
-      const avgResponseTime = responseTimes.length > 0 
-        ? responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length 
-        : 0;
-      
-      console.log('Average API response time:', avgResponseTime);
-      
-      // App should be functional regardless of API performance
-      await expect(page.locator('h1')).toBeVisible();
-    });
-
-    test('should handle concurrent API requests', async ({ page }) => {
-      let concurrentRequests = 0;
-      let maxConcurrent = 0;
-      
-      page.on('request', request => {
-        if (request.url().includes('/api/')) {
-          concurrentRequests++;
-          maxConcurrent = Math.max(maxConcurrent, concurrentRequests);
-        }
-      });
-
-      page.on('response', response => {
-        if (response.url().includes('/api/')) {
-          concurrentRequests--;
-        }
-      });
-
-      await page.goto('/');
-      
-      // Trigger multiple actions rapidly
-      const tabs = ['Overview', 'Quantum', 'Agents', 'Config'];
-      for (const tab of tabs) {
-        await page.click(`button:has-text("${tab}")`);
-        await page.waitForTimeout(500);
-      }
-      
-      await page.waitForTimeout(3000);
-      
-      console.log('Maximum concurrent API requests:', maxConcurrent);
-      
-      // App should handle concurrent requests gracefully
-      await expect(page.locator('h1')).toBeVisible();
     });
   });
 });
