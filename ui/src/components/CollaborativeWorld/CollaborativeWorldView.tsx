@@ -22,7 +22,7 @@ export const CollaborativeWorldView: React.FC<CollaborativeWorldViewProps> = ({
   const [agents, setAgents] = useState<Agent[]>([]);
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
-  const frameRef = useRef<number>();
+  const frameRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     // Initialize collaborative world

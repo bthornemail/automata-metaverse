@@ -92,7 +92,7 @@ class AgentProvenanceQueryServiceImpl implements AgentProvenanceQueryService {
 
     for (const entry of history) {
       // Document consumption facts
-      if (entry.type === 'document-consumption' && entry.target && 'file' in entry.target) {
+      if (entry.type === 'document-consumption' && entry.target && typeof entry.target === 'object' && 'file' in entry.target) {
         facts.push(`consumes(${agentId}, '${entry.target.file}', ${entry.timestamp}).`);
         if (entry.extracted?.facts) {
           entry.extracted.facts.forEach(fact => {
@@ -136,7 +136,7 @@ class AgentProvenanceQueryServiceImpl implements AgentProvenanceQueryService {
     const facts: any[] = [];
 
     for (const entry of history) {
-      if (entry.type === 'document-consumption' && entry.target && 'file' in entry.target) {
+      if (entry.type === 'document-consumption' && entry.target && typeof entry.target === 'object' && 'file' in entry.target) {
         facts.push({
           predicate: 'consumes',
           args: [agentId, entry.target.file, entry.timestamp]
@@ -183,7 +183,7 @@ class AgentProvenanceQueryServiceImpl implements AgentProvenanceQueryService {
       triples.push(`<${entryUri}> <http://www.w3.org/ns/prov#atTime> "${entry.timestamp}"^^<http://www.w3.org/2001/XMLSchema#long> .`);
       triples.push(`<${entryUri}> <http://www.w3.org/ns/prov#wasPerformedBy> <${baseUri}> .`);
 
-      if (entry.type === 'document-consumption' && entry.target && 'file' in entry.target) {
+      if (entry.type === 'document-consumption' && entry.target && typeof entry.target === 'object' && 'file' in entry.target) {
         triples.push(`<${entryUri}> <http://www.w3.org/ns/prov#used> <http://example.org/document/${encodeURIComponent(entry.target.file)}> .`);
       }
 
@@ -231,7 +231,7 @@ class AgentProvenanceQueryServiceImpl implements AgentProvenanceQueryService {
       
       const history = this.historyCache.get(agentId) || [];
       for (const entry of history) {
-        if (entry.type === 'document-consumption' && entry.target && 'file' in entry.target) {
+        if (entry.type === 'document-consumption' && entry.target && typeof entry.target === 'object' && 'file' in entry.target) {
           bindings.push({
             [agentVar]: agentId,
             [docVar]: entry.target.file,

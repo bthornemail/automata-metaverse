@@ -319,13 +319,66 @@ export const EnhancedGLTFAvatar: React.FC<EnhancedGLTFAvatarProps> = ({
     away: '#f59e0b'
   }[status];
 
+  // Drag and drop state
+  const [dragging, setDragging] = useState(false);
+  const dragStartPos = useRef<[number, number, number] | null>(null);
+  const { camera, raycaster, pointer } = useThree();
+
+  // Handle drag start
+  const handlePointerDown = (e: any) => {
+    e.stopPropagation();
+    if (e.button === 0) { // Left mouse button
+      setDragging(true);
+      dragStartPos.current = [...currentPosition] as [number, number, number];
+    }
+  };
+
+  // Handle drag
+  useFrame(() => {
+    if (dragging && dragStartPos.current) {
+      // Use raycaster to project pointer onto ground plane (y=0)
+      raycaster.setFromCamera(pointer, camera);
+      const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+      const intersection = new THREE.Vector3();
+      raycaster.ray.intersectPlane(plane, intersection);
+      
+      if (intersection) {
+        const newPosition: [number, number, number] = [
+          intersection.x,
+          currentPosition[1], // Keep Y position
+          intersection.z
+        ];
+        setCurrentPosition(newPosition);
+        if (onPositionUpdate) {
+          onPositionUpdate(config.id, newPosition);
+        }
+      }
+    }
+  });
+
+  // Handle drag end
+  useEffect(() => {
+    const handlePointerUp = () => {
+      if (dragging) {
+        setDragging(false);
+        dragStartPos.current = null;
+      }
+    };
+
+    if (dragging) {
+      window.addEventListener('pointerup', handlePointerUp);
+      return () => window.removeEventListener('pointerup', handlePointerUp);
+    }
+  }, [dragging]);
+
   return (
     <group
       ref={groupRef}
-      position={position}
+      position={currentPosition}
       onClick={onClick}
       onPointerOver={handlePointerOver}
       onPointerOut={handlePointerOut}
+      onPointerDown={handlePointerDown}
     >
       {/* Avatar model */}
       {renderAvatar()}
@@ -431,7 +484,7 @@ export const EnhancedGLTFAvatar: React.FC<EnhancedGLTFAvatarProps> = ({
       {config.enableAI && (
         <mesh position={[0, 1.8, 0]}>
           <sphereGeometry args={[0.1, 8, 8]} />
-          <meshBasicMaterial color="#10b981" emissive="#10b981" emissiveIntensity={0.5} />
+          <meshStandardMaterial color="#10b981" emissive="#10b981" emissiveIntensity={0.5} />
         </mesh>
       )}
     </group>

@@ -1,0 +1,520 @@
+---
+# Agent Collaboration Configuration for Minikube
+# This file configures Kubernetes resources for multi-agent collaboration
+# Based on AGENTS.md multi-agent system architecture
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agent-collaboration-config
+  namespace: automaton
+  labels:
+    app: automaton
+    component: agent-collaboration
+data:
+  # Agent Service Discovery Configuration
+  AGENT_DISCOVERY_MODE: "kubernetes-dns"
+  AGENT_REGISTRY_ENABLED: "true"
+  AGENT_COORDINATION_ENABLED: "true"
+  
+  # Agent Communication Protocol
+  AGENT_COMM_PROTOCOL: "http"
+  AGENT_WS_PROTOCOL: "ws"
+  AGENT_MESSAGE_TIMEOUT: "30000"
+  AGENT_RETRY_ATTEMPTS: "3"
+  
+  # Agent Service Endpoints
+  AGENT_SERVICE_BASE_URL: "http://agent-service:8080"
+  AGENT_COORDINATION_URL: "http://agent-coordination-service:8081"
+  AGENT_REGISTRY_URL: "http://agent-registry-service:8082"
+  
+  # Multi-Agent Coordination
+  CONSENSUS_AGENT_ENABLED: "true"
+  CONSENSUS_TIMEOUT: "60000"
+  CONSENSUS_MIN_APPROVALS: "2"
+  
+  # Agent Dimensions (0D-7D)
+  AGENT_DIMENSIONS: "0D,1D,2D,3D,4D,5D,6D,7D"
+  
+  # Agent Capabilities
+  AGENT_CAPABILITIES: "church-encoding,network-operations,consensus,ai-operations,quantum-operations"
+---
+# Agent Service Discovery - Headless Service for Agent Pod Discovery
+apiVersion: v1
+kind: Service
+metadata:
+  name: agent-service-headless
+  namespace: automaton
+  labels:
+    app: automaton
+    component: agent-service
+spec:
+  clusterIP: None  # Headless service for DNS-based discovery
+  selector:
+    app: automaton
+    component: agent-service
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  - name: websocket
+    port: 8081
+    targetPort: 8081
+    protocol: TCP
+  - name: coordination
+    port: 8082
+    targetPort: 8082
+    protocol: TCP
+---
+# Agent Service - ClusterIP for internal communication
+apiVersion: v1
+kind: Service
+metadata:
+  name: agent-service
+  namespace: automaton
+  labels:
+    app: automaton
+    component: agent-service
+spec:
+  type: ClusterIP
+  selector:
+    app: automaton
+    component: agent-service
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  - name: websocket
+    port: 8081
+    targetPort: 8081
+    protocol: TCP
+  - name: coordination
+    port: 8082
+    targetPort: 8082
+    protocol: TCP
+---
+# Agent Coordination Service - For multi-agent workflows
+apiVersion: v1
+kind: Service
+metadata:
+  name: agent-coordination-service
+  namespace: automaton
+  labels:
+    app: automaton
+    component: agent-coordination
+spec:
+  type: ClusterIP
+  selector:
+    app: automaton
+    component: agent-coordination
+  ports:
+  - name: http
+    port: 8081
+    targetPort: 8081
+    protocol: TCP
+  - name: websocket
+    port: 8082
+    targetPort: 8082
+    protocol: TCP
+---
+# Agent Registry Service - For agent discovery and capability mapping
+apiVersion: v1
+kind: Service
+metadata:
+  name: agent-registry-service
+  namespace: automaton
+  labels:
+    app: automaton
+    component: agent-registry
+spec:
+  type: ClusterIP
+  selector:
+    app: automaton
+    component: agent-registry
+  ports:
+  - name: http
+    port: 8082
+    targetPort: 8082
+    protocol: TCP
+---
+# Agent Service Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent-service-deployment
+  namespace: automaton
+  labels:
+    app: automaton
+    component: agent-service
+spec:
+  replicas: 3  # Multiple replicas for agent collaboration
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: automaton
+      component: agent-service
+  template:
+    metadata:
+      labels:
+        app: automaton
+        component: agent-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: agent-service
+        image: automaton-backend:latest  # Uses same backend image with agent API
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        - containerPort: 8081
+          name: websocket
+          protocol: TCP
+        - containerPort: 8082
+          name: coordination
+          protocol: TCP
+        env:
+        # Agent Collaboration Configuration
+        - name: AGENT_DISCOVERY_MODE
+          valueFrom:
+            configMapKeyRef:
+              name: agent-collaboration-config
+              key: AGENT_DISCOVERY_MODE
+        - name: AGENT_REGISTRY_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: agent-collaboration-config
+              key: AGENT_REGISTRY_ENABLED
+        - name: AGENT_COORDINATION_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: agent-collaboration-config
+              key: AGENT_COORDINATION_ENABLED
+        - name: AGENT_SERVICE_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: agent-collaboration-config
+              key: AGENT_SERVICE_BASE_URL
+        - name: AGENT_COORDINATION_URL
+          valueFrom:
+            configMapKeyRef:
+              name: agent-collaboration-config
+              key: AGENT_COORDINATION_URL
+        # Backend Configuration
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: automaton-config
+              key: NODE_ENV
+        - name: PORT
+          value: "8080"
+        - name: WS_PORT
+          value: "8081"
+        - name: REDIS_URL
+          valueFrom:
+            configMapKeyRef:
+              name: automaton-config
+              key: REDIS_URL
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: automaton-secrets
+              key: REDIS_PASSWORD
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: automaton-secrets
+              key: JWT_SECRET
+        - name: CORS_ORIGIN
+          valueFrom:
+            configMapKeyRef:
+              name: automaton-config
+              key: CORS_ORIGIN
+        - name: ENABLE_WEBSOCKETS
+          value: "true"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /api/agents/health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /api/agents/status
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        volumeMounts:
+        - name: agent-data
+          mountPath: /app/data/agents
+        - name: logs
+          mountPath: /app/logs
+      volumes:
+      - name: agent-data
+        emptyDir: {}
+      - name: logs
+        emptyDir: {}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        fsGroup: 1001
+---
+# Agent Coordination Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent-coordination-deployment
+  namespace: automaton
+  labels:
+    app: automaton
+    component: agent-coordination
+spec:
+  replicas: 2  # High availability for coordination
+  selector:
+    matchLabels:
+      app: automaton
+      component: agent-coordination
+  template:
+    metadata:
+      labels:
+        app: automaton
+        component: agent-coordination
+    spec:
+      containers:
+      - name: agent-coordination
+        image: automaton-backend:latest
+        ports:
+        - containerPort: 8081
+          name: http
+        - containerPort: 8082
+          name: websocket
+        env:
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: automaton-config
+              key: NODE_ENV
+        - name: PORT
+          value: "8081"
+        - name: REDIS_URL
+          valueFrom:
+            configMapKeyRef:
+              name: automaton-config
+              key: REDIS_URL
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: automaton-secrets
+              key: REDIS_PASSWORD
+        - name: AGENT_COORDINATION_ENABLED
+          value: "true"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /api/coordination/health
+            port: 8081
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/coordination/status
+            port: 8081
+          initialDelaySeconds: 10
+          periodSeconds: 5
+---
+# Network Policy for Agent-to-Agent Communication
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: agent-collaboration-policy
+  namespace: automaton
+spec:
+  podSelector:
+    matchLabels:
+      app: automaton
+      component: agent-service
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Allow ingress from backend service
+  - from:
+    - podSelector:
+        matchLabels:
+          app: backend
+          component: api
+    ports:
+    - protocol: TCP
+      port: 8080
+  # Allow ingress from frontend
+  - from:
+    - podSelector:
+        matchLabels:
+          app: frontend
+          component: ui
+    ports:
+    - protocol: TCP
+      port: 8080
+  # Allow ingress from other agent services (agent-to-agent communication)
+  - from:
+    - podSelector:
+        matchLabels:
+          app: automaton
+          component: agent-service
+    ports:
+    - protocol: TCP
+      port: 8080
+    - protocol: TCP
+      port: 8081
+    - protocol: TCP
+      port: 8082
+  # Allow ingress from coordination service
+  - from:
+    - podSelector:
+        matchLabels:
+          app: automaton
+          component: agent-coordination
+    ports:
+    - protocol: TCP
+      port: 8080
+    - protocol: TCP
+      port: 8081
+    - protocol: TCP
+      port: 8082
+  egress:
+  # Allow egress to Redis
+  - to:
+    - podSelector:
+        matchLabels:
+          app: redis
+          component: cache
+    ports:
+    - protocol: TCP
+      port: 6379
+  # Allow egress to backend service
+  - to:
+    - podSelector:
+        matchLabels:
+          app: backend
+          component: api
+    ports:
+    - protocol: TCP
+      port: 5555
+  # Allow egress to other agent services
+  - to:
+    - podSelector:
+        matchLabels:
+          app: automaton
+          component: agent-service
+    ports:
+    - protocol: TCP
+      port: 8080
+    - protocol: TCP
+      port: 8081
+    - protocol: TCP
+      port: 8082
+  # Allow egress to coordination service
+  - to:
+    - podSelector:
+        matchLabels:
+          app: automaton
+          component: agent-coordination
+    ports:
+    - protocol: TCP
+      port: 8081
+    - protocol: TCP
+      port: 8082
+  # Allow DNS resolution
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 53
+    - protocol: UDP
+      port: 53
+---
+# Ingress for Agent API (extends minikube-ingress.yaml)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: agent-api-ingress
+  namespace: automaton
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "30"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "30"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "30"
+    nginx.ingress.kubernetes.io/websocket-services: "agent-service"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: automaton.local
+    http:
+      paths:
+      # Agent API endpoints
+      - path: /api/agents
+        pathType: Prefix
+        backend:
+          service:
+            name: agent-service
+            port:
+              number: 8080
+      - path: /api/agents/ws
+        pathType: Prefix
+        backend:
+          service:
+            name: agent-service
+            port:
+              number: 8081
+      # Agent coordination endpoints
+      - path: /api/coordination
+        pathType: Prefix
+        backend:
+          service:
+            name: agent-coordination-service
+            port:
+              number: 8081
+      # Agent registry endpoints
+      - path: /api/registry
+        pathType: Prefix
+        backend:
+          service:
+            name: agent-registry-service
+            port:
+              number: 8082
+  - host: agents.automaton.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: agent-service
+            port:
+              number: 8080

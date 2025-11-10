@@ -5,16 +5,17 @@
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Canvas, useFrame, extend, useThree } from '@react-three/fiber';
-import { 
-  EffectComposer, 
-  Bloom, 
-  DepthOfField, 
-  Vignette, 
-  GodRays,
-  ChromaticAberration,
-  Noise
-} from '@react-three/postprocessing';
-import { BlendFunction } from 'postprocessing';
+// Postprocessing imports commented out - packages not installed
+// import { 
+//   EffectComposer, 
+//   Bloom, 
+//   DepthOfField, 
+//   Vignette, 
+//   GodRays,
+//   ChromaticAberration,
+//   Noise
+// } from '@react-three/postprocessing';
+// import { BlendFunction } from 'postprocessing';
 import * as THREE from 'three';
 import { metaversePortalService, ParticleEffect, PostProcessingEffect, DynamicLighting } from '../../services/metaverse-portal-service';
 
@@ -162,7 +163,7 @@ const ParticleSystem: React.FC<{
           <points
             key={system.id}
             ref={(el) => {
-              if (el) particlesRef.current[index] = el;
+              if (el) (particlesRef.current[index] as any) = el;
             }}
             geometry={system.geometry}
             material={system.material.clone()}
@@ -287,9 +288,14 @@ const DynamicLightingSystem: React.FC<{
 };
 
 // Post-processing effects component
+// PostProcessingEffects component commented out - postprocessing packages not installed
 const PostProcessingEffects: React.FC<{
   effects: PostProcessingEffect[];
 }> = ({ effects }) => {
+  // Postprocessing disabled - install @react-three/postprocessing and postprocessing packages to enable
+  return null;
+  
+  /* Original implementation commented out:
   const bloomEffect = effects.find(e => e.type === 'bloom');
   const dofEffect = effects.find(e => e.type === 'depth-of-field');
   const vignetteEffect = effects.find(e => e.type === 'vignette');
@@ -339,6 +345,7 @@ const PostProcessingEffects: React.FC<{
       )}
     </EffectComposer>
   );
+  */
 };
 
 // Control panel for visual effects
@@ -485,7 +492,7 @@ const VisualEffectsControlPanel: React.FC<{
                   max="1"
                   step="0.1"
                   value={effect?.intensity || 0}
-                  onChange={(e) => updatePostProcessingEffect(type, parseFloat(e.target.value))}
+                  onChange={(e) => updatePostProcessingEffect(type as PostProcessingEffect['type'], parseFloat(e.target.value))}
                   className="w-full"
                 />
               </div>

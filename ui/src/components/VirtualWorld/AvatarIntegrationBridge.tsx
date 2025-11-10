@@ -21,7 +21,7 @@ export const symbolToAvatarConfig = (symbol: Symbol): EnhancedAvatarConfigV2 => 
   }
   
   // Ensure status is one of the valid values
-  const statusValue = metadata.status as string;
+  const statusValue = (metadata as any).status as string | undefined;
   const status: 'online' | 'offline' | 'away' = 
     (statusValue === 'online' || statusValue === 'offline' || statusValue === 'away') 
       ? statusValue 
@@ -34,13 +34,13 @@ export const symbolToAvatarConfig = (symbol: Symbol): EnhancedAvatarConfigV2 => 
     gltfUrl: metadata.gltfModel as string | undefined,
     dimension,
     status,
-    animationState: (metadata.animationState as 'idle' | 'walking' | 'running' | 'jumping' | 'sitting' | 'dancing' | 'gesturing') || 'idle',
-    color: (metadata.color as string) || '#6366f1',
-    scale: typeof metadata.scale === 'number' ? metadata.scale : 1,
+    animationState: ((metadata as any).animationState as 'idle' | 'walking' | 'running' | 'jumping' | 'sitting' | 'dancing' | 'gesturing') || 'idle',
+    color: ((metadata as any).color as string) || '#6366f1',
+    scale: typeof (metadata as any).scale === 'number' ? (metadata as any).scale : 1,
     showNameTag: true,
     showStatusIndicator: true,
-    customization: metadata.customization as any,
-    metadata: metadata.avatarMetadata as any
+    customization: (metadata as any).customization as any,
+    metadata: (metadata as any).avatarMetadata as any
   };
 };
 

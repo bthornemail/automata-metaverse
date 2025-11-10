@@ -25,7 +25,7 @@ describe('WorkflowEngine', () => {
       healthCheck: vi.fn()
     };
 
-    engine = new WorkflowEngine(mockClient);
+    engine = new WorkflowEngine(mockClient as any);
   });
 
   describe('Sequential Workflow', () => {

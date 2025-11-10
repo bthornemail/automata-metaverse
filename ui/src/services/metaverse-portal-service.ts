@@ -77,11 +77,12 @@ export interface ParticleEffect {
   color: string;
   intensity: number;
   duration: number;
+  startTime?: number;
   parameters: Record<string, any>;
 }
 
 export interface PostProcessingEffect {
-  type: 'bloom' | 'depth-of-field' | 'motion-blur' | 'glow' | 'vignette';
+  type: 'bloom' | 'depth-of-field' | 'motion-blur' | 'glow' | 'vignette' | 'chromatic-aberration' | 'noise';
   intensity: number;
   parameters: Record<string, any>;
 }

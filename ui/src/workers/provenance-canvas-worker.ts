@@ -12,7 +12,7 @@ import * as THREE from 'three';
 
 // Worker message types
 interface WorkerMessage {
-  type: 'init' | 'load' | 'query' | 'render' | 'interact' | 'updateCamera';
+  type: 'init' | 'load' | 'query' | 'render' | 'interact' | 'updateCamera' | 'resize' | 'dispose';
   payload: any;
 }
 

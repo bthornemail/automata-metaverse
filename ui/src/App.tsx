@@ -16,6 +16,7 @@ import UnifiedEditor from './components/UnifiedEditor';
 const AppContent: React.FC = () => {
   const activeTab = useAutomatonStore((state) => state.activeTab);
   const setActiveTab = useAutomatonStore((state) => state.setActiveTab);
+  const [focusedTabIndex, setFocusedTabIndex] = React.useState(0);
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Activity },
@@ -25,6 +26,61 @@ const AppContent: React.FC = () => {
     { id: 'code-editor', label: 'Code Editor', icon: Code },
     { id: 'config', label: 'Config', icon: Cog }
   ];
+
+  // Handle keyboard navigation for tabs (ARIA tablist pattern)
+  const handleTabKeyDown = (e: React.KeyboardEvent, currentTabId: string) => {
+    const currentIndex = tabs.findIndex(tab => tab.id === currentTabId);
+    let nextIndex = currentIndex;
+
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      // Move focus to next tab (but don't activate yet)
+      nextIndex = (currentIndex + 1) % tabs.length;
+      setFocusedTabIndex(nextIndex);
+      // Focus will be handled by tabIndex update
+      setTimeout(() => {
+        const nextTabButton = document.querySelector(`[aria-label="Switch to ${tabs[nextIndex].label} tab"]`) as HTMLElement;
+        nextTabButton?.focus();
+      }, 0);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      // Move focus to previous tab (but don't activate yet)
+      nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+      setFocusedTabIndex(nextIndex);
+      setTimeout(() => {
+        const prevTabButton = document.querySelector(`[aria-label="Switch to ${tabs[nextIndex].label} tab"]`) as HTMLElement;
+        prevTabButton?.focus();
+      }, 0);
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      // Move focus to first tab
+      setFocusedTabIndex(0);
+      setTimeout(() => {
+        const firstTabButton = document.querySelector(`[aria-label="Switch to ${tabs[0].label} tab"]`) as HTMLElement;
+        firstTabButton?.focus();
+      }, 0);
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      // Move focus to last tab
+      setFocusedTabIndex(tabs.length - 1);
+      setTimeout(() => {
+        const lastTabButton = document.querySelector(`[aria-label="Switch to ${tabs[tabs.length - 1].label} tab"]`) as HTMLElement;
+        lastTabButton?.focus();
+      }, 0);
+    } else if (e.key === 'Enter' || e.key === ' ') {
+      // Enter or Space activates the currently focused tab
+      e.preventDefault();
+      setActiveTab(currentTabId);
+    }
+  };
+
+  // Update focusedTabIndex when activeTab changes via click
+  React.useEffect(() => {
+    const activeIndex = tabs.findIndex(tab => tab.id === activeTab);
+    if (activeIndex !== -1) {
+      setFocusedTabIndex(activeIndex);
+    }
+  }, [activeTab]);
 
   return (
     <div className="min-h-screen bg-gray-900">
@@ -55,9 +111,11 @@ const AppContent: React.FC = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
+                  onKeyDown={(e) => handleTabKeyDown(e, tab.id)}
                   role="tab"
                   aria-selected={activeTab === tab.id}
                   aria-controls={`tabpanel-${tab.id}`}
+                  tabIndex={focusedTabIndex === tabs.findIndex(t => t.id === tab.id) ? 0 : -1}
                   className={`flex items-center gap-2 px-4 py-3 border-b-2 transition-all duration-200 ${
                     activeTab === tab.id
                        ? 'border-[#6366f1] text-white bg-[#6366f1]/10'

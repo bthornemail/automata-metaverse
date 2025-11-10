@@ -1,0 +1,88 @@
+{
+    "mcpServers": {
+	"playwright": {
+	    "command": "npx",
+	    "args": [ "@playwright/mcp@latest" ]
+	},
+	"mcp-obsidian": {
+    "command": "uvx",
+    "args": [
+      "mcp-obsidian"
+    ],
+    "env": {
+      "OBSIDIAN_API_KEY": "<your_api_key_here>",
+      "OBSIDIAN_HOST": "127.0.0.1",
+      "OBSIDIAN_PORT": "27124"
+    }
+	},
+	 "arxiv-mcp-server": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "ARXIV_STORAGE_PATH",
+        "-v",
+        "/home/main/automaton:/home/main/automaton",
+        "mcp/arxiv-mcp-server"
+      ],
+      "env": {
+        "ARXIV_STORAGE_PATH": "/home/main/automaton/papers"
+      }
+	 },
+	"kubectl-mcp-server": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-v",
+        "/home/main/automaton:/home/main/automaton",
+        "mcp/kubectl-mcp-server"
+      ]
+	},
+	"kubernetes-mcp-server": {
+	    "command": "npx",
+	    "args": ["-y", "kubernetes-mcp-server@latest"]
+	},
+	"awslabs-memcached": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "mcp/memcached-mcp-server"
+      ]
+	},
+	"neo4j-data-modeling": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "NEO4J_TRANSPORT",
+        "-e",
+        "NEO4J_MCP_SERVER_HOST",
+        "-e",
+        "NEO4J_MCP_SERVER_PORT",
+        "-e",
+        "NEO4J_MCP_SERVER_PATH",
+        "-e",
+        "NEO4J_MCP_SERVER_ALLOW_ORIGINS",
+        "-e",
+        "NEO4J_MCP_SERVER_ALLOWED_HOSTS",
+        "mcp/neo4j-data-modeling"
+      ],
+      "env": {
+        "NEO4J_TRANSPORT": "http",
+        "NEO4J_MCP_SERVER_HOST": "0.0.0.0",
+        "NEO4J_MCP_SERVER_PORT": "11369",
+        "NEO4J_MCP_SERVER_PATH": "/mcp/",
+          "NEO4J_MCP_SERVER_ALLOW_ORIGINS": "localhost.com,universallifeprotocol.com,api.universallifeprotocol.com,ide.universallifeprotocol.com",
+        "NEO4J_MCP_SERVER_ALLOWED_HOSTS": "localhost,127.0.0.1"
+      }
+    }
+    }
+}

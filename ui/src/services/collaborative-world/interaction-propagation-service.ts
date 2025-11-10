@@ -257,7 +257,7 @@ class InteractionPropagationServiceImpl implements InteractionPropagationService
 
     // Update agent state based on interaction
     if (interaction.type === 'touch') {
-      agent.animationState = 'gesturing';
+      agent.animationState = 'idle'; // 'gesturing' not in Agent type, using 'idle'
     } else if (interaction.type === 'communicate') {
       agent.animationState = 'idle';
     } else if (interaction.type === 'collaborate') {

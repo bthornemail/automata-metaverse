@@ -6,10 +6,11 @@
 
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
+import { OrbitControls, PerspectiveCamera, Text } from '@react-three/drei';
 import * as THREE from 'three';
 import { EnhancedGLTFAvatar, AvatarConfig } from '@/components/VirtualWorld/EnhancedGLTFAvatar';
-import { collaborativeWorldService, Agent } from '@/services/collaborative-world';
+import { collaborativeWorldService } from '@/services/collaborative-world';
+import type { Agent as CollaborativeWorldAgent } from '@/services/collaborative-world/types';
 import type { PropagationLevel } from '@/services/collaborative-world/types';
 import { agentMovementService } from '@/services/collaborative-world/agent-movement-service';
 import { InteractionVisualization } from '@/components/CollaborativeWorld/InteractionVisualization';
@@ -79,7 +80,7 @@ const getInteractionRangeFromDimension = (dimension: string | null | undefined):
 };
 
 // Convert Agent API agent to CollaborativeWorld agent format
-const convertAgentAPIToCollaborativeWorld = (apiAgent: AgentAPIAgent, index: number, total: number): Agent | null => {
+const convertAgentAPIToCollaborativeWorld = (apiAgent: AgentAPIAgent, index: number, total: number): CollaborativeWorldAgent | null => {
   // Skip agents without dimensions (like Query-Interface-Agent, Visualization-Agent)
   if (!apiAgent.dimension) {
     console.log(`[CollaborativeWorld] Skipping agent ${apiAgent.id} - no dimension`);
@@ -112,8 +113,8 @@ const CollaborativeWorldContent: React.FC<{
   selectedSymbol: Symbol | null;
   onSymbolSelect: (symbol: Symbol | null) => void;
   config: Required<CollaborativeWorldIntegrationProps['config']>;
-  agents: Agent[];
-  setAgents: React.Dispatch<React.SetStateAction<Agent[]>>;
+  agents: CollaborativeWorldAgent[];
+  setAgents: React.Dispatch<React.SetStateAction<CollaborativeWorldAgent[]>>;
   isInitialized: boolean;
   selectedAgentId: string | null;
   setSelectedAgentId: React.Dispatch<React.SetStateAction<string | null>>;
@@ -146,42 +147,26 @@ const CollaborativeWorldContent: React.FC<{
   const { layout } = useWorldLayout();
   
   // Convert agents to avatar configs - spread them out in a circle for visibility
+  // Note: agents here are already CollaborativeWorldAgent[], not AgentAPIAgent[]
   const avatarConfigs: AvatarConfig[] = useMemo(() => {
+    console.log(`[CollaborativeWorld] 🔄 useMemo: Creating avatar configs from ${agents.length} agents`);
+    
     if (agents.length === 0) {
-      console.warn('[CollaborativeWorld] No agents available to create avatar configs');
+      console.warn('[CollaborativeWorld] ⚠️ No agents available to create avatar configs');
       return [];
     }
     
+    // Agents are already CollaborativeWorldAgent[], no conversion needed
+    const validAgents = agents;
+    
     // Log detailed information about agents
-    console.log(`[CollaborativeWorld] Creating ${agents.length} avatar configs from agents`);
-    console.log(`[CollaborativeWorld] Agents array:`, agents.map(a => ({
-      id: a.id,
-      name: a.name,
-      dimension: a.dimension,
-      position: a.position
-    })));
+    console.log(`[CollaborativeWorld] ✅ Creating ${validAgents.length} avatar configs from ${agents.length} agents`);
     
-    // Ensure we have exactly 8 agents
-    if (agents.length !== 8) {
-      console.warn(`[CollaborativeWorld] Expected 8 agents but got ${agents.length}. This may cause rendering issues.`);
-    }
-    
-    return agents.map((agent, index) => {
-      // Debug logging for React DevTools
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`[React DevTools] Creating avatar config for agent:`, {
-          id: agent.id,
-          name: agent.name,
-          dimension: agent.dimension,
-          position: agent.position,
-          hasMetadata: !!agent.metadata,
-          metadata: agent.metadata
-        });
-      }
+    const configs = validAgents.map((agent, index) => {
       // Always spread them out in a circle for visibility
       // Use a fixed radius for all avatars so they're evenly spaced in a circle
       const baseRadius = 15; // Fixed radius for circle
-      const angle = (index / agents.length) * Math.PI * 2;
+      const angle = (index / validAgents.length) * Math.PI * 2;
       const position: [number, number, number] = [
         Math.cos(angle) * baseRadius,
         0,
@@ -190,40 +175,47 @@ const CollaborativeWorldContent: React.FC<{
       
       console.log(`[CollaborativeWorld] Avatar ${agent.name} (${agent.dimension}) at position:`, position, `angle: ${(angle * 180 / Math.PI).toFixed(1)}°`);
       
+      // Map animationState from collaborative-world format to AvatarConfig format
+      const avatarAnimationState: 'idle' | 'walking' | 'gesturing' = 
+        agent.animationState === 'walking' ? 'walking' :
+        agent.animationState === 'running' ? 'walking' : // Map running to walking
+        'idle';
+      
       return {
         id: agent.id,
         name: agent.name,
         position,
         dimension: agent.dimension,
         status: 'online' as const,
-        animationState: agent.animationState || 'idle',
+        animationState: avatarAnimationState,
         showNameTag: true,
         showStatusIndicator: true,
-        color: getDimensionColor(agent.dimension),
+        color: getDimensionColor(agent.dimension as string),
         scale: 2, // Increased scale to make avatars more visible
         enableAI: true,
-        // Note: GLTF URLs can be added here if available:
-        // gltfUrl: agent.metadata?.gltfModel || `/models/avatars/${agent.dimension.toLowerCase()}-avatar.gltf`
       };
     });
+    
+    console.log(`[CollaborativeWorld] ✅ Created ${configs.length} avatar configs:`, configs.map(c => `${c.name} at [${c.position.join(', ')}]`));
+    return configs;
   }, [agents]);
 
   const handleAvatarClick = (avatar: AvatarConfig) => {
     console.log('[CollaborativeWorld] Avatar clicked:', avatar.id);
-    const agent = agents.find(a => a.id === avatar.id);
-    if (agent) {
-      console.log('[CollaborativeWorld] Agent found, selecting:', agent.name);
+    const apiAgent = agents.find(a => a.id === avatar.id);
+    if (apiAgent) {
+      console.log('[CollaborativeWorld] Agent found, selecting:', apiAgent.name);
       // Open control panel by setting selected agent
-      setSelectedAgentId(agent.id);
+      setSelectedAgentId(apiAgent.id);
       const symbol: Symbol = {
-        id: agent.id,
-        name: agent.name,
+        id: apiAgent.id,
+        name: apiAgent.name,
         type: 'avatar',
         environment: '3d-gltf',
-        position: agent.position,
-        data: agent,
+        position: avatar.position,
+        data: apiAgent,
         metadata: {
-          dimension: agent.dimension
+          dimension: apiAgent.dimension ? parseInt(apiAgent.dimension.replace('D', '')) : undefined
         }
       };
       onSymbolSelect(symbol);
@@ -325,95 +317,85 @@ const CollaborativeWorldContent: React.FC<{
         )}
 
         {/* Render GLTF avatars (affected by gravity from dimension nodes, AI-enabled) */}
-        {avatarConfigs.length > 0 ? avatarConfigs.map((avatar, index) => {
-          // CRITICAL: Always use the calculated circle position from avatarConfigs
-          // Don't override with agent's stored position - that causes all avatars to overlap
-          const avatarPosition = avatar.position;
+        {(() => {
+          // Debug: Always log avatar rendering
+          console.log(`[CollaborativeWorld] 🎨 RENDERING ${avatarConfigs.length} AVATARS:`, avatarConfigs.map(a => `${a.name} at [${a.position.join(', ')}]`));
           
-          // Debug: Log avatar rendering for React DevTools
-          if (process.env.NODE_ENV === 'development' && index === 0) {
-            console.log('[React DevTools] Rendering avatars:', {
-              totalAvatars: avatarConfigs.length,
-              totalAgents: agents.length,
-              firstAvatar: {
-                id: avatar.id,
-                name: avatar.name,
-                position: avatarPosition,
-                hasGLTF: !!avatar.gltfUrl,
-                scale: avatar.scale,
-                enableAI: avatar.enableAI
-              },
-              allAvatars: avatarConfigs.map(a => ({
-                id: a.id,
-                name: a.name,
-                position: a.position,
-                hasGLTF: !!a.gltfUrl
-              }))
-            });
+          if (avatarConfigs.length === 0) {
+            return (
+              // Show message if no avatars
+              <group position={[0, 5, 0]}>
+                <Text
+                  position={[0, 0, 0]}
+                  fontSize={0.5}
+                  color="#ff6b6b"
+                  anchorX="center"
+                  anchorY="middle"
+                >
+                  No avatars available
+                </Text>
+                <Text
+                  position={[0, -0.8, 0]}
+                  fontSize={0.3}
+                  color="#94a3b8"
+                  anchorX="center"
+                  anchorY="middle"
+                >
+                  Agents: {agents.length}
+                </Text>
+              </group>
+            );
           }
           
-          // Calculate nearby agents for AI decision making using avatar config positions
-          const nearbyAgents = avatarConfigs
-            .filter(a => a.id !== avatar.id)
-            .map(a => ({
-              id: a.id,
-              position: a.position
-            }));
+          return avatarConfigs.map((avatar, index) => {
+            // CRITICAL: Always use the calculated circle position from avatarConfigs
+            // Don't override with agent's stored position - that causes all avatars to overlap
+            const avatarPosition = avatar.position;
+            
+            // Debug: Log EVERY avatar rendering
+            console.log(`[CollaborativeWorld] 🎨 Rendering avatar ${index + 1}/${avatarConfigs.length}: ${avatar.name} at [${avatarPosition.join(', ')}]`);
+        
+            // Calculate nearby agents for AI decision making using avatar config positions
+            const nearbyAgents = avatarConfigs
+              .filter(a => a.id !== avatar.id)
+              .map(a => ({
+                id: a.id,
+                position: a.position
+              }));
 
-          return (
-            <EnhancedGLTFAvatar
-              key={`avatar-${avatar.id}-${index}`}
-              config={{
-                ...avatar,
-                position: avatarPosition, // Use calculated circle position
-                enableAI: true, // Enable AI for all avatars
-                nearbyAgents
-              }}
-              selected={selectedAgentId === avatar.id}
-              onClick={() => handleAvatarClick(avatar)}
-              onPositionUpdate={(id, newPosition) => {
-                // Update agent position in collaborative world service
-                const agent = agents.find(a => a.id === id);
-                if (agent) {
-                  agent.position = newPosition;
-                  // Also update in collaborative world service
-                  try {
-                    const state = collaborativeWorldService.getState();
-                    const serviceAgent = state.agents.get(id);
-                    if (serviceAgent) {
-                      serviceAgent.position = newPosition;
+            return (
+              <EnhancedGLTFAvatar
+                key={`avatar-${avatar.id}-${index}`}
+                config={{
+                  ...avatar,
+                  position: avatarPosition, // Use calculated circle position
+                  enableAI: true, // Enable AI for all avatars
+                  nearbyAgents
+                }}
+                selected={selectedAgentId === avatar.id}
+                onClick={() => handleAvatarClick(avatar)}
+                onPositionUpdate={(id, newPosition) => {
+                  // Update agent position in collaborative world service
+                  const agent = agents.find(a => a.id === id);
+                  if (agent) {
+                    agent.position = newPosition;
+                    // Also update in collaborative world service
+                    try {
+                      const state = collaborativeWorldService.getState();
+                      const serviceAgent = state.agents.get(id);
+                      if (serviceAgent) {
+                        serviceAgent.position = newPosition;
+                      }
+                    } catch (error) {
+                      // Service not available
                     }
-                  } catch (error) {
-                    // Service not available
+                    setAgents([...agents]);
                   }
-                  setAgents([...agents]);
-                }
-              }}
-            />
-          );
-        }) : (
-          // Show message if no avatars
-          <group position={[0, 5, 0]}>
-            <Text
-              position={[0, 0, 0]}
-              fontSize={0.5}
-              color="#ff6b6b"
-              anchorX="center"
-              anchorY="middle"
-            >
-              No avatars available
-            </Text>
-            <Text
-              position={[0, -0.8, 0]}
-              fontSize={0.3}
-              color="#94a3b8"
-              anchorX="center"
-              anchorY="middle"
-            >
-              Agents: {agents.length}
-            </Text>
-          </group>
-        )}
+                }}
+              />
+            );
+          });
+        })()}
 
         {/* Render interactions */}
         {config.enableInteractions && (
@@ -456,20 +438,20 @@ const CollaborativeWorldContent: React.FC<{
             id: b.id,
             name: b.name,
             position: b.position,
-            type: 'building' as const,
-            zoneId: undefined
+            type: 'landmark' as const,
+            zoneId: b.zoneId
           })),
-          // Add avatar positions as waypoints
-          ...agents.map(a => ({
-            id: `waypoint-${a.id}`,
-            name: `Teleport to ${a.name}`,
-            position: a.position,
+          // Add avatar positions as waypoints - need to get positions from converted agents
+          ...avatarConfigs.map(avatar => ({
+            id: `waypoint-${avatar.id}`,
+            name: `Teleport to ${avatar.name}`,
+            position: avatar.position,
             type: 'landmark' as const,
             zoneId: undefined
           }))
         ]}
         currentPosition={selectedAgentId 
-          ? agents.find(a => a.id === selectedAgentId)?.position 
+          ? avatarConfigs.find(a => a.id === selectedAgentId)?.position 
           : undefined}
         currentRotation={0}
         onWaypointClick={(waypoint) => {
@@ -489,6 +471,22 @@ const CollaborativeWorldContent: React.FC<{
         showWaypointList={true}
         showTeleportMenu={true}
       />
+
+      {/* Debug Overlay - Show agent count and positions */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="absolute top-4 right-4 z-30 bg-black/90 text-white text-xs p-3 rounded-lg font-mono border border-yellow-500">
+          <div className="font-bold mb-2">🐛 Debug Info</div>
+          <div>Agents: {agents.length}</div>
+          <div>Avatar Configs: {avatarConfigs.length}</div>
+          <div className="mt-2 max-h-32 overflow-y-auto">
+            {agents.map((a, i) => (
+              <div key={a.id} className="text-yellow-300">
+                {i+1}. {a.name} ({a.dimension}) @ [{a.position.join(', ')}]
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Agent List - Collapsed into icon button */}
       {agents.length > 0 && !selectedAgentId && (
@@ -517,10 +515,10 @@ const CollaborativeWorldContent: React.FC<{
                           position: agent.position,
                           dimension: agent.dimension,
                           status: 'online' as const,
-                          animationState: agent.animationState,
+                          animationState: agent.animationState === 'walking' ? 'walking' : agent.animationState === 'running' ? 'walking' : 'idle',
                           showNameTag: true,
                           showStatusIndicator: true,
-                          color: getDimensionColor(agent.dimension),
+                          color: getDimensionColor(agent.dimension as string),
                           scale: 1
                         });
                         setShowAgentList(false); // Collapse after selection
@@ -692,40 +690,10 @@ export const CollaborativeWorldIntegration: React.FC<CollaborativeWorldIntegrati
     console.log('[React DevTools] Agent API agents:', agentAPIAgents?.length || 0);
   }
   
-  // Helper function to convert Agent API format to CollaborativeWorld format
-  const convertAgentAPIToCollaborativeWorld = (apiAgent: import('@/services/agent-api/types').Agent, index: number): Agent => {
-    // Arrange agents in a circle around the center
-    const radius = 15;
-    const angle = (index / (agentAPIAgents?.length || 1)) * Math.PI * 2;
-    const x = Math.cos(angle) * radius;
-    const z = Math.sin(angle) * radius;
-    
-    // Map interaction range based on dimension
-    const getInteractionRangeFromDimension = (dimension?: string | null): PropagationLevel => {
-      if (!dimension) return 'personal';
-      const dim = parseInt(dimension.replace('D', ''));
-      if (dim <= 1) return 'personal';
-      if (dim <= 3) return 'local';
-      if (dim <= 5) return 'global';
-      return 'agentic';
-    };
-    
-    return {
-      id: apiAgent.id,
-      name: apiAgent.name,
-      dimension: (apiAgent.dimension || '0D') as '0D' | '1D' | '2D' | '3D' | '4D' | '5D' | '6D' | '7D',
-      position: [x, 0, z] as [number, number, number],
-      velocity: [0, 0, 0] as [number, number, number],
-      rotation: [0, 0, 0] as [number, number, number],
-      interactionRange: getInteractionRangeFromDimension(apiAgent.dimension),
-      learningEnabled: true,
-      isMoving: false,
-      animationState: 'idle' as const
-    };
-  };
+  // Note: convertAgentAPIToCollaborativeWorld is defined above as a module-level function
   
   // Initialize with empty array - will be populated by initialization
-  const [agents, setAgents] = useState<Agent[]>([]);
+  const [agents, setAgents] = useState<CollaborativeWorldAgent[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
   
@@ -758,7 +726,9 @@ export const CollaborativeWorldIntegration: React.FC<CollaborativeWorldIntegrati
       rotation: 0,
       color: '#4a5568',
       showLabel: true,
-      interactive: true
+      interactive: true,
+      zoneId: 'zone-1',
+      type: 'agent-building' as const
     },
     {
       id: 'building-2',
@@ -768,7 +738,9 @@ export const CollaborativeWorldIntegration: React.FC<CollaborativeWorldIntegrati
       rotation: Math.PI / 4,
       color: '#6366f1',
       showLabel: true,
-      interactive: true
+      interactive: true,
+      zoneId: 'zone-2',
+      type: 'agent-building' as const
     },
     {
       id: 'building-3',
@@ -778,7 +750,9 @@ export const CollaborativeWorldIntegration: React.FC<CollaborativeWorldIntegrati
       rotation: 0,
       color: '#22c55e',
       showLabel: true,
-      interactive: true
+      interactive: true,
+      zoneId: 'zone-3',
+      type: 'agent-building' as const
     }
   ], []);
 
@@ -857,14 +831,16 @@ export const CollaborativeWorldIntegration: React.FC<CollaborativeWorldIntegrati
         // Fall through to service initialization
       } else {
         // Convert valid agents, using their index in the valid array for circle positioning
-        const convertedAgents = validAgents.map((apiAgent, index) => {
-          const converted = convertAgentAPIToCollaborativeWorld(apiAgent, index, validAgents.length);
+        // validAgents here are AgentAPIAgent[], need to convert them
+        const filteredValidAgents = validAgents.filter((a): a is AgentAPIAgent => !!a.dimension);
+        const convertedAgents = filteredValidAgents.map((apiAgent, index) => {
+          const converted = convertAgentAPIToCollaborativeWorld(apiAgent, index, filteredValidAgents.length);
           if (!converted) {
             console.error(`[CollaborativeWorld] Failed to convert agent ${apiAgent.id} - this should not happen`);
             return null;
           }
           return converted;
-        }).filter((agent): agent is Agent => agent !== null);
+        }).filter((agent): agent is CollaborativeWorldAgent => agent !== null);
         
         console.log(`[CollaborativeWorld] Converted ${convertedAgents.length} agents`);
         console.log(`[CollaborativeWorld] Converted agents:`, convertedAgents.map(a => ({ 
@@ -874,7 +850,10 @@ export const CollaborativeWorldIntegration: React.FC<CollaborativeWorldIntegrati
           position: a.position 
         })));
         
+        // CRITICAL: Set agents state immediately and log it
         setAgents(convertedAgents);
+        console.log(`[CollaborativeWorld] ✅ SET AGENTS STATE: ${convertedAgents.length} agents`);
+        console.log(`[CollaborativeWorld] Agent positions:`, convertedAgents.map(a => `${a.name}: [${a.position.join(', ')}]`));
         
         // Register all agents with AI service
         convertedAgents.forEach(async (agent) => {
@@ -893,7 +872,7 @@ export const CollaborativeWorldIntegration: React.FC<CollaborativeWorldIntegrati
     }
 
     // Helper function to create default agents (used as fallback)
-    const createDefaultAgents = (): Agent[] => [
+    const createDefaultAgents = (): CollaborativeWorldAgent[] => [
       { id: 'agent-0D', dimension: '0D', name: '0D-Topology-Agent', position: [10, 0, 0], velocity: [0, 0, 0], rotation: [0, 0, 0], interactionRange: 'personal', learningEnabled: true, isMoving: false, animationState: 'idle' },
       { id: 'agent-1D', dimension: '1D', name: '1D-Temporal-Agent', position: [7.07, 0, 7.07], velocity: [0, 0, 0], rotation: [0, 0, 0], interactionRange: 'peer', learningEnabled: true, isMoving: false, animationState: 'idle' },
       { id: 'agent-2D', dimension: '2D', name: '2D-Structural-Agent', position: [0, 0, 10], velocity: [0, 0, 0], rotation: [0, 0, 0], interactionRange: 'local', learningEnabled: true, isMoving: false, animationState: 'idle' },
@@ -956,7 +935,7 @@ export const CollaborativeWorldIntegration: React.FC<CollaborativeWorldIntegrati
         }
         
         // Get initial state - with comprehensive error handling
-        let initialAgents: Agent[] = [];
+        let initialAgents: CollaborativeWorldAgent[] = [];
         let gotState = false;
         try {
           const state = cws.getState();
@@ -1020,8 +999,9 @@ export const CollaborativeWorldIntegration: React.FC<CollaborativeWorldIntegrati
               const serviceAgents = Array.from(currentState.agents.values());
               
               // Only update if service has 8+ agents
+              // serviceAgents are already Agent[] (collaborative-world), not AgentAPIAgent[]
               if (serviceAgents.length >= 8) {
-                setAgents(serviceAgents);
+                setAgents(serviceAgents as CollaborativeWorldAgent[]);
               }
               // Otherwise, don't update - preserve our 8 agents
             } catch (error) {
@@ -1108,7 +1088,14 @@ export const CollaborativeWorldIntegration: React.FC<CollaborativeWorldIntegrati
         <CollaborativeWorldContent
           selectedSymbol={selectedSymbol}
           onSymbolSelect={onSymbolSelect}
-          config={config}
+          config={{
+            enableInteractions: config?.enableInteractions ?? true,
+            enableLearning: config?.enableLearning ?? true,
+            showKnowledgeGraph: config?.showKnowledgeGraph ?? false,
+            showBuildings: config?.showBuildings ?? true,
+            showEnvironment: config?.showEnvironment ?? true,
+            showPaths: config?.showPaths ?? true
+          }}
           agents={agents}
           setAgents={setAgents}
           isInitialized={isInitialized}

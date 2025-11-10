@@ -57,9 +57,9 @@ export const EnvironmentRenderer: React.FC<EnvironmentRendererProps> = ({
           agents={agents}
           agentsLoading={agentsLoading}
           config={{
-            showAbstract: true,
-            showGrokMetaverse: true,
-            layout: 'layered'
+            enableInteractions: true,
+            enableLearning: true,
+            showKnowledgeGraph: false
           }}
         />
       );

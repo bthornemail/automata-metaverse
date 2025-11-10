@@ -40,8 +40,10 @@ export const NavigationUI: React.FC<NavigationUIProps> = ({
       id: l.id,
       name: l.name,
       position: l.position,
-      // Convert 'monument' and 'sign' to 'landmark' for Waypoint compatibility
-      type: (l.type === 'monument' || l.type === 'sign') ? 'landmark' : l.type,
+      // Convert to valid Waypoint type
+      type: l.type === 'portal' ? 'portal' as const :
+            l.type === 'spawn' ? 'spawn' as const :
+            (l.type === 'monument' || l.type === 'sign') ? 'landmark' as const : 'landmark' as const,
       zoneId: l.zoneId
     })),
     ...waypoints

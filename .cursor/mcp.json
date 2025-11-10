@@ -1,1 +1,23 @@
-{ "mcpServers": { "playwright": { "command": "npx", "args": [ "@playwright/mcp@latest" ] } } }
+{
+    "mcpServers": {
+	"playwright": {
+	    "command": "npx",
+	    "args": [ "@playwright/mcp@latest" ]
+	},
+	"kubectl-mcp-server": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-v",
+        "/home/main/automaton:/home/main/automaton",
+        "mcp/kubectl-mcp-server"
+      ]
+	},
+	"kubernetes-mcp-server": {
+	    "command": "npx",
+	    "args": ["-y", "kubernetes-mcp-server@latest"]
+	}
+   }
+}

@@ -25,7 +25,7 @@ describe('CoordinationEngine', () => {
       healthCheck: vi.fn()
     };
 
-    coordinator = new CoordinationEngine(mockClient);
+    coordinator = new CoordinationEngine(mockClient as any);
   });
 
   describe('Parallel Coordination', () => {

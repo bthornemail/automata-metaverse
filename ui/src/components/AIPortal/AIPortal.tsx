@@ -16,6 +16,8 @@ import { databaseService } from '@/services/database-service';
 import { llmService, type LLMProviderConfig } from '@/services/llm-service';
 import { nlQueryService } from '@/services/nl-query-service';
 import { chatService, ChatMessage as ChatServiceMessage, ChatParticipant } from '@/services/chat-service';
+import { agentCommunicationService } from '@/services/agent-communication-service';
+import { useAgentAPI } from '@/hooks/useAgentAPI';
 import UnifiedEditor from '@/components/UnifiedEditor';
 import { dimensionConfig } from '@/components/AdvancedAnimations/WebGLMetaverseEvolution';
 // Import refactored components
@@ -69,6 +71,9 @@ interface BridgeStatus {
 const AIPortal: React.FC = () => {
   // Automaton Metaverse State
   const { state: automatonState, actions: automatonActions } = useAutomatonState();
+  
+  // Load agents from Agent API
+  const { agents: agentAPIAgents, loading: agentsLoading } = useAgentAPI();
   
   // Agent Interface State
   const [chat, setChat] = useState<AgentChat>({
@@ -584,6 +589,57 @@ const AIPortal: React.FC = () => {
             addEvolutionLog(`✓ NL Query: Response generated (confidence: ${(nlResponse.confidence * 100).toFixed(0)}%)`);
             if (nlResponse.citations.length > 0) {
               addEvolutionLog(`  Citations: ${nlResponse.citations.map(c => c.source).join(', ')}`);
+            }
+            
+            // Check if response mentions agents or has agent-related entities
+            // Send agent communication messages for agent-related responses
+            if (nlResponse.relatedEntities && nlResponse.relatedEntities.length > 0) {
+              const agentEntities = nlResponse.relatedEntities.filter(e => e.type === 'agent');
+              for (const entity of agentEntities) {
+                // Find matching agent from Agent API
+                const matchingAgent = agentAPIAgents.find(a => 
+                  a.id === entity.id || 
+                  a.name.toLowerCase().includes(entity.name.toLowerCase()) ||
+                  entity.name.toLowerCase().includes(a.name.toLowerCase())
+                );
+                
+                if (matchingAgent) {
+                  try {
+                    // Send message to agent via communication service
+                    await agentCommunicationService.sendMessage('user', matchingAgent.id, {
+                      question: message,
+                      response: nlResponse.answer,
+                      context: 'nl-query-response'
+                    });
+                    addEvolutionLog(`  → Sent communication to ${matchingAgent.name}`);
+                  } catch (error) {
+                    console.warn(`Failed to send communication to agent ${matchingAgent.id}:`, error);
+                  }
+                }
+              }
+            }
+            
+            // Also check if answer mentions agent names/dimensions
+            const agentMentionMatch = nlResponse.answer.match(/(\d+D[-\w]*)\s+(?:agent|agent's)/i);
+            if (agentMentionMatch) {
+              const agentIdentifier = agentMentionMatch[1];
+              const targetAgent = agentAPIAgents.find(a => 
+                a.name.toLowerCase().includes(agentIdentifier.toLowerCase()) ||
+                a.dimension === agentIdentifier.toUpperCase()
+              );
+              
+              if (targetAgent) {
+                try {
+                  await agentCommunicationService.sendMessage('user', targetAgent.id, {
+                    question: message,
+                    response: nlResponse.answer,
+                    context: 'nl-query-mention'
+                  });
+                  addEvolutionLog(`  → Sent communication to mentioned agent ${targetAgent.name}`);
+                } catch (error) {
+                  console.warn(`Failed to send communication to mentioned agent ${targetAgent.id}:`, error);
+                }
+              }
             }
             
             setIsTyping(false);

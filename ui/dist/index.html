@@ -5,15 +5,34 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Automaton UI</title>
-    <script type="module" crossorigin src="/assets/index-ad1599f2.js"></script>
-    <link rel="modulepreload" crossorigin href="/assets/vendor-8a332d8f.js">
-    <link rel="modulepreload" crossorigin href="/assets/three-6467c223.js">
-    <link rel="modulepreload" crossorigin href="/assets/charts-0eb01fc9.js">
-    <link rel="modulepreload" crossorigin href="/assets/ui-5c4399ec.js">
-    <link rel="stylesheet" href="/assets/index-0b477076.css">
+    <!-- Eruda Console Debugger (Development Only) -->
+    <script>
+      // Load Eruda in development mode
+      // Check if we're in development by looking at the hostname or a query param
+      (function () {
+        var isDev = window.location.hostname === 'localhost' || 
+                    window.location.hostname === '127.0.0.1' ||
+                    window.location.search.includes('eruda=true');
+        
+        if (isDev) {
+          var script = document.createElement('script');
+          script.src = 'https://cdn.jsdelivr.net/npm/eruda@3.4.3/eruda.js';
+          script.onload = function () {
+            eruda.init();
+          };
+          document.head.appendChild(script);
+        }
+      })();
+    </script>
+    <script type="module" crossorigin src="/assets/index-WgfTXHBa.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/vendor-OvXVS5lI.js">
+    <link rel="modulepreload" crossorigin href="/assets/three-P0FcMTOD.js">
+    <link rel="modulepreload" crossorigin href="/assets/charts-Dqr5KQw1.js">
+    <link rel="modulepreload" crossorigin href="/assets/ui-AWn3VhF7.js">
+    <link rel="modulepreload" crossorigin href="/assets/codemirror-Bkp1R_Y_.js">
+    <link rel="stylesheet" crossorigin href="/assets/index-B6az2N_V.css">
   </head>
   <body>
     <div id="root"></div>
-    
   </body>
 </html>
