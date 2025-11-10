@@ -168,6 +168,10 @@ class EvolvedAutomaton extends MemoryOptimizedAutomaton {
     const oldest = recent[0];
     const newest = recent[recent.length - 1];
     
+    if (!oldest || !newest) {
+      return; // Not enough history yet
+    }
+    
     const timeDelta = (newest.timestamp - oldest.timestamp) / 1000; // seconds
     const memoryDelta = newest.memory - oldest.memory; // MB
     const growthRate = memoryDelta / timeDelta; // MB/sec
@@ -210,7 +214,8 @@ class EvolvedAutomaton extends MemoryOptimizedAutomaton {
   }
   
   getStats(): any {
-    const baseStats = super.getStats ? super.getStats() : {};
+    // Base class doesn't have getStats, so start with empty object
+    const baseStats: any = {};
     const memUsage = process.memoryUsage();
     const memMB = memUsage.heapUsed / 1024 / 1024;
     
@@ -218,9 +223,13 @@ class EvolvedAutomaton extends MemoryOptimizedAutomaton {
     let currentGrowthRate = 0;
     if (this.memoryHistory.length >= 2) {
       const recent = this.memoryHistory.slice(-2);
-      const timeDelta = (recent[1].timestamp - recent[0].timestamp) / 1000;
-      const memoryDelta = recent[1].memory - recent[0].memory;
-      currentGrowthRate = memoryDelta / timeDelta;
+      const first = recent[0];
+      const second = recent[1];
+      if (first && second) {
+        const timeDelta = (second.timestamp - first.timestamp) / 1000;
+        const memoryDelta = second.memory - first.memory;
+        currentGrowthRate = memoryDelta / timeDelta;
+      }
     }
     
     return {
@@ -247,7 +256,7 @@ class EvolvedAutomaton extends MemoryOptimizedAutomaton {
     };
   }
   
-  destroy(): void {
+  override destroy(): void {
     // Stop evolved timers
     if (this.modificationTimer) {
       clearInterval(this.modificationTimer);

@@ -473,7 +473,7 @@ const CollaborativeWorldContent: React.FC<{
       />
 
       {/* Debug Overlay - Show agent count and positions */}
-      {process.env.NODE_ENV === 'development' && (
+      {import.meta.env.DEV && (
         <div className="absolute top-4 right-4 z-30 bg-black/90 text-white text-xs p-3 rounded-lg font-mono border border-yellow-500">
           <div className="font-bold mb-2">🐛 Debug Info</div>
           <div>Agents: {agents.length}</div>
@@ -685,7 +685,7 @@ export const CollaborativeWorldIntegration: React.FC<CollaborativeWorldIntegrati
   CollaborativeWorldIntegration.displayName = 'CollaborativeWorldIntegration';
   
   // Debug logging for React DevTools
-  if (process.env.NODE_ENV === 'development') {
+  if (import.meta.env.DEV) {
     console.log('[React DevTools] CollaborativeWorldIntegration rendered with config:', config);
     console.log('[React DevTools] Agent API agents:', agentAPIAgents?.length || 0);
   }
@@ -699,7 +699,7 @@ export const CollaborativeWorldIntegration: React.FC<CollaborativeWorldIntegrati
   
   // React DevTools: Log agents state changes
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       console.log('[React DevTools] Agents state updated:', {
         count: agents.length,
         agents: agents.map(a => ({ id: a.id, name: a.name, position: a.position }))

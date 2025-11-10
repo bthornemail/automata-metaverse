@@ -4,6 +4,7 @@
  */
 
 import * as path from 'path';
+// @ts-ignore - glob types may not be available
 import { glob } from 'glob';
 
 async function runTests() {
@@ -20,7 +21,7 @@ async function runTests() {
   }
 
   console.log(`Found ${testFiles.length} test file(s):\n`);
-  testFiles.forEach(file => {
+  testFiles.forEach((file: string) => {
     console.log(`  - ${path.relative(__dirname, file)}`);
   });
 

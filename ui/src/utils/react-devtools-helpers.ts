@@ -16,7 +16,7 @@ export function setComponentDisplayName(component: React.ComponentType<any>, dis
  * Log component props for React DevTools inspection
  */
 export function logComponentProps(componentName: string, props: Record<string, any>): void {
-  if (process.env.NODE_ENV === 'development') {
+  if (import.meta.env.DEV) {
     console.log(`[React DevTools] ${componentName} props:`, props);
   }
 }
@@ -25,7 +25,7 @@ export function logComponentProps(componentName: string, props: Record<string, a
  * Log component state for React DevTools inspection
  */
 export function logComponentState(componentName: string, state: Record<string, any>): void {
-  if (process.env.NODE_ENV === 'development') {
+  if (import.meta.env.DEV) {
     console.log(`[React DevTools] ${componentName} state:`, state);
   }
 }
@@ -47,7 +47,7 @@ export function withDevToolsDisplayName<P extends object>(
  */
 export function useDevToolsDebug(componentName: string, props?: Record<string, any>, state?: Record<string, any>): void {
   React.useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       console.log(`[React DevTools] ${componentName} mounted`, { props, state });
       return () => {
         console.log(`[React DevTools] ${componentName} unmounted`);

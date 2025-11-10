@@ -46,6 +46,7 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: true,
     rollupOptions: {
+      external: ['gpu.js'], // Externalize optional dependency
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],

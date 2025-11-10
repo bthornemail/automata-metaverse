@@ -48,7 +48,7 @@ describe('EnhancedIntentParser', () => {
         turnId: 'turn-1',
         timestamp: Date.now(),
         userInput: 'Tell me about 4D-Network-Agent',
-        intent: { type: 'agent', entity: '4D-Network-Agent', question: 'Tell me about 4D-Network-Agent' },
+        intent: { type: 'agent' as const, entity: '4D-Network-Agent', question: 'Tell me about 4D-Network-Agent' },
         entities: [{
           id: 'entity-1',
           type: 'agent' as const,
@@ -105,7 +105,7 @@ describe('EnhancedIntentParser', () => {
         turnId: 'turn-1',
         timestamp: Date.now(),
         userInput: 'Tell me about 4D-Network-Agent',
-        intent: { type: 'agent', entity: '4D-Network-Agent', question: 'Tell me about 4D-Network-Agent' },
+        intent: { type: 'agent' as const, entity: '4D-Network-Agent', question: 'Tell me about 4D-Network-Agent' },
         entities: [{
           id: 'entity-1',
           type: 'agent' as const,

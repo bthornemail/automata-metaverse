@@ -32,7 +32,8 @@
   },
   "include": [
     "*.ts",
-    "grok_files/**/*"
+    "grok_files/**/*",
+    "evolutions/**/*.ts"
   ],
   "exclude": [
     "node_modules",

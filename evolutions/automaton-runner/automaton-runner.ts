@@ -1,10 +1,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join } from 'path';
 
-// Type declaration for global.gc (requires --expose-gc flag)
-declare global {
-  var gc: (() => void) | undefined;
-}
+// Note: global.gc is already declared by @types/node as NodeJS.GCFunction | undefined
 
 // Memory pool for CanvasObject reuse to reduce memory volatility
 class ObjectPool<T> {
@@ -111,12 +108,12 @@ class SelfReferencingAutomaton {
     () => ({ id: '', type: '', currentState: '', dimensionalLevel: 0 } as CanvasObject),
     (obj) => {
       // Reset object for reuse
-      delete obj.id;
-      delete obj.type;
-      delete obj.currentState;
-      delete obj.dimensionalLevel;
-      delete obj.selfReference;
-      delete obj.provenanceHistory;
+      (obj as any).id = '';
+      (obj as any).type = '';
+      (obj as any).currentState = '';
+      (obj as any).dimensionalLevel = 0;
+      obj.selfReference = undefined;
+      obj.provenanceHistory = undefined;
     },
     200 // Max pool size
   );

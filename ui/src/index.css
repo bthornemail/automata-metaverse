@@ -1,4 +1,6 @@
 @import "tailwindcss";
+/* Import unified design system */
+@import './styles/design-system.css';
 
 /* Theme configuration for Tailwind CSS v4 */
 @theme {
@@ -38,9 +40,6 @@
     100% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.8); }
   }
 }
-
-/* Import unified design system */
-@import './styles/design-system.css';
 
 @layer base {
   body {

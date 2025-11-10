@@ -145,7 +145,7 @@ class MemoryOptimizedAutomaton extends AdvancedSelfReferencingAutomaton {
   }
 
   // Override executeSelfModification to add memory checks and dimension control
-  executeSelfModification(): void {
+  override executeSelfModification(): void {
     // Ensure we're at dimension 0 if locked or focused
     if (this.config.lockDimension !== undefined) {
       (this as any).currentDimension = this.config.lockDimension;
@@ -196,7 +196,7 @@ class MemoryOptimizedAutomaton extends AdvancedSelfReferencingAutomaton {
   }
 
   // Override executeAction to prevent dimension progression when locked
-  executeAction(action: string, fromState: string, toState: string, context: any = {}): void {
+  override executeAction(action: string, fromState: string, toState: string, context: any = {}): void {
     // Prevent evolution if locked to dimension 0
     if (this.config.lockDimension !== undefined && action === 'evolve') {
       console.log(`🔒 Skipping evolution (locked to dimension ${this.config.lockDimension})`);

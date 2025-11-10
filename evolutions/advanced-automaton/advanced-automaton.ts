@@ -275,7 +275,7 @@ class AdvancedSelfReferencingAutomaton {
     console.log(`✅ Loaded ${this.objects.length} unique objects from ${this.filePath}`);
   }
 
-  private save(): void {
+  protected save(): void {
     // Provenance-aware deduplication before saving
     // Preserve provenance history while removing true duplicates
     const deduplicated: CanvasObject[] = [];
@@ -868,7 +868,7 @@ class AdvancedSelfReferencingAutomaton {
     };
   }
 
-  private executeSelfModification(): void {
+  protected executeSelfModification(): void {
     const currentDimension = this.currentDimension;
     const modificationCode = this.generateModificationCode(currentDimension);
     const modification: CanvasObject = {

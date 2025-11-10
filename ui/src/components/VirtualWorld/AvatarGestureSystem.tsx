@@ -5,6 +5,7 @@
 
 import React, { useState, useCallback } from 'react';
 import * as THREE from 'three';
+import { useFrame } from '@react-three/fiber';
 
 export type GestureType = 
   | 'wave' 
@@ -225,7 +226,6 @@ export const GestureAnimationController: React.FC<{
 }> = ({ gestureState, gltf, scene, onGestureComplete }) => {
   const mixerRef = React.useRef<THREE.AnimationMixer | null>(null);
   const currentActionRef = React.useRef<THREE.AnimationAction | null>(null);
-  const { useFrame } = require('@react-three/fiber');
 
   // Initialize mixer
   React.useEffect(() => {

@@ -68,8 +68,8 @@ describe('AgentRouter', () => {
       const routes = router.routeQuery(intent, context.conversationId);
 
       expect(routes.length).toBeGreaterThan(0);
-      expect(routes[0].agentName).toBe('4D-Network-Agent');
-      expect(routes[0].confidence).toBeGreaterThan(0.5);
+      expect(routes[0]?.agentName).toBe('4D-Network-Agent');
+      expect(routes[0]?.confidence).toBeGreaterThan(0.5);
     });
 
     it('should route by dimension', () => {
@@ -110,7 +110,7 @@ describe('AgentRouter', () => {
       const routes = router.routeQuery(intent, context.conversationId);
 
       expect(routes.length).toBeGreaterThan(0);
-      expect(routes[0].agentName).toBe('Query-Interface-Agent');
+      expect(routes[0]?.agentName).toBe('Query-Interface-Agent');
     });
   });
 

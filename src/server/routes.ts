@@ -41,12 +41,8 @@ export function setupRoutes(app: express.Application): void {
   }));
 
   // SPA fallback - serve index.html for all non-API routes
-  app.get('*', (req, res, next) => {
-    // Skip API routes
-    if (req.path.startsWith('/api')) {
-      return next();
-    }
-    
+  // Use regex pattern to avoid path-to-regexp issues with wildcards
+  app.get(/^(?!\/api).*/, (req, res) => {
     // Serve index.html for SPA routing
     const indexPath = join(serverConfig.uiDistPath, 'index.html');
     if (existsSync(indexPath)) {

@@ -113,12 +113,8 @@ app.use(express.static(UI_DIST_PATH, {
 }));
 
 // SPA fallback - serve index.html for all non-API routes
-app.get('*', (req, res, next) => {
-  // Skip API routes
-  if (req.path.startsWith('/api')) {
-    return next();
-  }
-  
+// Use regex pattern to avoid path-to-regexp issues with wildcards
+app.get(/^(?!\/api).*/, (req, res) => {
   // Serve index.html for SPA routing
   const indexPath = join(UI_DIST_PATH, 'index.html');
   if (existsSync(indexPath)) {

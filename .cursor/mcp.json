@@ -18,6 +18,10 @@
 	"kubernetes-mcp-server": {
 	    "command": "npx",
 	    "args": ["-y", "kubernetes-mcp-server@latest"]
-	}
+	},
+"wikipedia-mcp": { 
+"command": "docker", 
+"args": [ "run", "-i", "--rm", "mcp/wikipedia-mcp" ]
+}
    }
 }

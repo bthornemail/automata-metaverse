@@ -45,7 +45,7 @@ describe('ConversationContextManager', () => {
 
       const updatedContext = manager.getContext(context.conversationId);
       expect(updatedContext?.turns.length).toBe(1);
-      expect(updatedContext?.turns[0].userInput).toBe('What agents are available?');
+      expect(updatedContext?.turns[0]?.userInput).toBe('What agents are available?');
       expect(updatedContext?.currentIntent?.type).toBe('agent');
     });
 
@@ -61,7 +61,7 @@ describe('ConversationContextManager', () => {
         turnId: 'turn-1',
         timestamp: Date.now(),
         userInput: 'Tell me about 4D-Network-Agent',
-        intent: { type: 'agent', entity: '4D-Network-Agent', question: 'Tell me about 4D-Network-Agent' },
+        intent: { type: 'agent' as const, entity: '4D-Network-Agent', question: 'Tell me about 4D-Network-Agent' },
         entities: [entity]
       };
 
@@ -105,7 +105,7 @@ describe('ConversationContextManager', () => {
         turnId: 'turn-1',
         timestamp: Date.now(),
         userInput: 'Tell me about 4D-Network-Agent',
-        intent: { type: 'agent', entity: '4D-Network-Agent', question: 'Tell me about 4D-Network-Agent' },
+        intent: { type: 'agent' as const, entity: '4D-Network-Agent', question: 'Tell me about 4D-Network-Agent' },
         entities: [entity]
       };
 
@@ -128,7 +128,7 @@ describe('ConversationContextManager', () => {
         turnId: 'turn-1',
         timestamp: Date.now(),
         userInput: 'What is 5D-Consensus-Agent?',
-        intent: { type: 'agent', entity: '5D-Consensus-Agent', question: 'What is 5D-Consensus-Agent?' },
+        intent: { type: 'agent' as const, entity: '5D-Consensus-Agent', question: 'What is 5D-Consensus-Agent?' },
         entities: [entity]
       };
 
@@ -161,8 +161,8 @@ describe('ConversationContextManager', () => {
 
       const history = manager.getHistory(context.conversationId);
       expect(history.length).toBe(2);
-      expect(history[0].userInput).toBe('Question 1');
-      expect(history[1].userInput).toBe('Question 2');
+      expect(history[0]?.userInput).toBe('Question 1');
+      expect(history[1]?.userInput).toBe('Question 2');
     });
 
     it('should limit history when limit is provided', () => {
@@ -180,7 +180,7 @@ describe('ConversationContextManager', () => {
 
       const history = manager.getHistory(context.conversationId, 3);
       expect(history.length).toBe(3);
-      expect(history[0].userInput).toBe('Question 2'); // Last 3 turns
+      expect(history[0]?.userInput).toBe('Question 2'); // Last 3 turns
     });
   });
 

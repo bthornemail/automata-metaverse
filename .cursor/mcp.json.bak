@@ -31,6 +31,7 @@
         "ARXIV_STORAGE_PATH": "/home/main/automaton/papers"
       }
 	 },
+"wikipedia-mcp": { "command": "docker", "args": [ "run", "-i", "--rm", "mcp/wikipedia-mcp" ] },
 	"kubectl-mcp-server": {
       "command": "docker",
       "args": [

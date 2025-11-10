@@ -401,13 +401,13 @@ Action:`;
     
     // Pattern 1: [Reasoning: ...] or [briefly ...] format
     const reasoningBracketMatch = cleanResponse.match(/\[(?:Reasoning|briefly|reasoning):\s*([^\]]+)\]/i);
-    if (reasoningBracketMatch) {
+    if (reasoningBracketMatch && reasoningBracketMatch[1]) {
       addReasoning(reasoningBracketMatch[1]);
     }
     
     // Pattern 1b: [any text in brackets that looks like reasoning]
     const anyBracketMatch = cleanResponse.match(/\[([^\]]{20,})\]/);
-    if (anyBracketMatch && !anyBracketMatch[1].match(/^(next\s+action|action|result)/i)) {
+    if (anyBracketMatch && anyBracketMatch[1] && !anyBracketMatch[1].match(/^(next\s+action|action|result)/i)) {
       const bracketContent = anyBracketMatch[1];
       // Check if it contains reasoning keywords
       if (bracketContent.match(/(?:maintain|consistency|integrity|because|reason|since|allows|enables|promotes|facilitates)/i)) {
@@ -417,7 +417,7 @@ Action:`;
     
     // Pattern 2: "Brief reasoning:" or "Reasoning:" lines
     const briefReasoningMatch = cleanResponse.match(/(?:Brief\s+)?[Rr]easoning:\s*(.+?)(?:\n|$)/i);
-    if (briefReasoningMatch) {
+    if (briefReasoningMatch && briefReasoningMatch[1]) {
       addReasoning(briefReasoningMatch[1]);
     }
     
@@ -586,11 +586,14 @@ Action:`;
       
       // Try to extract just the action name if there's additional text
       const actionMatch = action.match(/\b(evolve|self-reference|self-modify|self-io|validate-self|self-train|self-observe|compose)\b/);
-      if (actionMatch) {
+      if (actionMatch && actionMatch[1]) {
         action = actionMatch[1];
       } else {
         // Fallback: take first word and normalize
-        action = action.split(/\s+/)[0].replace(/\s+/g, '-');
+        const firstWord = action.split(/\s+/)[0];
+        if (firstWord) {
+          action = firstWord.replace(/\s+/g, '-');
+        }
       }
       
       // Prepare decision trie context
@@ -799,23 +802,29 @@ async function main() {
   let argIndex = 0;
   
   // First arg: model
-  if (args.length > argIndex && args[argIndex] && !args[argIndex].startsWith('--')) {
-    model = args[argIndex++];
+  const modelArg = args[argIndex];
+  if (args.length > argIndex && modelArg && !modelArg.startsWith('--')) {
+    model = modelArg;
+    argIndex++;
   }
   
   // Second arg: interval
-  if (args.length > argIndex && args[argIndex] && !isNaN(parseInt(args[argIndex]))) {
-    interval = parseInt(args[argIndex++]) || 3000;
+  const intervalArg = args[argIndex];
+  if (args.length > argIndex && intervalArg && !isNaN(parseInt(intervalArg))) {
+    interval = parseInt(intervalArg) || 3000;
+    argIndex++;
   }
   
   // Third arg: maxIterations (optional)
-  if (args.length > argIndex && args[argIndex] && !isNaN(parseInt(args[argIndex]))) {
-    maxIterations = parseInt(args[argIndex++]);
+  const maxIterationsArg = args[argIndex];
+  if (args.length > argIndex && maxIterationsArg && !isNaN(parseInt(maxIterationsArg))) {
+    maxIterations = parseInt(maxIterationsArg);
+    argIndex++;
   }
   
   // Last arg: automatonFile (if provided)
-  if (args.length > argIndex && args[argIndex]) {
-    const potentialFile = args[argIndex];
+  const potentialFile = args[argIndex];
+  if (args.length > argIndex && potentialFile) {
     if (potentialFile.endsWith('.jsonl') || potentialFile.includes('/') || potentialFile.includes('\\')) {
       automatonFile = potentialFile;
     }

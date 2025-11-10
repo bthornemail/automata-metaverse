@@ -63,19 +63,19 @@ async function integrateSystems(): Promise<void> {
     console.log(`   Total Rules: ${kb.rules.length}`);
     console.log(`   Total Agents: ${kb.agents.length}`);
     console.log(`   Total Functions: ${kb.functions.length}`);
-    const examples = kb.facts.filter(f => f.type === 'example');
+    const examples = kb.facts.filter((f: any) => f.type === 'example');
     console.log(`   Total Examples: ${examples.length}`);
     
     // Calculate rules by keyword
     const rulesByKeyword: Record<string, number> = {};
-    kb.rules.forEach(r => {
+    kb.rules.forEach((r: any) => {
       rulesByKeyword[r.rfc2119Keyword] = (rulesByKeyword[r.rfc2119Keyword] || 0) + 1;
     });
     console.log(`   Rules by Keyword:`, rulesByKeyword);
     
     // Calculate agents by dimension
     const agentsByDimension: Record<string, number> = {};
-    kb.agents.forEach(a => {
+    kb.agents.forEach((a: any) => {
       const dim = a.dimension || 'no-dimension';
       agentsByDimension[dim] = (agentsByDimension[dim] || 0) + 1;
     });

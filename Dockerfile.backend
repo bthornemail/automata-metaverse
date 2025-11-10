@@ -15,6 +15,8 @@ RUN npm ci
 COPY *.ts ./
 COPY src/ ./src/
 COPY grok_files/ ./grok_files/
+COPY evolutions/ ./evolutions/
+COPY ui/ ./ui/
 
 # Build TypeScript
 RUN npm run build
@@ -39,6 +41,7 @@ RUN npm ci --only=production && npm cache clean --force
 # Copy built application and source
 COPY --from=builder /app/dist/*.js ./
 COPY --from=builder /app/dist/src/ ./src/
+COPY --from=builder /app/dist/evolutions/ ./evolutions/
 COPY --from=builder /app/grok_files/ ./grok_files/
 # Copy all JSONL files
 COPY *.jsonl ./
@@ -47,6 +50,8 @@ COPY automaton-kernel.seed.jsonl ./
 COPY automaton-kernel.jsonl ./
 COPY generate.metaverse.jsonl ./
 COPY r5rs-functions-trie.jsonl ./
+# Copy documentation files needed by services
+COPY AGENTS.md ./
 
 # Create directories
 RUN mkdir -p logs && \

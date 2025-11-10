@@ -173,7 +173,7 @@ class ScalableAutomaton {
     // Distribute work across workers
     for (let i = 0; i < this.workers.length; i++) {
       const worker = this.workers[i];
-      if (worker && !worker.threadId) continue;
+      if (!worker || !worker.threadId) continue;
       
       this.activeWorkers++;
       promises.push(
@@ -204,7 +204,10 @@ class ScalableAutomaton {
       // Example: GPU-accelerated Church encoding computation
       const churchEncode = gpu.createKernel(function(data: number[]) {
         // Simple GPU computation example
-        return data[this.thread.x] * 2;
+        // @ts-ignore - GPU.js provides thread context via 'this'
+        const index = this.thread.x;
+        const value = data[index];
+        return value !== undefined ? value * 2 : 0;
       }).setOutput([this.config.gpuBatchSize]);
       
       const input = Array.from({ length: this.config.gpuBatchSize }, (_, i) => i);

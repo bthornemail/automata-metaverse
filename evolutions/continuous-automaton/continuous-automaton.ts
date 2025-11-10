@@ -196,27 +196,36 @@ async function main() {
   const args = process.argv.slice(2);
   const useOllama = args.includes('--ollama');
   const model = args.find(arg => arg.startsWith('--model='))?.split('=')[1] || 'llama3.2';
-  const interval = parseInt(args.find(arg => !isNaN(parseInt(arg))) || '2000');
   // Parse arguments from bash script: interval [--max maxIterations] [automatonFile]
   let argIndex = 0;
   let maxIterations: number | undefined = undefined;
   let automatonFile = './automaton.jsonl';
   
-  // First arg: interval
-  if (args.length > argIndex && !isNaN(parseInt(args[argIndex]))) {
-    argIndex++; // Skip interval, already parsed above
+  // First arg: interval (find first numeric argument)
+  const intervalArg = args.find(arg => !isNaN(parseInt(arg)));
+  const interval = intervalArg ? parseInt(intervalArg) : 2000;
+  
+  // Skip interval arg if found
+  if (intervalArg) {
+    const intervalIndex = args.indexOf(intervalArg);
+    if (intervalIndex >= 0) {
+      argIndex = intervalIndex + 1;
+    }
   }
   
   // Check for --max flag
   const maxIndex = args.findIndex(arg => arg === '--max');
   if (maxIndex >= 0 && maxIndex + 1 < args.length) {
-    maxIterations = parseInt(args[maxIndex + 1]);
+    const maxArg = args[maxIndex + 1];
+    if (maxArg) {
+      maxIterations = parseInt(maxArg);
+    }
   }
   
   // Last argument that looks like a file path is the automaton file
   for (let i = args.length - 1; i >= 0; i--) {
     const arg = args[i];
-    if (arg.endsWith('.jsonl') || (arg.includes('/') && !arg.startsWith('--') && arg !== '--max')) {
+    if (arg && (arg.endsWith('.jsonl') || (arg.includes('/') && !arg.startsWith('--') && arg !== '--max'))) {
       automatonFile = arg;
       break;
     }

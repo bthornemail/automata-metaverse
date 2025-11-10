@@ -11,17 +11,20 @@ export * from './canvasl-parser';
 
 import {
   initializeAgentMovementService,
-  agentMovementService
+  agentMovementService,
+  getAgentMovementService
 } from './agent-movement-service';
 
 import {
   initializeInteractionPropagationService,
-  interactionPropagationService
+  interactionPropagationService,
+  getInteractionPropagationService
 } from './interaction-propagation-service';
 
 import {
   initializeLearningService,
-  learningService
+  learningService,
+  getLearningService
 } from './learning-service';
 
 import {
@@ -128,7 +131,7 @@ class CollaborativeWorldServiceImpl implements CollaborativeWorldService {
 
   private setupEventListeners(): void {
     // Listen to learning events
-    const learningServiceInstance = require('./learning-service').getLearningService();
+    const learningServiceInstance = getLearningService();
     if (learningServiceInstance) {
       learningServiceInstance.on('learning:pattern-stored', (data: any) => {
         if (this.state) {
@@ -152,12 +155,12 @@ class CollaborativeWorldServiceImpl implements CollaborativeWorldService {
 
   destroy(): void {
     // Cleanup services
-    const movementService = require('./agent-movement-service').getAgentMovementService();
+    const movementService = getAgentMovementService();
     if (movementService) {
       movementService.destroy();
     }
 
-    const propagationService = require('./interaction-propagation-service').getInteractionPropagationService();
+    const propagationService = getInteractionPropagationService();
     if (propagationService) {
       propagationService.destroy();
     }

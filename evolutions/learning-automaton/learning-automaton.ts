@@ -68,9 +68,10 @@ export class LearningAutomaton extends MemoryOptimizedAutomaton {
   /**
    * Override executeAction to track patterns
    */
-  public executeAction(): boolean {
+  override executeAction(action: string, fromState: string, toState: string, context: any = {}): void {
     if (!this.learningConfig.enableLearning) {
-      return super.executeAction();
+      super.executeAction(action, fromState, toState, context);
+      return;
     }
     
     // Track execution start
@@ -84,19 +85,18 @@ export class LearningAutomaton extends MemoryOptimizedAutomaton {
     const recommendedPattern = this.patternTracker.getRecommendedPattern(currentDimension);
     
     // Execute action
-    const result = super.executeAction();
+    super.executeAction(action, fromState, toState, context);
     
     // Track execution end
     const executionTime = Date.now() - this.executionStartTime;
     const memAfter = this.learningConfig.trackMemory ? this.getCurrentMemoryUsage() : 0;
     const memoryDelta = memAfter - memBefore;
     
-    // Track execution pattern
-    const outcome: ExecutionPattern['outcome'] = result ? 'success' : 'partial';
+    // Track execution pattern (assume success since no return value)
     this.patternTracker.trackExecution(
       currentDimension,
       [...this.currentActionSequence],
-      outcome,
+      'success',
       memAfter,
       executionTime,
       {
@@ -111,7 +111,7 @@ export class LearningAutomaton extends MemoryOptimizedAutomaton {
       this.trackModification(
         currentDimension,
         lastModification,
-        result,
+        true,
         memoryDelta,
         executionTime
       );
@@ -119,16 +119,20 @@ export class LearningAutomaton extends MemoryOptimizedAutomaton {
     
     // Clear action sequence for next execution
     this.currentActionSequence = [];
-    
-    return result;
   }
 
   /**
-   * Override generateModification to use learned patterns
+   * Generate modification using learned patterns
    */
   protected generateModification(): any {
     if (!this.learningConfig.enableLearning) {
-      return super.generateModification();
+      // Return a default modification object
+      return {
+        id: `modification-${Date.now()}`,
+        type: 'text',
+        currentState: 'modified',
+        dimensionalLevel: (this as any).currentDimension || 0
+      };
     }
     
     const currentDimension = (this as any).currentDimension || 0;
@@ -137,7 +141,7 @@ export class LearningAutomaton extends MemoryOptimizedAutomaton {
     const bestPatterns = this.patternTracker.getBestPatterns(currentDimension, 3);
     
     // Use learned pattern if confidence is high enough
-    if (bestPatterns.length > 0 && bestPatterns[0].confidence >= this.learningConfig.minPatternConfidence) {
+    if (bestPatterns.length > 0 && bestPatterns[0] && bestPatterns[0].confidence >= this.learningConfig.minPatternConfidence) {
       const learnedPattern = bestPatterns[0].pattern;
       
       // Try to adapt the pattern
@@ -149,9 +153,13 @@ export class LearningAutomaton extends MemoryOptimizedAutomaton {
     }
     
     // Fall back to default generation
-    const modification = super.generateModification();
     this.currentActionSequence.push('default-generation');
-    return modification;
+    return {
+      id: `modification-${Date.now()}`,
+      type: 'text',
+      currentState: 'modified',
+      dimensionalLevel: currentDimension
+    };
   }
 
   /**
@@ -306,7 +314,6 @@ export class LearningAutomaton extends MemoryOptimizedAutomaton {
     // Save patterns before cleanup
     this.saveLearnedPatterns();
     
-    // Call parent cleanup
-    super.cleanup?.();
+    // Note: cleanup method doesn't exist in base class
   }
 }

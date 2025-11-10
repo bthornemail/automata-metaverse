@@ -42,7 +42,7 @@ describe('DialogueHandler', () => {
         turnId: 'turn-1',
         timestamp: Date.now(),
         userInput: 'Tell me about 4D-Network-Agent',
-        intent: { type: 'agent', entity: '4D-Network-Agent', question: 'Tell me about 4D-Network-Agent' }
+        intent: { type: 'agent' as const, entity: '4D-Network-Agent', question: 'Tell me about 4D-Network-Agent' }
       };
       contextManager.addTurn(context.conversationId, turn1);
 
@@ -79,7 +79,7 @@ describe('DialogueHandler', () => {
         turnId: 'turn-1',
         timestamp: Date.now(),
         userInput: 'Tell me about 4D-Network-Agent',
-        intent: { type: 'agent', entity: '4D-Network-Agent', question: 'Tell me about 4D-Network-Agent' }
+        intent: { type: 'agent' as const, entity: '4D-Network-Agent', question: 'Tell me about 4D-Network-Agent' }
       };
       contextManager.addTurn(context.conversationId, turn);
 
