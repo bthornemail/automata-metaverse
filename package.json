@@ -1,0 +1,89 @@
+{
+  "name": "automata-metaverse",
+  "version": "1.0.1",
+  "description": "Automaton execution engines for self-referential CanvasL/JSONL systems",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "browser": "dist/browser/index.js",
+  "module": "dist/browser/index.js",
+  "exports": {
+    ".": {
+      "node": "./dist/index.js",
+      "browser": "./dist/browser/index.js",
+      "default": "./dist/index.js"
+    },
+    "./browser": {
+      "browser": "./dist/browser/index.js",
+      "default": "./dist/browser/index.js"
+    },
+    "./server": {
+      "node": "./dist/server/index.js",
+      "default": "./dist/server/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src",
+    "scripts",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "build:browser": "rollup -c rollup.config.js",
+    "build:all": "npm run build && npm run build:browser",
+    "watch": "tsc --watch",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run build:all",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "test:watch": "jest --watch"
+  },
+  "keywords": [
+    "automaton",
+    "canvasl",
+    "jsonl",
+    "self-referential",
+    "state-machine",
+    "evolution",
+    "dimensional-progression",
+    "church-encoding"
+  ],
+  "author": {
+    "name": "Brian Thorne",
+    "url": "https://github.com/bthornemail"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bthornemail/automata-metaverse.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bthornemail/automata-metaverse/issues"
+  },
+  "homepage": "https://bthornemail.github.io/automata-metaverse/",
+  "license": "MIT",
+  "dependencies": {
+    "meta-log-db": "^1.2.0",
+    "automaton-evolutions": "^1.0.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.5",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^20.0.0",
+    "jest": "^29.0.0",
+    "rollup": "^4.9.0",
+    "ts-jest": "^29.4.5",
+    "typescript": "^5.0.0"
+  },
+  "peerDependencies": {
+    "socket.io": "^4.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
+
