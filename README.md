@@ -95,3 +95,4 @@ const automaton = new AdvancedSelfReferencingAutomaton(
 ## License
 
 MIT
+# automata-metaverse
