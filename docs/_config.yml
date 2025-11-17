@@ -1,0 +1,61 @@
+# Site settings
+title: Automata Metaverse
+description: Automaton execution engines for self-referential CanvasL/JSONL systems
+baseurl: "/automata-metaverse"
+url: "https://bthornemail.github.io"
+
+# Repository
+repository: "bthornemail/automata-metaverse"
+github:
+  repository_url: https://github.com/bthornemail/automata-metaverse
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+
+# Theme (using minima theme)
+theme: minima
+
+# Navigation
+navigation:
+  - title: Overview
+    url: /automata-metaverse/
+  - title: API Reference
+    url: /automata-metaverse/api/
+  - title: Examples
+    url: /automata-metaverse/examples/
+
+# Exclude files and directories
+exclude:
+  - "node_modules"
+  - "*.log"
+  - ".git"
+  - ".gitignore"
+  - "Gemfile"
+  - "Gemfile.lock"
+  - "vendor"
+  - "dist"
+  - "src"
+  - "tsconfig*.json"
+  - "package.json"
+  - "package-lock.json"
+  - "*.tgz"
+  - "tests"
+
+# Include files
+include:
+  - "_pages"
+
+# Kramdown settings
+kramdown:
+  input: GFM
+  hard_wrap: false
+  syntax_highlighter: rouge
+
+# Minima theme settings
+minima:
+  social_links:
+    github: bthornemail
