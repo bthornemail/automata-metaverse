@@ -1,0 +1,11 @@
+* Federation Blackboard
+:PROPERTIES:
+:FEDERATION_VERSION: 1.0
+:BLACKBOARD_ID: blackboard-366118
+:LAST_SYNC: 2025-11-18T06:13:32Z
+:END:
+
+** Peers
+
+** CanvasL State
+

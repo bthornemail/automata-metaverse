@@ -1,0 +1,11 @@
+.git
+.gitignore
+*.md
+docs/
+examples/
+mosquitto/
+federation-data/
+metaverse-data/
+*.log
+.DS_Store
+

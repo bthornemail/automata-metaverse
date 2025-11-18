@@ -1,0 +1,47 @@
+* Federation Blackboard
+:PROPERTIES:
+:FEDERATION_VERSION: 1.0
+:BLACKBOARD_ID: blackboard-abc123
+:LAST_SYNC: 2025-01-07T12:00:00Z
+:END:
+
+** Peers
+
+*** Peer: peer-abc123
+:PROPERTIES:
+:PEER_ID: peer-abc123
+:PEER_PUBLIC_KEY: 0x1234567890abcdef...
+:PEER_ADDRESS: mqtt://broker.example.com
+:PEER_STATUS: connected
+:LAST_SEEN: 2025-01-07T12:00:00Z
+:END:
+
+*** Peer: peer-xyz789
+:PROPERTIES:
+:PEER_ID: peer-xyz789
+:PEER_PUBLIC_KEY: 0xfedcba0987654321...
+:PEER_ADDRESS: mqtt://broker.example.com
+:PEER_STATUS: discovered
+:LAST_SEEN: 2025-01-07T11:30:00Z
+:END:
+
+** CanvasL State
+
+*** Node: node-1
+:PROPERTIES:
+:NODE_ID: node-1
+:CANVASL_CID: bafyreiabc123...
+:CANVASL_SIGNATURE: 0xabcdef1234567890...
+:PEER_OWNER: peer-abc123
+:LAST_MODIFIED: 2025-01-07T12:00:00Z
+:END:
+
+*** Node: node-2
+:PROPERTIES:
+:NODE_ID: node-2
+:CANVASL_CID: bafyreidef456...
+:CANVASL_SIGNATURE: 0x1234567890abcdef...
+:PEER_OWNER: peer-xyz789
+:LAST_MODIFIED: 2025-01-07T11:30:00Z
+:END:
+

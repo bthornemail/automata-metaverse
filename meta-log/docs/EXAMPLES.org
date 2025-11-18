@@ -1,0 +1,98 @@
+#+TITLE: meta-log Examples
+
+* Automaton Blackboard Example
+
+:PROPERTIES:
+:META_LOG_VERSION: 1.0
+:R5RS_ENGINE: r5rs-canvas-engine.scm
+:END:
+
+** 0D Topology
+
+:PROPERTIES:
+:NODE_ID: 0D-topology
+:DIMENSION: 0D
+:NODE_TYPE: text
+:END:
+
+0D topology node content.
+
+** 1D Temporal
+
+:PROPERTIES:
+:NODE_ID: 1D-temporal
+:DIMENSION: 1D
+:NODE_TYPE: text
+:END:
+
+1D temporal node content.
+
+* M-Expression Examples
+
+** Evaluation
+
+#+BEGIN_SRC meta-log-m-expr :results value
+eval[church-add[2; 3]; environment[global]]
+#+END_SRC
+
+** Query
+
+#+BEGIN_SRC meta-log-m-expr :results value
+query[find[all[nodes]; where[dimension[?X; "0D"]]]
+#+END_SRC
+
+* Prolog Examples
+
+** Facts and Queries
+
+#+BEGIN_SRC meta-log-prolog :results output
+node(node1, text).
+node(node2, text).
+dimension(node1, 0D).
+dimension(node2, 1D).
+?- node(?Id, ?Type).
+#+END_SRC
+
+** Rules
+
+#+BEGIN_SRC meta-log-prolog :results output
+vertical(node1, node2).
+inherits(node1, base).
+inherits(X, Z) :- vertical(Y, X), inherits(Y, Z).
+?- inherits(?X, ?Z).
+#+END_SRC
+
+* Datalog Examples
+
+** Facts
+
+#+BEGIN_SRC meta-log-datalog :results table
+node(node1, text).
+node(node2, text).
+dimension(node1, 0D).
+?- node(?Id, ?Type).
+#+END_SRC
+
+** Rules
+
+#+BEGIN_SRC meta-log-datalog :results table
+vertical(node1, node2).
+inherits(node1, base).
+inherits(X, Z) :- vertical(Y, X), inherits(Y, Z).
+?- inherits(?X, ?Z).
+#+END_SRC
+
+* R5RS Examples
+
+** Church Encoding
+
+#+BEGIN_SRC meta-log-r5rs :results value
+(church-add 2 3)
+#+END_SRC
+
+** Church Multiplication
+
+#+BEGIN_SRC meta-log-r5rs :results value
+(church-mult 2 3)
+#+END_SRC
+

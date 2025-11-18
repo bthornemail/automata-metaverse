@@ -1,0 +1,36 @@
+services:
+  mqtt-broker:
+    image: eclipse-mosquitto:2.0
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+    command: mosquitto -c /mosquitto/config/mosquitto.conf
+    restart: unless-stopped
+
+  meta-log:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./metaverse-data:/root/metaverse
+      - ./automaton-evolutions:/root/automaton-evolutions
+      - ./r5rs-canvas-engine.scm:/root/r5rs-canvas-engine.scm
+      - ./federation-data:/root/federation
+    environment:
+      - META_LOG_AUTOMATA_PATH=/root/automaton-evolutions
+      - META_LOG_BLACKBOARD_PATH=/root/metaverse/blackboard.org
+      - META_LOG_R5RS_ENGINE_PATH=/root/r5rs-canvas-engine.scm
+      - META_LOG_MQTT_BROKER=mqtt://mqtt-broker:1883
+      - META_LOG_FEDERATION_BLACKBOARD=/root/federation/blackboard.org
+      - META_LOG_ENABLE_FEDERATION=1
+    depends_on:
+      - mqtt-broker
+    command: sh -c "emacs --daemon --eval '(server-start)' --eval '(meta-log-initialize)' && tail -f /dev/null"
+    restart: unless-stopped
+

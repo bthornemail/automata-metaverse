@@ -1,0 +1,451 @@
+# Cursor Rules for Automaton Project
+
+## Project Overview
+
+This is a **Computational Topology Canvas** system implementing a multi-agent architecture with Church encoding, dimensional progression (0D-7D), and self-referential automaton execution. The system uses JSONL/CanvasL formats, integrates ProLog/DataLog/R5RS logic programming, and supports automaton evolution.
+
+## Architecture Principles
+
+### Multi-Agent System (0D-7D Dimensional Progression)
+- **Foundation Agents (0D-2D)**: Topology, temporal, and structural operations
+- **Operational Agents (3D-4D)**: Algebraic and network operations
+- **Advanced Agents (5D-7D)**: Consensus, intelligence, and quantum operations
+- **Interface Agents**: Query interface, visualization, multiplayer
+- **Evolutionary Agents**: Self-modification, goal-oriented coordination
+- **OpenCode Integration Agent**: Bridges CLI commands with dimensional operations
+
+### Three-Layer Architecture
+1. **Top Layer (Vertical Spine)**: Fixed Church encoding mathematical foundation (immutable)
+2. **Middle Layer (Horizontal Templates)**: Implementation mappings via blackboard (mutable)
+3. **Bottom Layer (JSONL Blackboard)**: Queryable fact database
+
+### Key Technologies
+- **CanvasL**: Extended JSONL format with directives, R5RS calls, dimension references
+- **R5RS Functions**: Church encoding, JSONL parsing, RDF conversion, ProLog/DataLog queries
+- **Meta-Log**: ProLog, DataLog, R5RS integration for logic programming
+- **Automaton Execution**: Self-referential automaton system with dimensional progression
+
+## Primary Automaton Files (Production)
+
+**CRITICAL**: These are the main production automaton files that define the core system. Always reference these when working with automaton operations:
+
+### Core Automaton Files (in `evolutions/`)
+- **`evolutions/unified.automaton.canvasl`**: Unified automaton integrating all foundation files
+  - Integrates kernel, seed, shape, centroid, and basis
+  - Provides query interface and dimensional structure
+  - Primary entry point for automaton operations
+
+- **`evolutions/automaton.kernel.seed.canvasl`**: Minimal seed for kernel regeneration
+  - Contains 0D-7D dimensional definitions
+  - Self-reference patterns for regeneration
+  - Bootstrap instructions and code generation patterns
+  - **Regenerates**: Full `automaton.kernel.canvasl` via R5RS functions
+
+- **`evolutions/metaverse.shape.canvasl`**: Metaverse shape topology
+  - 8D affine space and S7 boundary
+  - Stratification levels (0D-7D) for topology and system partitions
+  - Horizontal edges (topology→system) and vertical edges (dimensional progression)
+  - Bipartite-BQF encoding for each dimension
+
+- **`evolutions/metaverse.centroid.canvasl`**: Metaverse centroid and identity
+  - Virtual centroid with 8D coordinates
+  - Schläfli symbol averages and Betti number modes
+  - Federated identity across self-dual geometries
+  - Projective and affine space identities
+
+- **`evolutions/autonomous.basis.canvasl`**: Autonomous basis for self-sustaining operations
+  - Self-regeneration capabilities
+  - Autonomous evolution and goal negotiation
+  - Self-modification and performance optimization
+  - Links to kernel seed, metaverse shape, and centroid
+
+### Usage Priority
+1. **Start with**: `unified.automaton.canvasl` for complete system view
+2. **Regeneration**: Use `automaton.kernel.seed.canvasl` to regenerate full kernel
+3. **Topology**: Reference `metaverse.shape.canvasl` for dimensional structure
+4. **Identity**: Use `metaverse.centroid.canvasl` for federated identity operations
+5. **Autonomy**: Reference `autonomous.basis.canvasl` for self-sustaining capabilities
+
+## Research Automaton Directories (Comparison)
+
+These directories contain research automatons for comparing different implementation approaches. They are **NOT** production files but are used for:
+- Comparing implementation strategies
+- Researching computational geometries
+- Exploring alternative approaches
+- Validating theoretical foundations
+
+### Research Directories
+- **`docs/31-Understanding-Computational-Geometries/`**: Research on dimensional geometric mapping, Archimedean solids, shared virtual centroids, GECS vs Bipartite-BQF, binary floating-point topology, transformer model integration, monads/functors/comonads/perceptron
+- **`docs/32-Regulay-Polyhedra-Geometry/`**: Research on Platonic solids, Archimedean solids, geometric properties, computational mapping, BQF encoding, consensus patterns, constraint pointers, categorical foundations, E8 lattice integration, comonadic ports federation, temporal models categorical
+- **`docs/33-Autonomous-CanvasL/`**: Research on autonomous CanvasL specifications, protocol specifications, kernel seed and autonomous implementation plans
+
+**Note**: When implementing production features, prefer the primary automaton files listed above. Use research directories for understanding alternative approaches and theoretical foundations.
+
+## Latest Knowledge and Implementation Directories
+
+**PRIORITY**: These directories contain the most recent knowledge, specifications, and implementation details. Always check these first when implementing new features:
+
+### Core Implementation Directories
+- **`docs/25-Church-Encoding-Metaverse-Presentation/`**: Foundational research and evolution
+  - SPARQL Agent Protection System
+  - ProLog Rules Explained
+  - DataLog in the Semantic Web
+  - Answer Set Programming in the Semantic Web
+  - Complete overview of presentation system evolution
+
+- **`docs/26-CanvasL-Semantic-Slides-Project/`**: Semantic slides implementation
+  - CanvasL Semantic Slides Project specification
+  - Public-Private Integration with Agent Protection
+  - Status and implementation details
+  - Browser-native semantic reasoning stack
+
+- **`docs/27-Meta-Log-Browser-Db/`**: Browser-based Meta-Log database
+  - Browser API reference and architecture
+  - IndexedDB persistence implementation
+  - BIP32-39-44 integration for cryptographic operations
+  - Migration guide from server-side to browser-native
+
+- **`docs/28-Canvasl-Frontmatter-Knowledge-Model/`**: Bipartite-BQF CanvasL Extension (v1.0.0)
+  - Meta-specification coordinating all specs
+  - Bipartite-BQF extension RFC2119 specification
+  - Protocol specification for Bipartite-BQF operations
+  - Frontmatter integration specification
+  - Complete examples and reference materials
+
+- **`docs/29-Bipartite-BQF-Federated-Offscreen-Workers/`**: Federated provenance with offscreen workers
+  - Federated Provenance Canvas Integration Plan
+  - Phase completion summaries
+  - Implementation details and API reference
+  - Developer guide and troubleshooting
+  - Workflow walkthroughs
+
+- **`docs/30-Provanance-Canvas-Renderer/`**: Provenance-aware canvas rendering
+  - Provenance Canvas Renderer RFC2119 specification
+  - Protocol specification
+  - Rendering evolution and testing
+  - Complete rendering system documentation
+
+### Research and Comparison Directories
+- **`docs/31-Understanding-Computational-Geometries/`**: Computational geometry research
+- **`docs/32-Regulay-Polyhedra-Geometry/`**: Regular polyhedra research
+- **`docs/33-Autonomous-CanvasL/`**: Autonomous CanvasL research
+
+**When Implementing Features**:
+1. **Check latest knowledge directories first** (docs/25-30) for current specifications
+2. **Reference primary automaton files** (evolutions/*.canvasl) for production patterns
+3. **Use research directories** (docs/31-33) for alternative approaches and theoretical validation
+4. **Follow RFC2119 specifications** in the latest knowledge directories
+
+## Code Style and Formatting
+
+### TypeScript/JavaScript
+- Use TypeScript for all new code
+- Follow existing code style (check similar files)
+- Use async/await for asynchronous operations
+- Prefer named exports over default exports
+- Use descriptive variable and function names
+- Add JSDoc comments for public APIs
+
+### File Naming
+- Use kebab-case for file names: `automaton-kernel.jsonl`, `r5rs-canvas-engine.scm`
+- Use camelCase for TypeScript files: `automatonRunner.ts`, `advancedAutomaton.ts`
+- Use descriptive names that indicate purpose
+
+### Code Organization
+- Group related functionality in modules
+- Keep functions focused and single-purpose
+- Use dependency injection for testability
+- Follow the existing project structure in `src/`
+
+## File Format Conventions
+
+### JSONL Files
+- One JSON object per line
+- Include `selfReference` metadata for provenance tracking
+- Use `id`, `type`, `metadata` structure consistently
+- Support both JSONL and CanvasL formats
+
+### CanvasL Format
+- Support directives: `@version`, `@schema`
+- Support R5RS function calls: `{"type": "r5rs-call", "function": "r5rs:church-add"}`
+- Support dimension references: `{"dimension": "0D"}`
+- Support node references: `{"fromNode": "#0D-topology"}`
+
+### R5RS Scheme Files
+- Follow R5RS Scheme standard
+- Use prefix `r5rs:` for function names
+- Document functions with comments
+- Support Church encoding operations
+
+## R5RS Function Integration
+
+### Required Functions
+When implementing features that require R5RS operations, use these functions:
+- **Church Encoding**: `r5rs:church-zero`, `r5rs:church-succ`, `r5rs:church-add`, `r5rs:church-mult`, `r5rs:church-exp`
+- **JSONL Operations**: `r5rs:parse-jsonl-canvas`, `r5rs:extract-facts`, `r5rs:query-facts`
+- **RDF Operations**: `r5rs:jsonl-to-rdf`, `r5rs:rdf-query`, `r5rs:sparql-query`
+- **Logic Programming**: `r5rs:prolog-query`, `r5rs:datalog-query`, `r5rs:build-prolog-db`
+- **Validation**: `r5rs:load-shacl-shapes`, `r5rs:shacl-validate`
+
+### Function Naming
+- All R5RS functions MUST use `r5rs:` prefix
+- Function names should be descriptive and follow Scheme conventions
+- Document function signatures and usage
+
+## Agent Responsibilities
+
+### When Implementing Agent Features
+- **0D-Topology-Agent**: Core automaton engine operations, identity processes
+- **1D-Temporal-Agent**: Temporal evolution, Church successor operations
+- **2D-Structural-Agent**: Pattern operations, bipartite graph structure, BQF encoding
+- **3D-Algebraic-Agent**: Church algebra operations (add, mult, exp)
+- **4D-Network-Agent**: Network operations, CI/CD deployments, automaton execution
+- **5D-Consensus-Agent**: Consensus operations, deployment approvals, bootstrap validation
+- **6D-Intelligence-Agent**: AI operations, test analysis, performance metrics
+- **7D-Quantum-Agent**: Quantum operations, qubit systems
+- **Query-Interface-Agent**: SPARQL/REPL access, ProLog/DataLog queries
+- **Self-Modification-Agent**: Canvas JSONL rewriting, SHACL validation
+
+## Documentation Requirements
+
+### When Creating or Updating Documentation
+- Use Obsidian frontmatter format with required fields:
+  - `id`: Unique identifier
+  - `title`: Document title
+  - `level`: foundational | intermediate | advanced
+  - `type`: specification | guide | reference
+  - `tags`: Array of relevant tags
+  - `prerequisites`: Array of prerequisite document IDs
+  - `enables`: Array of documents this enables
+  - `related`: Array of related document IDs
+
+### Documentation Structure
+- Follow existing structure in `docs/` directory
+- Create README.md files for each major section
+- Include code examples with proper formatting
+- Reference related documentation using document IDs
+
+## Testing Requirements
+
+### Test Organization
+- Unit tests in `tests/unit/`
+- E2E tests in `tests/e2e/`
+- Use Jest for unit tests
+- Use Playwright for E2E tests
+
+### Test Naming
+- Use descriptive test names: `test-automaton-execution.ts`
+- Group related tests in describe blocks
+- Use `it()` for individual test cases
+
+### Running Tests
+- `npm run test` - Run all unit tests
+- `npm run test:e2e` - Run E2E tests
+- `npm run test:all` - Run all tests
+
+## Automaton Execution
+
+### Automaton Files
+- Support both JSONL and CanvasL formats
+- Use `scripts/run-automaton.sh` for execution
+- Support dimensional progression (0D-7D)
+- Include self-reference metadata
+
+### Automaton Scripts
+- `continuous-automaton.ts`: Built-in intelligence automaton
+- `ollama-automaton.ts`: Ollama AI-powered automaton
+- `advanced-automaton.ts`: Core automaton engine
+- `bootstrap-automaton.ts`: Bootstrap process
+
+## CI/CD Integration
+
+### When Implementing CI/CD Features
+- Use CI Pipeline Adapter pattern
+- Support GitHub Actions, GitLab CI, Jenkins
+- Integrate with agent operations:
+  - **4D-Network-Agent**: Deployment operations
+  - **5D-Consensus-Agent**: Approval workflows
+  - **6D-Intelligence-Agent**: Test analysis
+
+### CI/CD Files
+- Workflow files in `.github/workflows/`
+- Use environment variables for configuration
+- Follow existing CI/CD patterns
+
+## Provenance and Deduplication
+
+### Provenance Requirements
+- MUST preserve provenance through all transformations
+- MUST maintain file and line accuracy in `selfReference` metadata
+- MUST handle missing provenance gracefully (warn, don't fail)
+- MUST implement provenance-aware deduplication
+
+### Deduplication Logic
+- Same-file duplicates: Merge provenance history, keep latest
+- Cross-file duplicates: Preserve both objects (federated provenance)
+- Track provenance history in `provenanceHistory` array
+
+## Error Handling
+
+### Best Practices
+- Use try-catch blocks for async operations
+- Log errors with context (file, line, operation)
+- Provide meaningful error messages
+- Don't fail silently - always log or throw
+
+### Error Types
+- Validation errors: SHACL, RFC2119, ASP constraints
+- Runtime errors: Network failures, parsing errors
+- Logic errors: ProLog/DataLog query failures
+
+## Performance Considerations
+
+### Optimization Guidelines
+- Use efficient data structures for large JSONL files
+- Cache parsed results when possible
+- Optimize R5RS function calls
+- Monitor memory usage for automaton execution
+
+### Memory Management
+- Clean up resources after operations
+- Avoid memory leaks in long-running processes
+- Use streaming for large file operations
+
+## Security Requirements
+
+### Authentication and Authorization
+- Use JWT for authentication
+- Implement role-based access control
+- Validate all inputs
+- Sanitize user-provided data
+
+### Data Protection
+- Don't expose sensitive data in logs
+- Use environment variables for secrets
+- Validate all file operations
+- Implement rate limiting for APIs
+
+## Code Citation Rules
+
+### When Referencing Existing Code
+- Use CODE REFERENCES format: ```startLine:endLine:filepath
+- Include at least 1 line of actual code
+- Don't add language tags to code references
+- Don't indent triple backticks
+
+### When Showing New Code
+- Use standard markdown code blocks with language tag
+- Include complete, runnable examples
+- Add comments for clarity
+
+## Common Patterns
+
+### JSONL Parsing
+```typescript
+import { parseJSONL } from './jsonl-parser';
+const objects = await parseJSONL(filePath);
+```
+
+### R5RS Function Calls
+```typescript
+const result = await r5rsEngine.call('r5rs:church-add', [2, 3]);
+```
+
+### Agent Operations
+```typescript
+const result = await agentApi.executeAgent('2D-Structural-Agent', {
+  operation: 'buildBipartiteGraph',
+  parameters: { canvasFile: 'automaton-kernel.jsonl' }
+});
+```
+
+### ProLog Queries
+```typescript
+const db = await r5rsEngine.buildPrologDB(triples);
+const results = await r5rsEngine.prologQuery(db, 'inherits(X, Z)');
+```
+
+## File Locations
+
+### Key Directories
+- `docs/`: Documentation (organized by topic)
+  - **Priority**: `docs/25-30/` contain latest knowledge and implementations
+  - **Research**: `docs/31-33/` contain research automatons for comparison
+- `evolutions/`: Evolution variants and knowledge systems
+  - **Primary**: Contains main production automaton files (see "Primary Automaton Files" section)
+- `src/`: Source code
+- `scripts/`: Shell scripts and automation
+- `tests/`: Test files
+- `grok_files/`: R5RS concept definitions
+- `meta-log-db/`: Meta-Log database package
+- `plugin/`: Plugin implementations
+
+### Key Files
+- `AGENTS.md`: Multi-agent system specification
+- `r5rs-canvas-engine.scm`: R5RS function implementations
+- `evolutions/unified.automaton.canvasl`: **Primary** unified automaton (see "Primary Automaton Files")
+- `evolutions/automaton.kernel.seed.canvasl`: **Primary** kernel seed for regeneration
+- `evolutions/metaverse.shape.canvasl`: **Primary** metaverse shape topology
+- `evolutions/metaverse.centroid.canvasl`: **Primary** metaverse centroid and identity
+- `evolutions/autonomous.basis.canvasl`: **Primary** autonomous basis
+- `automaton-kernel.jsonl`: Core automaton kernel (legacy, prefer CanvasL versions)
+- `generate.metaverse.jsonl`: Metaverse generator
+- `package.json`: Project dependencies and scripts
+
+## When in Doubt
+
+1. **Check primary automaton files first**: Reference `evolutions/unified.automaton.canvasl` and related files
+2. **Check latest knowledge directories**: Review `docs/25-30/` for current specifications and implementations
+3. **Check existing code**: Look for similar implementations in primary automaton files
+4. **Read documentation**: Check `docs/` directory for specifications (prioritize docs/25-30)
+5. **Follow patterns**: Use existing code patterns from primary automaton files
+6. **Reference research directories**: Use `docs/31-33/` for alternative approaches and theoretical validation
+7. **Ask questions**: If unclear, reference the AGENTS.md specification
+8. **Test thoroughly**: Write tests for new features
+9. **Document changes**: Update relevant documentation
+
+## Quick Reference
+
+### Common Commands
+- `npm run dev` - Start development server
+- `npm run build` - Build production bundle
+- `npm run test` - Run unit tests
+- `npm run test:e2e` - Run E2E tests
+- `./scripts/run-automaton.sh` - Run automaton execution
+
+### Key Documentation
+**Latest Knowledge (Priority)**:
+- `docs/25-Church-Encoding-Metaverse-Presentation/`: Foundational research and evolution
+- `docs/26-CanvasL-Semantic-Slides-Project/`: Semantic slides implementation
+- `docs/27-Meta-Log-Browser-Db/`: Browser-based Meta-Log database
+- `docs/28-Canvasl-Frontmatter-Knowledge-Model/`: Bipartite-BQF CanvasL Extension
+- `docs/29-Bipartite-BQF-Federated-Offscreen-Workers/`: Federated provenance
+- `docs/30-Provanance-Canvas-Renderer/`: Provenance-aware rendering
+
+**Core Documentation**:
+- `docs/03-Metaverse-Canvas/`: Canvas editing system
+- `docs/04-CanvasL/`: CanvasL format specification
+- `docs/05-Meta-Log/`: Meta-Log integration
+- `docs/11-Automatons/`: Automaton execution
+- `docs/10-Github-CI-CD-Workflow/`: CI/CD integration
+
+**Primary Automaton Files**:
+- `evolutions/unified.automaton.canvasl`: Unified automaton (start here)
+- `evolutions/automaton.kernel.seed.canvasl`: Kernel seed for regeneration
+- `evolutions/metaverse.shape.canvasl`: Metaverse shape topology
+- `evolutions/metaverse.centroid.canvasl`: Metaverse centroid and identity
+- `evolutions/autonomous.basis.canvasl`: Autonomous basis
+
+### Agent Quick Reference
+- **0D-2D**: Foundation operations (topology, temporal, structural)
+- **3D-4D**: Operational operations (algebraic, network)
+- **5D-7D**: Advanced operations (consensus, intelligence, quantum)
+- **Interface**: Query, visualization, multiplayer
+- **Evolutionary**: Self-modification, goal-oriented
+
+---
+
+**Last Updated**: 2025-01-07
+**Version**: 1.0.0
+**Project**: Automaton Computational Topology Canvas
+

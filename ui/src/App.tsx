@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Activity, Eye, MessageSquare, History, Zap, Sparkles, Cog, Brain, Code, Layers } from 'lucide-react';
+import { Activity, Eye, MessageSquare, History, Zap, Sparkles, Cog, Brain } from 'lucide-react';
 import { AutomatonProvider } from '@/contexts/AutomatonContext';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { ToastContainer } from '@/components/shared/Toast';
@@ -11,7 +11,6 @@ import SelfReferenceAnalyzer from '@/components/SelfReferenceAnalyzer/SelfRefere
 import AIPortal from '@/components/AIPortal/AIPortal';
 import MetaverseInterface from '@/components/AdvancedAnimations/MetaverseInterface';
 import Configuration from '@/components/Configuration/Configuration';
-import UnifiedEditor from './components/UnifiedEditor';
 
 const AppContent: React.FC = () => {
   const activeTab = useAutomatonStore((state) => state.activeTab);
@@ -22,8 +21,6 @@ const AppContent: React.FC = () => {
     { id: 'overview', label: 'Overview', icon: Activity },
     { id: 'analysis', label: 'Self-Reference', icon: Eye },
     { id: 'ai-portal', label: 'AI Portal', icon: Brain },
-    { id: 'canvas-editor', label: 'Canvas Editor', icon: Layers },
-    { id: 'code-editor', label: 'Code Editor', icon: Code },
     { id: 'config', label: 'Config', icon: Cog }
   ];
 
@@ -192,41 +189,6 @@ const AppContent: React.FC = () => {
           </motion.div>
         )}
 
-        {/* Canvas Editor Tab - Dedicated Canvas Editor */}
-        {activeTab === 'canvas-editor' && (
-          <motion.div
-            id="tabpanel-canvas-editor"
-            role="tabpanel"
-            aria-labelledby="tab-canvas-editor"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="h-[calc(100vh-200px)] rounded-xl overflow-hidden shadow-xl"
-          >
-            <UnifiedEditor
-              filename="automaton.canvasl"
-              initialMode="canvas"
-              height="100%"
-            />
-          </motion.div>
-        )}
-
-        {/* Code Editor Tab - Unified Editor (Code + Canvas) */}
-        {activeTab === 'code-editor' && (
-          <motion.div
-            id="tabpanel-code-editor"
-            role="tabpanel"
-            aria-labelledby="tab-code-editor"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="h-[calc(100vh-200px)] rounded-xl overflow-hidden shadow-xl"
-          >
-            <UnifiedEditor
-              filename="editor.code"
-              initialMode="auto"
-              height="100%"
-            />
-          </motion.div>
-        )}
 
         {/* Configuration Tab */}
         {activeTab === 'config' && (

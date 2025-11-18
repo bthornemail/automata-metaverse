@@ -1,128 +1,51 @@
-# Automaton UI
+# Metaverse Portal
 
-Phase 1 implementation of the user interface for the Self-Referencing JSONL Automaton system.
+2D/3D/AR/VR Collaborative Agentic Universe Portal
 
-## Features Implemented
+## Overview
 
-### ✅ Core Components
-- **Dashboard**: Real-time status monitoring with dimensional progression
-- **DimensionalCanvas**: Interactive 8D topology visualization with D3.js
-- **ControlPanel**: Manual action execution and parameter controls
-- **WebSocket Integration**: Real-time updates from automaton backend
-- **TypeScript Architecture**: Full type safety with comprehensive interfaces
+Metaverse Portal provides immersive 3D visualization, AR/VR experiences, and collaborative agentic interactions for the automaton system. This package focuses on metaverse visualization and interaction, separate from canvas editing functionality.
 
-### ✅ Key Features
-- Real-time status monitoring (iterations, self-modifications, objects)
-- Interactive dimensional visualization (0D-7D progression)
-- Manual action execution with all 8 automaton actions
-- Dynamic parameter adjustment (interval, max iterations)
-- Dimension jumping capabilities
-- WebSocket connection management
-- Error handling and status indicators
-- Responsive design with Tailwind CSS
+## Features
 
-## Getting Started
+- **3D World Rendering**: WebGL-based 3D visualization using Three.js and React Three Fiber
+- **Metaverse Portal System**: Portal-based navigation and interaction
+- **Advanced Animations**: WebGL animations and effects
+- **Collaborative World**: Multi-user collaboration support
+- **Agent Visualization**: Visual representation of automaton agents
+- **Quantum Visualization**: Quantum state visualization
+- **Unified Metaverse View**: Comprehensive metaverse interface
 
-### Prerequisites
-- Node.js 18+
-- Automaton backend running on port 8080
+## Installation
 
-### Installation
 ```bash
-cd ui
-npm install
+npm install metaverse-portal
 ```
 
-### Development
-```bash
-npm run dev
+## Dependencies
+
+- `meta-log-db`: Core database engine for CanvasL/JSONL operations
+- `automata-metaverse`: Automaton execution engines
+- `three`: 3D graphics library
+- `@react-three/fiber`: React renderer for Three.js
+- `@react-three/drei`: Useful helpers for React Three Fiber
+
+## Usage
+
+```typescript
+import { MetaversePortal } from 'metaverse-portal';
+
+function App() {
+  return <MetaversePortal />;
+}
 ```
 
-### Build
-```bash
-npm run build
-```
+## Related Packages
 
-## Architecture
-
-### Components Structure
-```
-src/
-├── components/
-│   ├── Dashboard/           # Real-time status monitoring
-│   ├── DimensionalCanvas/   # 8D topology visualization
-│   └── ControlPanel/        # Action execution controls
-├── hooks/
-│   ├── useAutomatonState.ts  # State management
-│   └── useExecutionHistory.ts # History tracking
-├── services/
-│   ├── api.ts              # REST API client
-│   └── websocket.ts        # WebSocket client
-└── types/
-    └── index.ts            # TypeScript definitions
-```
-
-### Technology Stack
-- **React 18** with TypeScript
-- **Vite** for build tooling
-- **Tailwind CSS** for styling
-- **Framer Motion** for animations
-- **D3.js** for data visualization
-- **Lucide React** for icons
-
-## Backend Integration
-
-The UI expects a backend API running on `localhost:8080` with the following endpoints:
-
-### REST API
-- `GET /api/status` - Current automaton state
-- `POST /api/automaton/start` - Start execution
-- `POST /api/automaton/stop` - Stop execution
-- `POST /api/automaton/action` - Execute action
-- `POST /api/automaton/dimension` - Set dimension
-
-### WebSocket
-- `ws://localhost:8080/ws` - Real-time updates
-
-## Next Steps
-
-### Phase 2: Advanced Features
-- Self-reference analysis tools
-- Execution history visualization
-- Agent chat interface
-- Configuration management
-
-### Phase 3: Visualization
-- Quantum state visualization
-- Advanced animations
-- Interactive canvas manipulation
-
-## Design System
-
-### Color Scheme
-- **0D**: Indigo (#6366f1)
-- **1D**: Purple (#8b5cf6)
-- **2D**: Pink (#ec4899)
-- **3D**: Rose (#f43f5e)
-- **4D**: Orange (#f97316)
-- **5D**: Yellow (#eab308)
-- **6D**: Green (#22c55e)
-- **7D**: Cyan (#06b6d4)
-
-### Animations
-- Smooth transitions between states
-- Pulsing status indicators
-- Hover effects on interactive elements
-- Glow effects for active dimensions
-
-## Contributing
-
-1. Follow the established component structure
-2. Use TypeScript for all new code
-3. Maintain responsive design principles
-4. Test with different screen sizes
-5. Ensure accessibility standards
+- **[meta-log-db](https://www.npmjs.com/package/meta-log-db)** - Core database engine
+- **[automata-metaverse](https://www.npmjs.com/package/automata-metaverse)** - Automaton execution engines
+- **[metaverse-projector](https://www.npmjs.com/package/metaverse-projector)** - Canvas-based template creation
 
 ## License
 
-MIT License - see LICENSE file for details
+MIT License

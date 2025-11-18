@@ -18,7 +18,6 @@ import { nlQueryService } from '@/services/nl-query-service';
 import { chatService, ChatMessage as ChatServiceMessage, ChatParticipant } from '@/services/chat-service';
 import { agentCommunicationService } from '@/services/agent-communication-service';
 import { useAgentAPI } from '@/hooks/useAgentAPI';
-import UnifiedEditor from '@/components/UnifiedEditor';
 import { dimensionConfig } from '@/components/AdvancedAnimations/WebGLMetaverseEvolution';
 // Import refactored components
 import { ChatPanel } from './components/ChatPanel';
@@ -2258,15 +2257,8 @@ Generate a helpful, informative response:
 
                 {/* Editor View */}
                 {canvasEditorView === 'editor' && (
-                  <div className="border border-gray-700 rounded-lg overflow-hidden" style={{ height: '600px' }}>
-                    <UnifiedEditor
-                      filename={selectedJSONLFile}
-                      initialMode="auto"
-                      height="100%"
-                      onSave={(content, format) => {
-                        addEvolutionLog(`Saved canvas: ${selectedJSONLFile} (${format})`);
-                      }}
-                    />
+                  <div className="border border-gray-700 rounded-lg overflow-hidden p-4" style={{ height: '600px' }}>
+                    <p className="text-gray-400">Canvas editor moved to metaverse-projector package</p>
                   </div>
                 )}
 

@@ -71,3 +71,5 @@ benchmark-results-*.jsonl
 =======
 .git-rewrite/
 >>>>>>> 71ce46d279589c911f7d42ffe985427007f54c36
+mosquitto.db
+speak-generate-templates/.git

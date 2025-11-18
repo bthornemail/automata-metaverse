@@ -1,0 +1,26 @@
+* Peer Identity
+:PROPERTIES:
+:PEER_ID: peer-abc123
+:PEER_MNEMONIC: abandon ability able about above absent absorb abstract absurd abuse access accident
+:PEER_PUBLIC_KEY: 0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef
+:CRYPTO_PATH: m/44'/meta-log'/0'/0/0
+:END:
+
+* MQTT Configuration
+:PROPERTIES:
+:MQTT_BROKER: mqtt://broker.example.com:1883
+:MQTT_TOPIC: canvasl/peers/#
+:MQTT_CLIENT_ID: emacs-peer-abc123
+:MQTT_USERNAME: username
+:MQTT_PASSWORD: password
+:END:
+
+* WebRTC Peer Connection
+:PROPERTIES:
+:PEER_ID: peer-xyz789
+:PEER_ADDRESS: webrtc://peer-xyz789.example.com:8080
+:PEER_PUBLIC_KEY: 0xfedcba0987654321fedcba0987654321fedcba0987654321fedcba0987654321
+:CONNECTION_STATUS: connected
+:LAST_SYNC: 2025-01-07T12:00:00Z
+:END:
+
