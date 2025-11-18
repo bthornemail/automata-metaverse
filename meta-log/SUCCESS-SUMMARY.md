@@ -119,3 +119,4 @@ docker compose exec meta-log mosquitto_pub \
 
 **The federation system is fully operational and ready for use!**
 
+

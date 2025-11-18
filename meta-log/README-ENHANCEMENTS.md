@@ -79,3 +79,4 @@ Execute computations with cryptographic proofs:
 - **Enhancements Summary**: `ENHANCEMENTS-SUMMARY.md`
 - **Demos**: `examples/collective-intelligence-demo.el`, `examples/verifiable-computation-demo.el`
 
+

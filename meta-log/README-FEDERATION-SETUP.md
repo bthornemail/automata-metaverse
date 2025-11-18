@@ -85,3 +85,4 @@ docker compose logs meta-log | grep "Federation initialized"
 - Federation auto-init enabled in Docker
 - Peer-to-peer CanvasL synchronization implemented and documented
 
+
