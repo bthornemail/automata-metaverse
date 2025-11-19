@@ -665,6 +665,50 @@ Returns (private-key public-key chain-code)."
   (let ((path (meta-log-crypto-derive-bip44-path 44 'meta-log account change index)))
     (meta-log-crypto-derive-key seed path)))
 
+;;; Local Identity Management
+
+(defvar meta-log-crypto--local-identity nil
+  "Local identity (public key) for this node.")
+
+(defvar meta-log-crypto--local-private-key nil
+  "Local private key for this node.")
+
+(defun meta-log-crypto-set-local-identity (mnemonic-or-seed &optional passphrase)
+  "Set local identity from mnemonic or seed.
+
+MNEMONIC-OR-SEED can be:
+- A BIP39 mnemonic (list of words or space-separated string)
+- A 64-byte seed (list of bytes)
+
+PASSPHRASE is optional passphrase for mnemonic.
+
+Derives the local identity (public key) and stores it globally."
+  (interactive "sMnemonic or seed: \nsPassphrase (optional): ")
+  (let* ((seed (if (and (listp mnemonic-or-seed) (= (length mnemonic-or-seed) 64))
+                   ;; Already a seed
+                   mnemonic-or-seed
+                 ;; Convert mnemonic to seed
+                 (meta-log-crypto-mnemonic-to-seed mnemonic-or-seed passphrase)))
+         (keys (meta-log-crypto-derive-meta-log-key seed 0 0 0))
+         (private-key (nth 0 keys))
+         (public-key (nth 1 keys)))
+    (setq meta-log-crypto--local-private-key private-key)
+    (setq meta-log-crypto--local-identity public-key)
+    (message "Local identity set: %s" (meta-log-crypto-format-key public-key))
+    public-key))
+
+(defun meta-log-crypto-get-local-identity ()
+  "Get the local identity (public key).
+
+Returns the public key as a list of bytes, or nil if not set."
+  meta-log-crypto--local-identity)
+
+(defun meta-log-crypto-get-local-private-key ()
+  "Get the local private key.
+
+Returns the private key as a list of bytes, or nil if not set."
+  meta-log-crypto--local-private-key)
+
 (provide 'meta-log-crypto)
 
 ;;; meta-log-crypto.el ends here
