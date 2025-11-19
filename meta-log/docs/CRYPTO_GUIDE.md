@@ -1,3 +1,11 @@
+---
+layout: default
+title: Cryptography Guide
+nav_order: 6
+description: "Cryptographic identity management"
+permalink: /CRYPTO_GUIDE
+---
+
 # Cryptographic Operations Guide
 
 Guide for using BIP32/39/44 cryptographic operations in meta-log.

@@ -1,0 +1,93 @@
+# Jekyll configuration for meta-log GitHub Pages
+
+title: meta-log
+description: Abstraction layer for automaton systems with Prolog, Datalog, and R5RS integration
+baseurl: "/meta-log"
+url: "https://bthornemail.github.io"
+
+# Theme
+theme: jekyll-theme-cayman
+# remote_theme: just-the-docs/just-the-docs
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+
+# Kramdown settings
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+  auto_ids: true
+  toc_levels: 1..3
+
+# Collections
+collections:
+  docs:
+    output: true
+    permalink: /:collection/:name
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "default"
+  - scope:
+      path: ""
+      type: "docs"
+    values:
+      layout: "default"
+
+# Navigation
+navigation:
+  - title: Home
+    url: /
+  - title: User Guide
+    url: /USER_GUIDE
+  - title: Modules
+    url: /MODULES
+  - title: API Reference
+    url: /API_REFERENCE
+  - title: Federation Guide
+    url: /FEDERATION_GUIDE
+  - title: Crypto Guide
+    url: /CRYPTO_GUIDE
+  - title: Protocol Handlers
+    url: /PROTOCOL_HANDLERS
+  - title: Template Discovery
+    url: /TEMPLATE-DISCOVERY-BRIDGE
+  - title: Better than LLM
+    url: /BETTER-THAN-LLM
+  - title: Potential Additions
+    url: /POTENTIAL-ADDITIONS
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+  - .bundle
+  - README.md
+
+# Include
+include:
+  - _pages
+
+# Plugins
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+  - jekyll-feed
+
+# SEO
+author: Brian Thorne
+twitter:
+  username: bthornemail
+  card: summary
+logo: /assets/images/logo.png
+
+# GitHub
+github:
+  repository_url: https://github.com/bthornemail/meta-log
+  is_project_page: true

@@ -27,7 +27,7 @@
 (defvar meta-log-template-discovery--template-cache (make-hash-table :test 'equal)
   "Cache for discovered templates.")
 
-(defstruct meta-log-template
+(cl-defstruct meta-log-template
   "Structure for template metadata."
   id
   name
@@ -168,7 +168,7 @@ Returns list of matching templates."
                                      :similarity-score similarity)))
                       (push template templates)))))))))
     (kill-buffer buffer)
-    templates))
+    templates)))
 
 (defun meta-log-template-discovery-calculate-similarity (keywords text)
   "Calculate similarity between keywords and text.

@@ -1,3 +1,11 @@
+---
+layout: default
+title: Template Discovery
+nav_order: 8
+description: "Dynamic template discovery system"
+permalink: /TEMPLATE-DISCOVERY-BRIDGE
+---
+
 # Template Discovery Bridge: Org Mode ↔ Canvas API ↔ WordNet ↔ meta-log
 
 ## Overview

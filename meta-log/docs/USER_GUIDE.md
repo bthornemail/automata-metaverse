@@ -1,3 +1,11 @@
+---
+layout: default
+title: User Guide
+nav_order: 2
+description: "Complete guide for using meta-log"
+permalink: /USER_GUIDE
+---
+
 # meta-log User Guide
 
 Complete guide for using meta-log to interact with automaton systems.
@@ -13,6 +21,7 @@ Complete guide for using meta-log to interact with automaton systems.
 7. [Datalog Queries](#datalog-queries)
 8. [R5RS Execution](#r5rs-execution)
 9. [Loading Automata](#loading-automata)
+10. [Optional Modules](#optional-modules)
 
 ## Installation
 
@@ -205,6 +214,77 @@ Then initialize:
 ```elisp
 (meta-log-initialize)
 ```
+
+## Optional Modules
+
+meta-log has a modular architecture. Core features are loaded automatically, but advanced features can be enabled by requiring additional modules.
+
+### Core vs Optional
+
+**Core modules** (loaded with `(require 'meta-log)`):
+- Prolog and Datalog engines
+- R5RS Scheme integration
+- M-expression parser
+- Natural language interface
+- Org Mode integration
+
+**Optional modules** (require separately):
+- Federation and networking
+- Cryptography and identity
+- Template discovery and sharing
+- Collective intelligence
+- Verifiable computation
+- And more...
+
+### Using Optional Modules
+
+To use federation features:
+
+```elisp
+(require 'meta-log)
+(require 'meta-log-federation)
+(require 'meta-log-mqtt)
+(require 'meta-log-webrtc)
+(require 'meta-log-identity)
+
+(meta-log-initialize)
+(meta-log-federation-init "~/.emacs.d/meta-log/blackboard.org")
+```
+
+To use template discovery:
+
+```elisp
+(require 'meta-log)
+(require 'meta-log-template-discovery)
+(require 'meta-log-wordnet)
+
+(meta-log-initialize)
+(let ((templates (meta-log-discover-template "peer identity management")))
+  (message "Found %d templates" (length templates)))
+```
+
+### Complete Module Documentation
+
+For comprehensive documentation on all optional modules, their features, dependencies, and usage examples, see:
+
+**[MODULES.md](MODULES.md)** - Complete module reference
+
+Key topics covered:
+- Detailed description of each optional module
+- External dependencies required
+- Usage examples and code samples
+- Dependency graph showing module relationships
+- Troubleshooting common issues
+
+### External Dependencies
+
+Some optional modules require external dependencies:
+
+- **Guile 3.0+**: Required for R5RS Scheme (core feature)
+- **Mosquitto MQTT broker**: Required for federation features
+- **npm**: Optional, for automaton-evolutions integration
+
+See [MODULES.md](MODULES.md) for complete dependency information.
 
 ## Examples
 

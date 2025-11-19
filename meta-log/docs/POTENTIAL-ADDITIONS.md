@@ -1,3 +1,11 @@
+---
+layout: default
+title: Potential Additions
+nav_order: 10
+description: "Future features and enhancements"
+permalink: /POTENTIAL-ADDITIONS
+---
+
 # Diverse List of Potential Additions to meta-log
 
 ## Natural Language & AI Enhancements

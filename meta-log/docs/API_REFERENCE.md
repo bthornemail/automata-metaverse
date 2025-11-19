@@ -1,3 +1,11 @@
+---
+layout: default
+title: API Reference
+nav_order: 4
+description: "Function and macro reference"
+permalink: /API_REFERENCE
+---
+
 # meta-log API Reference
 
 Complete API reference for meta-log package.

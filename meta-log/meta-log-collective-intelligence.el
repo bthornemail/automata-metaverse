@@ -115,7 +115,7 @@ Returns result or nil."
           (setq elapsed (- (float-time) start-time))))
       
       (when response-received
-        (gethash "result" response)))))
+        (gethash "result" response))))
 
 (defun meta-log-collective-intelligence-aggregate-results (peer-results query)
   "Aggregate results from multiple peers using consensus.
@@ -223,7 +223,7 @@ REQUEST is the parsed request message."
                   (meta-log-mqtt-publish meta-log-federation--mqtt-connection
                                          (format "canvasl/peers/%s/responses/%s" peer-id request-id)
                                          (json-encode (append response (list (cons 'signature signature))))))))
-          (error "Peer identity not initialized"))))
+          (error "Peer identity not initialized"))))))
 
 (defun meta-log-collective-intelligence-execute-query-locally (query)
   "Execute a query locally.

@@ -1,3 +1,11 @@
+---
+layout: default
+title: Federation Guide
+nav_order: 5
+description: "Guide to setting up federated systems"
+permalink: /FEDERATION_GUIDE
+---
+
 # Federation Guide
 
 Complete guide for using meta-log federation to synchronize Org Mode blackboards between multiple Emacs instances.

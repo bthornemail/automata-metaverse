@@ -26,7 +26,7 @@
 (defvar meta-log-verifiable-computation--verification-cache (make-hash-table :test 'equal)
   "Cache for verified computations.")
 
-(defstruct meta-log-verifiable-computation
+(cl-defstruct meta-log-verifiable-computation
   "Structure for verifiable computation."
   id
   function-name

@@ -1,0 +1,33 @@
+# Ignore Docker files (moved to docker/ directory)
+docker/
+
+# Ignore test files (moved to tests/ directory)
+tests/
+
+# Ignore development documentation (moved to dev-docs/ directory)
+dev-docs/
+
+# Ignore data directories
+automaton-evolutions/
+federation-data/
+metaverse-data/
+mosquitto/
+r5rs-canvas-engine.scm/
+
+# Ignore Emacs config directory
+.emacs.d/
+
+# Ignore build artifacts
+*.elc
+*~
+\#*\#
+
+# Ignore development-only docs from docs/ directory
+docs/BETTER-THAN-LLM.md
+docs/POTENTIAL-ADDITIONS.md
+
+# Keep these user-facing files:
+# - *.el (all elisp files)
+# - README.md, LICENSE, CHANGELOG.md
+# - docs/*.md (user guides)
+# - examples/ (useful for users)

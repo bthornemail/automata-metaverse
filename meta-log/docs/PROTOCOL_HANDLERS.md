@@ -1,3 +1,11 @@
+---
+layout: default
+title: Protocol Handlers
+nav_order: 7
+description: "CanvasL protocol handler documentation"
+permalink: /PROTOCOL_HANDLERS
+---
+
 # Protocol Handler Reference
 
 Reference for CanvasL protocol handlers in meta-log.

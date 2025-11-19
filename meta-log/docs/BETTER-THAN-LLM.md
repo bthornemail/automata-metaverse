@@ -1,3 +1,11 @@
+---
+layout: default
+title: Better than LLM
+nav_order: 9
+description: "Why meta-log is better than an LLM"
+permalink: /BETTER-THAN-LLM
+---
+
 # Making meta-log Better Than an LLM
 
 ## Overview
